@@ -42,8 +42,7 @@ parameters:
       - destroy
 
 variables:
-  - name: timeoutInMinutes
-    value: 60
+  timeoutInMinutes: 60
 
 stages:
   - stage: Init
@@ -54,7 +53,6 @@ stages:
           - checkout: self
           - script: terraform init
             displayName: "Terraform Init"
-            workingDirectory: $(System.DefaultWorkingDirectory)
 
   - stage: Plan
     dependsOn: Init
@@ -65,7 +63,6 @@ stages:
           - checkout: self
           - script: terraform plan -out=tfplan
             displayName: "Terraform Plan"
-            workingDirectory: $(System.DefaultWorkingDirectory)
 
   - stage: Apply
     dependsOn: Plan
@@ -77,4 +74,3 @@ stages:
           - checkout: self
           - script: terraform apply -auto-approve tfplan
             displayName: "Terraform Apply"
-            workingDirectory: $(System.DefaultWorkingDirectory)

@@ -33,7 +33,6 @@ parameters:
       - "UK South"
 
   - name: overrideAction
-    displayName: Override Action
     type: string
     default: plan
     values:
@@ -42,7 +41,8 @@ parameters:
       - destroy
 
 variables:
-  timeoutInMinutes: 60
+  - name: timeoutInMinutes
+    value: 60
 
 stages:
   - stage: Init
@@ -57,11 +57,17 @@ stages:
     dependsOn: Init
     jobs:
       - job: Plan
+        displayName: "Plan Terraform Changes"
         steps:
           - script: terraform plan -out=tfplan
             displayName: "Terraform Plan"
-          - script: |
-              if [ "${{ parameters.action }}" == "apply" ]; then
-                terraform apply -auto-approve tfplan
-              fi
+
+  - stage: Apply
+    dependsOn: Plan
+    condition: eq('${{ parameters.action }}', 'apply')
+    jobs:
+      - job: TerraformApply
+        displayName: "Apply Terraform Changes"
+        steps:
+          - script: terraform apply -auto-approve tfplan
             displayName: "Terraform Apply"

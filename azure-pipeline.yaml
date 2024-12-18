@@ -39,3 +39,19 @@ parameters:
       - plan
       - apply
       - destroy
+
+variables:
+  - name: timeoutInMinutes
+    value: 60
+
+stages:
+  - stage: Plan
+    jobs:
+      - job: Plan
+        steps:
+          - template: templates/terraform.yaml@cnp-azuredevops-libraries
+            parameters:
+              action: ${{ parameters.action }}
+              location: ${{ parameters.location }}
+              overrideAction: ${{ parameters.overrideAction }}
+              timeoutInMinutes: ${{ variables.timeoutInMinutes }}

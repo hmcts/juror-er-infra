@@ -33,6 +33,7 @@ parameters:
       - "UK South"
 
   - name: overrideAction
+    displayName: Override Action
     type: string
     default: plan
     values:
@@ -50,9 +51,10 @@ stages:
       - job: TerraformInit
         displayName: "Initialize Terraform"
         steps:
+          - checkout: self
           - script: terraform init
             displayName: "Terraform Init"
-            workingDirectory: $(System.DefaultWorkingDirectory)/juror-er-infra
+            workingDirectory: $(System.DefaultWorkingDirectory)
 
   - stage: Plan
     dependsOn: Init
@@ -60,9 +62,10 @@ stages:
       - job: Plan
         displayName: "Plan Terraform Changes"
         steps:
+          - checkout: self
           - script: terraform plan -out=tfplan
             displayName: "Terraform Plan"
-            workingDirectory: $(System.DefaultWorkingDirectory)/juror-er-infra
+            workingDirectory: $(System.DefaultWorkingDirectory)
 
   - stage: Apply
     dependsOn: Plan
@@ -71,6 +74,7 @@ stages:
       - job: TerraformApply
         displayName: "Apply Terraform Changes"
         steps:
+          - checkout: self
           - script: terraform apply -auto-approve tfplan
             displayName: "Terraform Apply"
-            workingDirectory: $(System.DefaultWorkingDirectory)/juror-er-infra
+            workingDirectory: $(System.DefaultWorkingDirectory)

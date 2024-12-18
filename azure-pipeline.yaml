@@ -45,7 +45,16 @@ variables:
     value: 60
 
 stages:
+  - stage: Init
+    jobs:
+      - job: TerraformInit
+        displayName: "Initialize Terraform"
+        steps:
+          - script: terraform init
+            displayName: "Terraform Init"
+
   - stage: Plan
+    dependsOn: Init
     jobs:
       - job: Plan
         steps:

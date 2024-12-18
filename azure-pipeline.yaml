@@ -53,6 +53,7 @@ stages:
           - checkout: self
           - script: terraform init
             displayName: "Terraform Init"
+            workingDirectory: $(System.DefaultWorkingDirectory)/juror-er-infra
 
   - stage: Plan
     dependsOn: Init
@@ -63,6 +64,7 @@ stages:
           - checkout: self
           - script: terraform plan -out=tfplan
             displayName: "Terraform Plan"
+            workingDirectory: $(System.DefaultWorkingDirectory)/juror-er-infra
 
   - stage: Apply
     dependsOn: Plan
@@ -74,3 +76,4 @@ stages:
           - checkout: self
           - script: terraform apply -auto-approve tfplan
             displayName: "Terraform Apply"
+            workingDirectory: $(System.DefaultWorkingDirectory)/juror-er-infra

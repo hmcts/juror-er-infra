@@ -33,6 +33,7 @@ parameters:
       - "UK South"
 
   - name: overrideAction
+    displayName: Override Action
     type: string
     default: plan
     values:
@@ -41,8 +42,7 @@ parameters:
       - destroy
 
 variables:
-  - name: timeoutInMinutes
-    value: 60
+  timeoutInMinutes: 60
 
 stages:
   - stage: Init
@@ -58,9 +58,10 @@ stages:
     jobs:
       - job: Plan
         steps:
-          - template: templates/terraform.yaml@cnp-azuredevops-libraries
-            parameters:
-              action: ${{ parameters.action }}
-              location: ${{ parameters.location }}
-              overrideAction: ${{ parameters.overrideAction }}
-              timeoutInMinutes: ${{ variables.timeoutInMinutes }}
+          - script: terraform plan -out=tfplan
+            displayName: "Terraform Plan"
+          - script: |
+              if [ "${{ parameters.action }}" == "apply" ]; then
+                terraform apply -auto-approve tfplan
+              fi
+            displayName: "Terraform Apply"

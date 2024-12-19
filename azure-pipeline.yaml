@@ -75,7 +75,7 @@ stages:
           - task: TerraformInstaller@1
             displayName: Install Terraform 1.10.3
             inputs:
-            terraformVersion: "1.10.3"
+              terraformVersion: "1.10.3"
           - template: steps/terraform.yaml@cnp-azuredevops-libraries
             parameters:
               location: ${{ parameters.location }}

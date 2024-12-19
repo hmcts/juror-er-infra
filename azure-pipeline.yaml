@@ -55,8 +55,6 @@ variables:
   - template: vars/input-variables.yaml@cnp-azuredevops-libraries
   - name: environment
     value: stg
-  - name: TF_VERSION
-    value: 1.10.3
 
 stages:
   # - stage: Precheck
@@ -74,6 +72,10 @@ stages:
     jobs:
       - job: PlanAndApply
         steps:
+          - task: TerraformInstaller@1
+            displayName: Install Terraform 1.10.3
+            inputs:
+            terraformVersion: "1.10.3"
           - template: steps/terraform.yaml@cnp-azuredevops-libraries
             parameters:
               location: ${{ parameters.location }}
@@ -81,7 +83,6 @@ stages:
               product: ${{ variables.product }}
               overrideAction: ${{ parameters.overrideAction }}
               environment: "sbox"
-              terraformVersion: ${{ variables.TF_VERSION }}
               terraformInitSubscription: ${{ variables.terraformInitSubscription }}
               tfVarsFile: NULL
               initCommandOptions: >

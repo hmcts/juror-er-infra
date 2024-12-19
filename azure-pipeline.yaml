@@ -57,17 +57,17 @@ variables:
     value: stg
 
 stages:
-  - stage: Precheck
-    jobs:
-      - job:
-        timeoutInMinutes: ${{ variables.timeoutInMinutes }}
-        steps:
-          - template: steps/terraform-precheck.yaml@cnp-azuredevops-libraries
-            parameters:
-              keyvaultName: "infra-vault-nonprod"
-              keyvaultSecret: "azure-devops-sp-token"
-              serviceConnection: "DCD-CFT-Sandbox"
-              overrideAction: ${{ parameters.overrideAction }}
+  # - stage: Precheck
+  #   jobs:
+  #     - job:
+  #       timeoutInMinutes: ${{ variables.timeoutInMinutes }}
+  #       steps:
+  #         - template: steps/terraform-precheck.yaml@cnp-azuredevops-libraries
+  #           parameters:
+  #             keyvaultName: "infra-vault-nonprod"
+  #             keyvaultSecret: "azure-devops-sp-token"
+  #             serviceConnection: "DCD-CFT-Sandbox"
+  #             overrideAction: ${{ parameters.overrideAction }}
   - stage: deploy
     jobs:
       - job: PlanAndApply

@@ -44,12 +44,6 @@ parameters:
 variables:
   - name: timeoutInMinutes
     value: 60
-  - name: project
-    value: "juror-er-infra"
-  - name: product
-    value: "sds-platform"
-  - name: terraformInitSubscription
-    value: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
   - name: action
     value: ${{ parameters.action }}
   - template: vars/input-variables.yaml@cnp-azuredevops-libraries
@@ -65,7 +59,7 @@ stages:
           - checkout: self
           - script: terraform init
             displayName: "Terraform Init"
-            workingDirectory: $(System.DefaultWorkingDirectory)
+            workingDirectory: $(System.DefaultWorkingDirectory)/components
 
   - stage: Plan
     dependsOn: Init
@@ -76,7 +70,7 @@ stages:
           - checkout: self
           - script: terraform plan -out=tfplan
             displayName: "Terraform Plan"
-            workingDirectory: $(System.DefaultWorkingDirectory)
+            workingDirectory: $(System.DefaultWorkingDirectory)/components
 
   - stage: Apply
     dependsOn: Plan
@@ -88,4 +82,4 @@ stages:
           - checkout: self
           - script: terraform apply -auto-approve tfplan
             displayName: "Terraform Apply"
-            workingDirectory: $(System.DefaultWorkingDirectory)
+            workingDirectory: $(System.DefaultWorkingDirectory)/components

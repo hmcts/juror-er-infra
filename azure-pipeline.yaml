@@ -79,7 +79,6 @@ stages:
               product: ${{ variables.product }}
               overrideAction: ${{ parameters.overrideAction }}
               environment: "sbox"
-              component: "components"
               terraformInitSubscription: ${{ variables.terraformInitSubscription }}
               tfVarsFile: NULL
               initCommandOptions: >

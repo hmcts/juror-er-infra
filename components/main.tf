@@ -5,7 +5,7 @@ module "datafactory" {
   product   = "baubais"
   component = "datafactory"
 
-  common_tags = module.common_tags.common_tags
+  common_tags = module.tags.common_tags
 }
 
 module "tags" {

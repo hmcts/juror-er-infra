@@ -1,5 +1,5 @@
 module "datafactory" {
-  source = "https://github.com/hmcts/terraform-module-azure-datafactory?ref=main"
+  source = "git::https://github.com/hmcts/terraform-module-azure-datafactory.git?ref=main"
   env    = var.env
 
   product   = "baubais"

@@ -58,7 +58,7 @@ variables:
   - name: TF_VERSION
     value: "1.10.3"
   - name: resource_group_name
-    value: "juror-er-stg-rg"
+    value: "azure-contorl-sbox-rg"
 
 stages:
   # - stage: Precheck

@@ -5,89 +5,77 @@ trigger:
     include:
       - main
 
-resources:
-  repositories:
-    - repository: cnp-azuredevops-libraries
-      type: github
-      ref: refs/heads/master
-      name: hmcts/cnp-azuredevops-libraries
-      endpoint: "hmcts"
+pr:
+  branches:
+    include:
+      - '*'
 
 pool:
-  vmImage: "ubuntu-latest"
-
-parameters:
-  - name: action
-    displayName: Action
-    type: string
-    default: plan
-    values:
-      - plan
-      - apply
-
-  - name: location
-    displayName: Location
-    type: string
-    default: "UK South"
-    values:
-      - "UK South"
-
-  - name: overrideAction
-    displayName: Override Action
-    type: string
-    default: plan
-    values:
-      - plan
-      - apply
-      - destroy
+  vmImage: 'ubuntu-latest'
 
 variables:
-  - name: timeoutInMinutes
-    value: 60
-  - name: project
-    value: "juror-er-infra"
-  - name: product
-    value: "sds-platform"
-  - name: terraformInitSubscription
-    value: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
-  - name: action
-    value: ${{ parameters.action }}
-  - template: vars/input-variables.yaml@cnp-azuredevops-libraries
-  - name: environment
-    value: stg
+  - name: terraformVersion
+    value: '1.5.7'
+  - name: SUBSCRIPTION_ID
+    value: '74dacd4f-a248-45bb-a2f0-af700dc4cf68'
+  - name: workingDirectory
+    value: '$(System.DefaultWorkingDirectory)'
 
 stages:
-  - stage: Precheck
-    displayName: 'Pre-deployment Check'
+  - stage: Terraform
     jobs:
-      - job:
-        timeoutInMinutes: ${{ variables.timeoutInMinutes }}
+      - job: terraform
         steps:
-          - template: steps/terraform-precheck.yaml@cnp-azuredevops-libraries
-            parameters:
-              keyvaultName: 'infra-vault-nonprod'
-              keyvaultSecret: 'azure-devops-sp-token'
-              serviceConnection: 'DCD-CFT-Sandbox'
-              overrideAction: ${{ parameters.overrideAction }}
+          - task: TerraformInstaller@1
+            displayName: 'Install Terraform $(terraformVersion)'
+            inputs:
+              terraformVersion: $(terraformVersion)
 
-  - stage: deploy
-    displayName: 'Deploy Infrastructure'
-    condition: always()
-    jobs:
-      - job: PlanAndApply
-        steps:
-          - template: steps/terraform.yaml@cnp-azuredevops-libraries
-            parameters:
-              location: ${{ parameters.location }}
-              serviceConnection: "DTS-SHAREDSERVICES-SBOX"
-              product: ${{ variables.product }}
-              overrideAction: ${{ parameters.overrideAction }}
-              environment: "sbox"
-              component: "lab"
-              terraformInitSubscription: ${{ variables.terraformInitSubscription }}
-              tfVarsFile: NULL
-              initCommandOptions: >
-                -reconfigure
-              planCommandOptions: >
-                -compact-warnings
-                -lock-timeout=30s
+          - task: AzureCLI@2
+            displayName: 'Azure CLI Login'
+            inputs:
+              azureSubscription: 'DTS-SHAREDSERVICES-SBOX'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az account set --subscription $(SUBSCRIPTION_ID)
+                az account show
+
+          - task: AzureCLI@2
+            displayName: 'Terraform Init'
+            inputs:
+              azureSubscription: 'DTS-SHAREDSERVICES-SBOX'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                terraform init -reconfigure
+              workingDirectory: $(workingDirectory)
+
+          - task: AzureCLI@2
+            displayName: 'Terraform Plan'
+            inputs:
+              azureSubscription: 'DTS-SHAREDSERVICES-SBOX'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                terraform plan -out=tfplan
+              workingDirectory: $(workingDirectory)
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Terraform Plan'
+            inputs:
+              targetPath: '$(workingDirectory)/tfplan'
+              artifact: 'terraformPlan'
+              publishLocation: 'pipeline'
+
+
+          - task: AzureCLI@2
+            displayName: 'Terraform Apply'
+            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+            inputs:
+              azureSubscription: 'DTS-SHAREDSERVICES-SBOX'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                terraform apply -auto-approve tfplan
+              workingDirectory: $(workingDirectory)

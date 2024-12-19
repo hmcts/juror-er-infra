@@ -76,6 +76,7 @@ stages:
             displayName: Install Terraform 1.10.3
             inputs:
               terraformVersion: "1.10.3"
+              terraformDownloadUrl: "https://releases.hashicorp.com/terraform/1.10.3/terraform_1.10.3_linux_amd64.zip"
           - template: steps/terraform.yaml@cnp-azuredevops-libraries
             parameters:
               location: ${{ parameters.location }}

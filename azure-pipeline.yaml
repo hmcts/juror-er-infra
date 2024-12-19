@@ -65,6 +65,7 @@ stages:
           - checkout: self
           - script: terraform init
             displayName: "Terraform Init"
+            workingDirectory: $(System.DefaultWorkingDirectory)
 
   - stage: Plan
     dependsOn: Init

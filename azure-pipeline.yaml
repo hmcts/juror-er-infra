@@ -55,6 +55,8 @@ variables:
   - template: vars/input-variables.yaml@cnp-azuredevops-libraries
   - name: environment
     value: stg
+  - name: TF_VERSION
+    value: "1.10.3"
 
 stages:
   # - stage: Precheck
@@ -72,11 +74,9 @@ stages:
     jobs:
       - job: PlanAndApply
         steps:
-          - task: TerraformInstaller@1
-            displayName: Install Terraform 1.10.3
+          - task: UseTerraform@1
             inputs:
-              terraformVersion: "1.10.3"
-              terraformDownloadUrl: "https://releases.hashicorp.com/terraform/1.10.3/terraform_1.10.3_linux_amd64.zip"
+              terraformVersion: $(TF_VERSION)
           - template: steps/terraform.yaml@cnp-azuredevops-libraries
             parameters:
               location: ${{ parameters.location }}

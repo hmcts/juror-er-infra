@@ -64,6 +64,8 @@ stages:
         steps:
           - checkout: self
           - script: terraform init
+            serviceConnection: "DTS-SHAREDSERVICES-SBOX"
+            terraformInitSubscription: ${{ variables.terraformInitSubscription }}
             displayName: "Terraform Init"
             workingDirectory: $(System.DefaultWorkingDirectory)/components
 

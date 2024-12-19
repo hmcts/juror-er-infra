@@ -74,9 +74,9 @@ stages:
     jobs:
       - job: PlanAndApply
         steps:
-          - task: UseTerraform@1
+          - task: TerraformInstaller@1
             inputs:
-              terraformVersion: $(TF_VERSION)
+              terraformVersion: ${{ variables.TF_VERSION }}
           - template: steps/terraform.yaml@cnp-azuredevops-libraries
             parameters:
               location: ${{ parameters.location }}

@@ -58,6 +58,8 @@ variables:
 
 stages:
   - stage: Precheck
+    displayName: 'Pre-deployment Check'
+    condition: succeeded()
     jobs:
       - job:
         timeoutInMinutes: ${{ variables.timeoutInMinutes }}
@@ -69,8 +71,9 @@ stages:
               serviceConnection: 'DCD-CFT-Sandbox'
               overrideAction: ${{ parameters.overrideAction }}
 
-
   - stage: deploy
+    displayName: 'Deploy Infrastructure'
+    condition: succeeded()
     jobs:
       - job: PlanAndApply
         steps:

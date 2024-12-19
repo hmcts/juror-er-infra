@@ -55,11 +55,13 @@ variables:
   - template: vars/input-variables.yaml@cnp-azuredevops-libraries
   - name: environment
     value: stg
+  - name: disable_terraform_nagger
+    value: true
 
 stages:
   - stage: Precheck
     displayName: 'Pre-deployment Check'
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['disable_terraform_nagger'], true))
     jobs:
       - job:
         timeoutInMinutes: ${{ variables.timeoutInMinutes }}
@@ -87,6 +89,7 @@ stages:
               component: "lab"
               terraformInitSubscription: ${{ variables.terraformInitSubscription }}
               tfVarsFile: NULL
+              disableTerraformNagger: true
               initCommandOptions: >
                 -reconfigure
               planCommandOptions: >

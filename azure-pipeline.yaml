@@ -5,91 +5,78 @@ trigger:
     include:
       - main
 
-resources:
-  repositories:
-    - repository: cnp-azuredevops-libraries
-      type: github
-      ref: refs/heads/master
-      name: hmcts/cnp-azuredevops-libraries
-      endpoint: "hmcts"
-
 pool:
   vmImage: "ubuntu-latest"
 
-parameters:
-  - name: action
-    displayName: Action
-    type: string
-    default: plan
-    values:
-      - plan
-      - apply
-
-  - name: location
-    displayName: Location
-    type: string
-    default: "UK South"
-    values:
-      - "UK South"
-
-  - name: overrideAction
-    displayName: Override Action
-    type: string
-    default: plan
-    values:
-      - plan
-      - apply
-      - destroy
-
 variables:
-  - name: timeoutInMinutes
-    value: 60
-  - name: project
-    value: "juror-er-infra"
-  - name: product
-    value: "sds-platform"
-  - name: terraformInitSubscription
+  - name: terraformVersion
+    value: "1.5.7"
+  - name: SUBSCRIPTION_ID
     value: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
-  - name: action
-    value: ${{ parameters.action }}
-  - template: vars/input-variables.yaml@cnp-azuredevops-libraries
-  - name: environment
-    value: stg
-  - name: TF_VERSION
-    value: "1.10.3"
-  - name: resource_group_name
-    value: "azure-contorl-sbox-rg"
+  - name: workingDirectory
+    value: "$(System.DefaultWorkingDirectory)/components"
+  - name: ARM_CLIENT_ID
+    value: $(servicePrincipalId)
+  - name: ARM_CLIENT_SECRET
+    value: $(servicePrincipalKey)
+  - name: ARM_SUBSCRIPTION_ID
+    value: $(SUBSCRIPTION_ID)
+  - name: ARM_TENANT_ID
+    value: $(tenantId)
 
 stages:
-  # - stage: Precheck
-  #   jobs:
-  #     - job:
-  #       timeoutInMinutes: ${{ variables.timeoutInMinutes }}
-  #       steps:
-  #         - template: steps/terraform-precheck.yaml@cnp-azuredevops-libraries
-  #           parameters:
-  #             keyvaultName: "infra-vault-nonprod"
-  #             keyvaultSecret: "azure-devops-sp-token"
-  #             serviceConnection: "DCD-CFT-Sandbox"
-  #             overrideAction: ${{ parameters.overrideAction }}
-  - stage: deploy
+  - stage: Terraform
     jobs:
-      - job: PlanAndApply
+      - job: terraform
         steps:
           - task: TerraformInstaller@1
+            displayName: "Install Terraform $(terraformVersion)"
             inputs:
-              terraformVersion: ${{ variables.TF_VERSION }}
-          - template: steps/terraform.yaml@cnp-azuredevops-libraries
-            parameters:
-              location: ${{ parameters.location }}
-              serviceConnection: "DTS-SHAREDSERVICES-SBOX"
-              product: ${{ variables.product }}
-              overrideAction: ${{ parameters.overrideAction }}
-              environment: "sbox"
-              terraformInitSubscription: ${{ variables.terraformInitSubscription }}
-              tfVarsFile: NULL
-              initCommandOptions: >
-                -reconfigure
-              planCommandOptions: >
-                -compact-warnings
-                -lock-timeout=30s
+              terraformVersion: $(terraformVersion)
+
+          - task: Bash@3
+            displayName: "Terraform Init"
+            env:
+              ARM_CLIENT_ID: $(servicePrincipalId)
+              ARM_CLIENT_SECRET: $(servicePrincipalKey)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(tenantId)
+            inputs:
+              targetType: "inline"
+              script: |
+                terraform init -reconfigure
+              workingDirectory: $(workingDirectory)
+
+          - task: Bash@3
+            displayName: "Terraform Plan"
+            env:
+              ARM_CLIENT_ID: $(servicePrincipalId)
+              ARM_CLIENT_SECRET: $(servicePrincipalKey)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(tenantId)
+            inputs:
+              targetType: "inline"
+              script: |
+                terraform plan -out=tfplan
+              workingDirectory: $(workingDirectory)
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Terraform Plan"
+            inputs:
+              targetPath: "$(workingDirectory)/tfplan"
+              artifact: "terraformPlan"
+              publishLocation: "pipeline"
+
+          - task: Bash@3
+            displayName: "Terraform Apply"
+            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+            env:
+              ARM_CLIENT_ID: $(servicePrincipalId)
+              ARM_CLIENT_SECRET: $(servicePrincipalKey)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(tenantId)
+            inputs:
+              targetType: "inline"
+              script: |
+                terraform apply -auto-approve tfplan
+              workingDirectory: $(workingDirectory)

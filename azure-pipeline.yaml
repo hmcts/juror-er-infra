@@ -15,7 +15,6 @@ variables:
     value: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
   - name: workingDirectory
     value: "$(System.DefaultWorkingDirectory)/components"
-  # Add environment variables for Terraform authentication
   - name: ARM_CLIENT_ID
     value: $(servicePrincipalId)
   - name: ARM_CLIENT_SECRET

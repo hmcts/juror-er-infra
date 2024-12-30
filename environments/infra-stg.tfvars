@@ -1,0 +1,6 @@
+env                  = "stg"
+resource_group_name  = "rg-juror-er"
+location             = "UK South"
+storage_account_name = "stojurorer"
+product              = "sds-platform"
+builtFrom            = "https://github.com/hmcts/juror-er-infra"

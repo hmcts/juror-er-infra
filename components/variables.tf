@@ -1,5 +1,6 @@
 variable "env" {
-  default = "stg"
+  type        = string
+  description = "this is the environment variable"
 }
 
 variable "location" {

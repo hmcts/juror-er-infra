@@ -49,8 +49,10 @@ variables:
     value: "sds-platform"
   - name: terraformVersion
     value: "1.5.7"
-  - name: SUBSCRIPTION_ID
+  - name: SUBSCRIPTION_ID_STG
     value: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
+  - name: SUBSCRIPTION_ID_PROD
+    value: "5ca62022-6aa2-4cee-aaa7-e7536c8d566c"
   - name: workingDirectory
     value: "$(System.DefaultWorkingDirectory)/components"
   - name: ARM_CLIENT_ID
@@ -96,7 +98,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -109,7 +111,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -130,7 +132,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -148,7 +150,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_PROD)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -161,7 +163,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_PROD)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -182,7 +184,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_PROD)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"

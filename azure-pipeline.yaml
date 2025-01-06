@@ -106,6 +106,11 @@ stages:
               artifact: "terraformPlan"
               publishLocation: "pipeline"
 
+  - stage: deploy
+    dependsOn: Precheck
+    jobs:
+      - job: PlanAndApply
+        steps:
           - task: Bash@3
             displayName: "Terraform Apply"
             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))

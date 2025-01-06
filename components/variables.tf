@@ -1,5 +1,6 @@
 variable "env" {
   type        = string
+  default     = ""
   description = "this is the environment variable"
 }
 

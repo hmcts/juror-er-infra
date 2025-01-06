@@ -71,8 +71,10 @@ variables:
     value: $(servicePrincipalId)
   - name: ARM_CLIENT_SECRET
     value: $(servicePrincipalKey)
-  - name: ARM_SUBSCRIPTION_ID
-    value: $(SUBSCRIPTION_ID)
+  - name: ARM_SUBSCRIPTION_ID_STG
+    value: $(SUBSCRIPTION_ID_STG)
+  - name: ARM_SUBSCRIPTION_ID_PROD
+    value: $(SUBSCRIPTION_ID_PROD)
   - name: ARM_TENANT_ID
     value: $(tenantId)
 
@@ -92,7 +94,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -110,7 +112,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -123,7 +125,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -144,7 +146,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -162,7 +164,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_PROD)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -175,7 +177,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_PROD)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"
@@ -196,7 +198,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_PROD)
+              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"

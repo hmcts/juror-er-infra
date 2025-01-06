@@ -1,7 +1,11 @@
 variable "env" {
   type        = string
-  default     = ""
   description = "this is the environment variable"
+  default     = "stg"
+  validation {
+    condition     = contains(["stg", "prod"], var.env)
+    error_message = "The environment must be one of 'stg', or 'prod'."
+  }
 }
 
 variable "location" {

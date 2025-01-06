@@ -114,7 +114,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                terraform plan -out=tfplan-stg
+                terraform plan -var-file=$(System.DefaultWorkingDirectory)/environments/infra-stg.tfvars -out=tfplan-stg
               workingDirectory: $(workingDirectory)
 
           - task: PublishPipelineArtifact@1
@@ -166,7 +166,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                terraform plan -out=tfplan-prod
+                terraform plan -var-file=$(System.DefaultWorkingDirectory)/environments/infra-prod.tfvars -out=tfplan-prod
               workingDirectory: $(workingDirectory)
 
           - task: PublishPipelineArtifact@1

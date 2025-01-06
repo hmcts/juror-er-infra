@@ -41,6 +41,12 @@ parameters:
       - destroy
 
 variables:
+  - name: timeoutInMinutes
+    value: 60
+  - name: project
+    value: "juror-er-infra"
+  - name: product
+    value: "sds-platform"
   - name: terraformVersion
     value: "1.5.7"
   - name: SUBSCRIPTION_ID
@@ -57,9 +63,10 @@ variables:
     value: $(tenantId)
 
 stages:
-  - stage: Terraform
+  - stage: Precheck
     jobs:
-      - job: terraform
+      - job: Precheck
+        timeoutInMinutes: ${{ variables.timeoutInMinutes }}
         steps:
           - task: TerraformInstaller@1
             displayName: "Install Terraform $(terraformVersion)"

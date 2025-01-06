@@ -40,13 +40,17 @@ parameters:
       - apply
       - destroy
 
-  - name: environment
-    displayName: Environment
-    type: string
-    default: "stg"
-    values:
-      - "stg"
-      - "prod"
+  - name: environment_components
+    type: object
+    default:
+      - deployment: "stg"
+        environment: "stg"
+        subscription: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
+        dependsOn: "Precheck"
+      - deployment: "prod"
+        environment: "prod"
+        subscription: "5ca62022-6aa2-4cee-aaa7-e7536c8d566c"
+        dependsOn: "deploy_stg"
 
 variables:
   - name: timeoutInMinutes

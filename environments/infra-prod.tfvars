@@ -1,1 +1,5 @@
-
+env                  = "prod"
+resource_group_name  = "rg-juror-er-prod"
+location             = "UK South"
+storage_account_name = "stojurorerprod"
+product              = "sds-platform"

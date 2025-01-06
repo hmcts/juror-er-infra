@@ -1,21 +1,23 @@
 variable "env" {
   type        = string
-  default     = "stg"
   description = "this is the environment variable"
 }
 
 variable "location" {
-  default = "UK South"
+  default     = "UK South"
+  description = "Location of the resource"
 
 }
 
 variable "resource_group_name" {
-  default = "rg-juror-er"
+  default     = "rg-juror-er"
+  description = "The resource group name"
 
 }
 
 variable "storage_account_name" {
-  default = "stojurorer"
+  default     = "stojurorer"
+  description = "The storage account name"
 
 }
 variable "product" {

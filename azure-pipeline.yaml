@@ -5,8 +5,40 @@ trigger:
     include:
       - main
 
+resources:
+  repositories:
+    - repository: cnp-azuredevops-libraries
+      type: github
+      ref: refs/heads/master
+      name: hmcts/cnp-azuredevops-libraries
+      endpoint: "hmcts"
+
 pool:
   vmImage: "ubuntu-latest"
+
+parameters:
+  - name: action
+    displayName: Action
+    type: string
+    default: plan
+    values:
+      - plan
+      - apply
+
+  - name: location
+    displayName: Location
+    type: string
+    default: "UK South"
+    values:
+      - "UK South"
+
+  - name: overrideAction
+    type: string
+    default: plan
+    values:
+      - plan
+      - apply
+      - destroy
 
 variables:
   - name: terraformVersion

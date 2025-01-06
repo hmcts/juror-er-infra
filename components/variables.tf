@@ -1,7 +1,7 @@
 variable "env" {
   type        = string
   description = "this is the environment variable"
-  default     = "prod"
+  default     = "stg"
 
 }
 

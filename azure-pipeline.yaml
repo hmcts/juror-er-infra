@@ -86,8 +86,13 @@ stages:
                 terraform init -reconfigure
               workingDirectory: $(workingDirectory)
 
+  - stage: deploy_stg
+    dependsOn: Precheck
+    jobs:
+      - job: PlanAndApplyStg
+        steps:
           - task: Bash@3
-            displayName: "Terraform Plan"
+            displayName: "Terraform Plan for Staging"
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
@@ -96,21 +101,16 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                terraform plan -out=tfplan
+                terraform plan -out=tfplan-stg
               workingDirectory: $(workingDirectory)
 
           - task: PublishPipelineArtifact@1
-            displayName: "Publish Terraform Plan"
+            displayName: "Publish Terraform Plan for Staging"
             inputs:
-              targetPath: "$(workingDirectory)/tfplan"
-              artifact: "terraformPlan"
+              targetPath: "$(workingDirectory)/tfplan-stg"
+              artifact: "terraformPlanStg"
               publishLocation: "pipeline"
 
-  - stage: deploy_stg
-    dependsOn: Precheck
-    jobs:
-      - job: PlanAndApplyStg
-        steps:
           - task: Bash@3
             displayName: "Terraform Apply for Staging"
             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
@@ -122,7 +122,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                terraform apply -auto-approve tfplan
+                terraform apply -auto-approve tfplan-stg
               workingDirectory: $(workingDirectory)
 
   - stage: deploy_prod
@@ -130,6 +130,26 @@ stages:
     jobs:
       - job: PlanAndApplyProd
         steps:
+          - task: Bash@3
+            displayName: "Terraform Plan for Production"
+            env:
+              ARM_CLIENT_ID: $(servicePrincipalId)
+              ARM_CLIENT_SECRET: $(servicePrincipalKey)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(tenantId)
+            inputs:
+              targetType: "inline"
+              script: |
+                terraform plan -out=tfplan-prod
+              workingDirectory: $(workingDirectory)
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Terraform Plan for Production"
+            inputs:
+              targetPath: "$(workingDirectory)/tfplan-prod"
+              artifact: "terraformPlanProd"
+              publishLocation: "pipeline"
+
           - task: Bash@3
             displayName: "Terraform Apply for Production"
             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
@@ -141,5 +161,5 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                terraform apply -auto-approve tfplan
+                terraform apply -auto-approve tfplan-prod
               workingDirectory: $(workingDirectory)

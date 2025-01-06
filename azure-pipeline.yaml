@@ -40,6 +40,14 @@ parameters:
       - apply
       - destroy
 
+  - name: environment
+    displayName: Environment
+    type: string
+    default: "stg"
+    values:
+      - "stg"
+      - "prod"
+
 variables:
   - name: timeoutInMinutes
     value: 60

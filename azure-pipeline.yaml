@@ -92,7 +92,7 @@ stages:
             env:
               ARM_CLIENT_ID: $(servicePrincipalId)
               ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              ARM_SUBSCRIPTION_ID: $(SUBSCRIPTION_ID_STG)
               ARM_TENANT_ID: $(tenantId)
             inputs:
               targetType: "inline"

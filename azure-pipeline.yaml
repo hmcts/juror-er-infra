@@ -154,54 +154,54 @@ stages:
                 terraform apply -auto-approve tfplan-stg
               workingDirectory: $(workingDirectory)
 
-  - stage: deploy_prod
-    dependsOn: deploy_stg
-    jobs:
-      - job: PlanAndApplyProd
-        steps:
-          - task: Bash@3
-            displayName: "Terraform Init for Production"
-            env:
-              ARM_CLIENT_ID: $(servicePrincipalId)
-              ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
-              ARM_TENANT_ID: $(tenantId)
-            inputs:
-              targetType: "inline"
-              script: |
-                terraform init -reconfigure
-              workingDirectory: $(workingDirectory)
+  # - stage: deploy_prod
+  #   dependsOn: deploy_stg
+  #   jobs:
+  #     - job: PlanAndApplyProd
+  #       steps:
+  #         - task: Bash@3
+  #           displayName: "Terraform Init for Production"
+  #           env:
+  #             ARM_CLIENT_ID: $(servicePrincipalId)
+  #             ARM_CLIENT_SECRET: $(servicePrincipalKey)
+  #             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
+  #             ARM_TENANT_ID: $(tenantId)
+  #           inputs:
+  #             targetType: "inline"
+  #             script: |
+  #               terraform init -reconfigure
+  #             workingDirectory: $(workingDirectory)
 
-          - task: Bash@3
-            displayName: "Terraform Plan for Production"
-            env:
-              ARM_CLIENT_ID: $(servicePrincipalId)
-              ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
-              ARM_TENANT_ID: $(tenantId)
-            inputs:
-              targetType: "inline"
-              script: |
-                terraform plan -var-file=$(System.DefaultWorkingDirectory)/environments/infra-prod.tfvars -out=tfplan-prod
-              workingDirectory: $(workingDirectory)
+  #         - task: Bash@3
+  #           displayName: "Terraform Plan for Production"
+  #           env:
+  #             ARM_CLIENT_ID: $(servicePrincipalId)
+  #             ARM_CLIENT_SECRET: $(servicePrincipalKey)
+  #             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
+  #             ARM_TENANT_ID: $(tenantId)
+  #           inputs:
+  #             targetType: "inline"
+  #             script: |
+  #               terraform plan -var-file=$(System.DefaultWorkingDirectory)/environments/infra-prod.tfvars -out=tfplan-prod
+  #             workingDirectory: $(workingDirectory)
 
-          - task: PublishPipelineArtifact@1
-            displayName: "Publish Terraform Plan for Production"
-            inputs:
-              targetPath: "$(workingDirectory)/tfplan-prod"
-              artifact: "terraformPlanProd"
-              publishLocation: "pipeline"
+  #         - task: PublishPipelineArtifact@1
+  #           displayName: "Publish Terraform Plan for Production"
+  #           inputs:
+  #             targetPath: "$(workingDirectory)/tfplan-prod"
+  #             artifact: "terraformPlanProd"
+  #             publishLocation: "pipeline"
 
-          - task: Bash@3
-            displayName: "Terraform Apply for Production"
-            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-            env:
-              ARM_CLIENT_ID: $(servicePrincipalId)
-              ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
-              ARM_TENANT_ID: $(tenantId)
-            inputs:
-              targetType: "inline"
-              script: |
-                terraform apply -auto-approve tfplan-prod
-              workingDirectory: $(workingDirectory)
+  #         - task: Bash@3
+  #           displayName: "Terraform Apply for Production"
+  #           condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  #           env:
+  #             ARM_CLIENT_ID: $(servicePrincipalId)
+  #             ARM_CLIENT_SECRET: $(servicePrincipalKey)
+  #             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
+  #             ARM_TENANT_ID: $(tenantId)
+  #           inputs:
+  #             targetType: "inline"
+  #             script: |
+  #               terraform apply -auto-approve tfplan-prod
+  #             workingDirectory: $(workingDirectory)

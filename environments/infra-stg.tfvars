@@ -1,5 +1,5 @@
 env                  = "stg"
-resource_group_name  = "rg-juror-er"
+resource_group_name  = "rg-juror-er-stg"
 location             = "UK South"
 storage_account_name = "stojurorer"
 product              = "sds-platform"

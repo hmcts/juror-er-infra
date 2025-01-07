@@ -12,7 +12,6 @@ variable "location" {
 }
 
 variable "resource_group_name" {
-  default     = "rg-juror-er"
   description = "The resource group name"
 
 }

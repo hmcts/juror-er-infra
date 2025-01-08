@@ -1,208 +1,78 @@
-name: juror-er-infra
 trigger:
   batch: true
   branches:
     include:
-      - main
+    - master
 
 resources:
   repositories:
-    - repository: cnp-azuredevops-libraries
-      type: github
-      ref: refs/heads/master
-      name: hmcts/cnp-azuredevops-libraries
-      endpoint: "hmcts"
-
-pool:
-  vmImage: "ubuntu-latest"
-
-parameters:
-  - name: action
-    displayName: Action
-    type: string
-    default: plan
-    values:
-      - plan
-      - apply
-
-  - name: location
-    displayName: Location
-    type: string
-    default: "UK South"
-    values:
-      - "UK South"
-
-  - name: overrideAction
-    type: string
-    default: plan
-    values:
-      - plan
-      - apply
-      - destroy
-
-  - name: environment_components
-    type: object
-    default:
-      - deployment: stg
-        environment: stg
-        service_connection: dts-sharedservices-stg
-        dependsOn: Precheck
-      - deployment: "prod"
-        environment: "prod"
-        subscription_id: "5ca62022-6aa2-4cee-aaa7-e7536c8d566c"
-        dependsOn: "deploy_stg"
-
+  - repository: cnp-azuredevops-libraries
+    type: github
+    ref: refs/heads/master
+    name: hmcts/cnp-azuredevops-libraries
+    endpoint: 'hmcts'
 
 variables:
   - name: timeoutInMinutes
     value: 60
-  - name: project
-    value: "juror-er-infra"
+  - name: agentPool
+    value: ubuntu-20.04
+  - name: build
+    value: $(Build.BuildNumber)
   - name: product
-    value: "sds-platform"
-  - name: terraformVersion
-    value: "1.5.7"
-  - name: SUBSCRIPTION_ID_STG
-    value: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
-  - name: SUBSCRIPTION_ID_PROD
-    value: "5ca62022-6aa2-4cee-aaa7-e7536c8d566c"
-  - name: workingDirectory
-    value: "$(System.DefaultWorkingDirectory)/components"
-  - name: ARM_CLIENT_ID
-    value: $(servicePrincipalId)
-  - name: ARM_CLIENT_SECRET
-    value: $(servicePrincipalKey)
-  - name: ARM_SUBSCRIPTION_ID_STG
-    value: $(SUBSCRIPTION_ID_STG)
-  - name: ARM_SUBSCRIPTION_ID_PROD
-    value: $(SUBSCRIPTION_ID_PROD)
-  - name: ARM_TENANT_ID
-    value: $(tenantId)
+    value: cft-platform
+  - name: terraformInitSubscription
+    value: 04d27a32-7a07-48b3-95b8-3c8691e1a263
+  - template: vars/input-variables.yaml@cnp-azuredevops-libraries
+
+parameters:
+  - name: overrideAction
+    type: string
+    default: plan
+    values:
+    - plan
+    - apply
+    - destroy
+
+  - name: environment_components
+    type: object
+    default:
+    - deployment: 'data-factory'
+      environment: 'stg'
+      component: 'data-factory'
+      service_connection: 'DTS-SHAREDSERVICES-STG'
+      dependsOn: 'Precheck'
 
 stages:
   - stage: Precheck
     jobs:
-      - job: Precheck
+      - job:
+        pool:
+          vmImage: ${{ variables.agentPool }}
         timeoutInMinutes: ${{ variables.timeoutInMinutes }}
         steps:
-          - task: TerraformInstaller@1
-            displayName: "Install Terraform $(terraformVersion)"
-            inputs:
-              terraformVersion: $(terraformVersion)
+          - template: steps/terraform-precheck.yaml@cnp-azuredevops-libraries
+            parameters:
+              keyvaultName: 'infra-vault-nonprod'
+              keyvaultSecret: 'azure-devops-sp-token'
+              serviceConnection: 'azurerm-sandbox'
+              overrideAction: ${{ parameters.overrideAction }}
 
-          - task: Bash@3
-            displayName: "Terraform Init"
-            env:
-              ARM_CLIENT_ID: $(servicePrincipalId)
-              ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
-              ARM_TENANT_ID: $(tenantId)
-            inputs:
-              targetType: "inline"
-              script: |
-                terraform init -reconfigure
-              workingDirectory: $(workingDirectory)
 
-  - stage: deploy_stg
-    dependsOn: Precheck
-    jobs:
-      - job: PlanAndApplyStg
-        steps:
-          - task: Bash@3
-            displayName: "Terraform Init for Staging"
-            env:
-              ARM_CLIENT_ID: $(servicePrincipalId)
-              ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
-              ARM_TENANT_ID: $(tenantId)
-            inputs:
-              targetType: "inline"
-              script: |
-                terraform init -reconfigure
-              workingDirectory: $(workingDirectory)
-
-          - task: Bash@3
-            displayName: "Terraform Plan for Staging"
-            env:
-              ARM_CLIENT_ID: $(servicePrincipalId)
-              ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
-              ARM_TENANT_ID: $(tenantId)
-            inputs:
-              targetType: "inline"
-              script: |
-                terraform plan -var-file=$(System.DefaultWorkingDirectory)/environments/infra-stg.tfvars -out=tfplan-stg
-              workingDirectory: $(workingDirectory)
-
-          - task: PublishPipelineArtifact@1
-            displayName: "Publish Terraform Plan for Staging"
-            inputs:
-              targetPath: "$(workingDirectory)/tfplan-stg"
-              artifact: "terraformPlanStg"
-              publishLocation: "pipeline"
-
-          - task: Bash@3
-            displayName: "Terraform Apply for Staging"
-            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-            env:
-              ARM_CLIENT_ID: $(servicePrincipalId)
-              ARM_CLIENT_SECRET: $(servicePrincipalKey)
-              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_STG)
-              ARM_TENANT_ID: $(tenantId)
-            inputs:
-              targetType: "inline"
-              script: |
-                terraform apply -auto-approve tfplan-stg
-              workingDirectory: $(workingDirectory)
-
-  # - stage: deploy_prod
-  #   dependsOn: deploy_stg
-  #   jobs:
-  #     - job: PlanAndApplyProd
-  #       steps:
-  #         - task: Bash@3
-  #           displayName: "Terraform Init for Production"
-  #           env:
-  #             ARM_CLIENT_ID: $(servicePrincipalId)
-  #             ARM_CLIENT_SECRET: $(servicePrincipalKey)
-  #             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
-  #             ARM_TENANT_ID: $(tenantId)
-  #           inputs:
-  #             targetType: "inline"
-  #             script: |
-  #               terraform init -reconfigure
-  #             workingDirectory: $(workingDirectory)
-
-  #         - task: Bash@3
-  #           displayName: "Terraform Plan for Production"
-  #           env:
-  #             ARM_CLIENT_ID: $(servicePrincipalId)
-  #             ARM_CLIENT_SECRET: $(servicePrincipalKey)
-  #             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
-  #             ARM_TENANT_ID: $(tenantId)
-  #           inputs:
-  #             targetType: "inline"
-  #             script: |
-  #               terraform plan -var-file=$(System.DefaultWorkingDirectory)/environments/infra-prod.tfvars -out=tfplan-prod
-  #             workingDirectory: $(workingDirectory)
-
-  #         - task: PublishPipelineArtifact@1
-  #           displayName: "Publish Terraform Plan for Production"
-  #           inputs:
-  #             targetPath: "$(workingDirectory)/tfplan-prod"
-  #             artifact: "terraformPlanProd"
-  #             publishLocation: "pipeline"
-
-  #         - task: Bash@3
-  #           displayName: "Terraform Apply for Production"
-  #           condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  #           env:
-  #             ARM_CLIENT_ID: $(servicePrincipalId)
-  #             ARM_CLIENT_SECRET: $(servicePrincipalKey)
-  #             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID_PROD)
-  #             ARM_TENANT_ID: $(tenantId)
-  #           inputs:
-  #             targetType: "inline"
-  #             script: |
-  #               terraform apply -auto-approve tfplan-prod
-  #             workingDirectory: $(workingDirectory)
+  - ${{ each deployment in parameters.environment_components }}:
+    - stage: ${{ deployment.deployment }}
+      dependsOn: ${{ deployment.dependsOn }}
+      jobs:
+        - job: TerraformPlanApply
+          pool:
+            vmImage: ${{ variables.agentPool }}
+          timeoutInMinutes: ${{ variables.timeoutInMinutes }}
+          steps:
+          - template: steps/terraform.yaml@cnp-azuredevops-libraries
+            parameters:
+              overrideAction: ${{ parameters.overrideAction }}
+              environment: ${{ deployment.environment }}
+              component: ${{ deployment.component }}
+              serviceConnection: ${{ deployment.service_connection }}
+              terraformInitSubscription: ${{ variables.terraformInitSubscription }}
+              product: ${{ variables.product }}

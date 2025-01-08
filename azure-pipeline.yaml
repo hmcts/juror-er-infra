@@ -43,6 +43,7 @@ parameters:
         environment: "stg"
         component: "data-factory"
         service_connection: "DTS-SHAREDSERVICES-STG"
+        dependsOn: 'Precheck'
 
 stages:
   - stage: Precheck

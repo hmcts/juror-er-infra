@@ -21,11 +21,6 @@ variable "product" {
   type        = string
   default     = "sds-platform"
 }
-variable "builtFrom" {
-  description = "Information about the build source or version"
-  type        = string
-  default     = "https://github.com/hmcts/juror-er-infra"
-}
 
 
 

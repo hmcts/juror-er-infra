@@ -37,7 +37,7 @@ parameters:
   - name: environment_components
     type: object
     default:
-    - deployment: 'data-factory'
+    - deployment: 'data_factory'
       environment: 'stg'
       component: 'data-factory'
       service_connection: 'DTS-SHAREDSERVICES-STG'

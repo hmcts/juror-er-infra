@@ -1,9 +1,4 @@
-variable "env" {
-  type        = string
-  description = "this is the environment variable"
-  default     = "stg"
 
-}
 
 variable "location" {
   default     = "UK South"

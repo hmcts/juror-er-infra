@@ -45,7 +45,6 @@ parameters:
     default:
       - deployment: stg
         environment: stg
-        component: data-factory
         service_connection: dts-sharedservices-stg
         dependsOn: Precheck
       - deployment: "prod"

@@ -3,7 +3,7 @@ module "datafactory" {
   env    = var.env
 
   product   = "baubais"
-  component = "datafactory"
+  component = "data-factory"
 
   common_tags = module.tags.common_tags
 }

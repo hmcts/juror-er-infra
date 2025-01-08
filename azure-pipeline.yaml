@@ -24,7 +24,7 @@ variables:
   - name: terraformInitSubscription
     value: 04d27a32-7a07-48b3-95b8-3c8691e1a263
   - name: workingDirectory
-    value: "$(System.DefaultWorkingDirectory)/juror-er-infra/components"
+    value: "$(System.DefaultWorkingDirectory)/components"
   - template: vars/input-variables.yaml@cnp-azuredevops-libraries
 
 parameters:
@@ -76,4 +76,4 @@ stages:
                   serviceConnection: ${{ deployment.service_connection }}
                   terraformInitSubscription: ${{ variables.terraformInitSubscription }}
                   product: ${{ variables.product }}
-                  workingDirectory: ${{ variables.workingDirectory }}
+                  workingDirectory: $(workingDirectory)

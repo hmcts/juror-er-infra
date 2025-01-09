@@ -39,7 +39,7 @@ parameters:
   - name: environment_components
     type: object
     default:
-      - deployment: "data_factory"
+      - deployment: "Azure Data Factory Staging"
         environment: "stg"
         component: "data-factory"
         service_connection: "DTS-SHAREDSERVICES-STG"

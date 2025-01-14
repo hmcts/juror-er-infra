@@ -1,4 +1,3 @@
-name: juror-er-infra
 trigger:
   batch: true
   branches:
@@ -13,27 +12,23 @@ resources:
       name: hmcts/cnp-azuredevops-libraries
       endpoint: "hmcts"
 
-pool:
-  vmImage: "ubuntu-latest"
+variables:
+  - name: timeoutInMinutes
+    value: 60
+  - name: agentPool
+    value: ubuntu-latest
+  - name: build
+    value: $(Build.BuildNumber)
+  - name: product
+    value: cft-platform
+  - name: terraformInitSubscription
+    value: 04d27a32-7a07-48b3-95b8-3c8691e1a263
+  - name: workingDirectory
+    value: "$(System.DefaultWorkingDirectory)/components"
+  - template: vars/input-variables.yaml@cnp-azuredevops-libraries
 
 parameters:
-  - name: action
-    displayName: Action
-    type: string
-    default: plan
-    values:
-      - plan
-      - apply
-
-  - name: location
-    displayName: Location
-    type: string
-    default: "UK South"
-    values:
-      - "UK South"
-
   - name: overrideAction
-    displayName: Override Action
     type: string
     default: plan
     values:
@@ -41,51 +36,44 @@ parameters:
       - apply
       - destroy
 
-variables:
-  - name: timeoutInMinutes
-    value: 60
-  - name: project
-    value: "juror-er-infra"
-  - name: product
-    value: "sds-platform"
-  - name: terraformInitSubscription
-    value: "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
-  - name: action
-    value: ${{ parameters.action }}
-  - template: vars/input-variables.yaml@cnp-azuredevops-libraries
-  - name: environment
-    value: stg
+  - name: environment_components
+    type: object
+    default:
+      - deployment: "AzureDataFactory_Staging"
+        environment: "stg"
+        component: "data-factory"
+        service_connection: "DTS-SHAREDSERVICES-STG"
+        dependsOn: 'Precheck'
 
 stages:
-  - stage: Init
+  - stage: Precheck
     jobs:
-      - job: TerraformInit
-        displayName: "Initialize Terraform"
+      - job:
+        pool:
+          vmImage: ${{ variables.agentPool }}
+        timeoutInMinutes: ${{ variables.timeoutInMinutes }}
         steps:
-          - checkout: self
-          - script: terraform init
-            displayName: "Terraform Init"
-            workingDirectory: $(System.DefaultWorkingDirectory)
+          - template: steps/terraform-precheck.yaml@cnp-azuredevops-libraries
+            parameters:
+              keyvaultName: "infra-vault-nonprod"
+              keyvaultSecret: "azure-devops-sp-token"
+              serviceConnection: "azurerm-sandbox"
+              overrideAction: ${{ parameters.overrideAction }}
 
-  - stage: Plan
-    dependsOn: Init
-    jobs:
-      - job: Plan
-        displayName: "Plan Terraform Changes"
-        steps:
-          - checkout: self
-          - script: terraform plan -out=tfplan
-            displayName: "Terraform Plan"
-            workingDirectory: $(System.DefaultWorkingDirectory)
-
-  - stage: Apply
-    dependsOn: Plan
-    condition: eq('${{ parameters.action }}', 'apply')
-    jobs:
-      - job: TerraformApply
-        displayName: "Apply Terraform Changes"
-        steps:
-          - checkout: self
-          - script: terraform apply -auto-approve tfplan
-            displayName: "Terraform Apply"
-            workingDirectory: $(System.DefaultWorkingDirectory)
+  - ${{ each deployment in parameters.environment_components }}:
+      - stage: ${{ deployment.deployment }}
+        dependsOn: ${{ deployment.dependsOn }}
+        jobs:
+          - job: TerraformPlanApply
+            pool:
+              vmImage: ${{ variables.agentPool }}
+            timeoutInMinutes: ${{ variables.timeoutInMinutes }}
+            steps:
+              - template: steps/terraform.yaml@cnp-azuredevops-libraries
+                parameters:
+                  overrideAction: ${{ parameters.overrideAction }}
+                  environment: ${{ deployment.environment }}
+                  component: ${{ deployment.component }}
+                  serviceConnection: ${{ deployment.service_connection }}
+                  terraformInitSubscription: ${{ variables.terraformInitSubscription }}
+                  product: ${{ variables.product }}

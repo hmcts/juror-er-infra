@@ -28,7 +28,6 @@ variable "storage_account_type" {
 }
 
 variable "storage_account_name" {
-  default     = "adf"
   description = "The storage account name"
 
 }

@@ -15,3 +15,4 @@ module "tags" {
   environment = var.env
   product     = "sds-platform"
 }
+

@@ -9,6 +9,11 @@ variable "product" {
   default     = "sds-platform"
 }
 
+variable "storage_account_name" {
+  description = "The storage account name"
+  type        = string
+}
+
 
 
 

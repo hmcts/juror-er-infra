@@ -16,7 +16,7 @@ module "tags" {
   product     = "sds-platform"
 }
 
-resource "azurerm_storage_account" "adf_jurerstg_" {
+resource "azurerm_storage_account" "adf_jurerstg" {
   name                            = var.storage_account_name
   resource_group_name             = var.resource_group_name
   location                        = var.location

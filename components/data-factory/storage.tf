@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "adf_jurerstg" {
-  name                            = "baubaisadfsa${var.env}"
+  name                            = "${var.storage_account_name}${var.env}"
   resource_group_name             = var.resource_group_name
   location                        = var.location
   account_tier                    = var.storage_account_tier

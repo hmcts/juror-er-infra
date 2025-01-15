@@ -27,7 +27,7 @@ variable "storage_account_type" {
 
 }
 
-variable "baubaisadfsa_storage_account_name" {
+variable "storage_account_name" {
   type        = string
   description = "The storage account name"
 

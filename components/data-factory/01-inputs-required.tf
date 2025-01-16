@@ -41,7 +41,6 @@ variable "vnet_name" {
   description = "The VNET name"
 }
 
-
 variable "vnet_address_space" {
   description = "The IP for the VNET"
 }

@@ -44,3 +44,10 @@ variable "vnet_name" {
 variable "vnet_address_space" {
   description = "The IP for the VNET"
 }
+
+variable "subnet1_name" {
+  description = "The Name for Subnet1"
+}
+variable "subnet1_address_space" {
+  description = "The IP for Subnet1"
+}

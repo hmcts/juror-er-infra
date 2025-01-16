@@ -34,10 +34,13 @@ variable "storage_account_name" {
 }
 
 variable "resource_group_name" {
-  default     = "baubais-data-factory-rg-stg"
   description = "The resource group name"
-
 }
+
+variable "vnet_name" {
+  description = "The VNET name"
+}
+
 
 variable "vnet_address_space" {
   description = "The IP for the VNET"

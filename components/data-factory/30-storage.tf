@@ -1,4 +1,4 @@
-resource "azurerm_storage_account" "adf_jurerstg" {
+resource "azurerm_storage_account" "adf_juror_sa" {
   name                            = "${var.storage_account_name}${var.env}"
   resource_group_name             = var.resource_group_name
   location                        = var.location

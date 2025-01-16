@@ -38,3 +38,7 @@ variable "resource_group_name" {
   description = "The resource group name"
 
 }
+
+variable "vnet_address_space" {
+  description = "The IP for the VNET"
+}

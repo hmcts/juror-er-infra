@@ -18,7 +18,7 @@ resource "azurerm_postgresql_flexible_server" "adf_juror_postgresql" {
   resource_group_name    = var.resource_group_name
   location               = var.location
   version                = "15"
-  sku_name               = "Standard_D2dsv5"
+  sku_name               = "GeneralPurpose_D2ds_v4"
   storage_mb             = 32768
   administrator_login    = data.azurerm_key_vault_secret.postgres_username.value
   administrator_password = data.azurerm_key_vault_secret.postgres_password.value

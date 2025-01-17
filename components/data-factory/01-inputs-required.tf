@@ -51,3 +51,11 @@ variable "subnet1_name" {
 variable "subnet1_address_space" {
   description = "The IP for Subnet1"
 }
+
+variable "postgresql_server_name" {
+  description = "The SQL Server name"
+}
+variable "key_vault_name" {
+  description = "The Key Vault name"
+}
+

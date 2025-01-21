@@ -10,27 +10,28 @@ variable "storage_account_tier" {
   type        = string
   description = "The storage account tier"
   default     = "Premium"
-
 }
 
 variable "storage_account_replication" {
   type        = string
   description = "The storage account replication type"
   default     = "LRS"
-
 }
 
-variable "storage_account_type" {
+variable "storage_account_kind" {
   type        = string
-  description = "The storage account type"
-  default     = "StorageV2"
-
+  description = "Defines the Kind of account."
+  default     = "BlockBlobStorage"
 }
 
 variable "storage_account_name" {
   type        = string
   description = "The storage account name"
+}
 
+variable "storage_account_name" {
+  type        = string
+  description = "The storage account name"
 }
 
 variable "resource_group_name" {

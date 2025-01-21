@@ -29,11 +29,6 @@ variable "storage_account_name" {
   description = "The storage account name"
 }
 
-variable "storage_account_name" {
-  type        = string
-  description = "The storage account name"
-}
-
 variable "resource_group_name" {
   description = "The resource group name"
 }

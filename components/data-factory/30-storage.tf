@@ -6,7 +6,7 @@ resource "azurerm_storage_account" "adf_juror_sa" {
   account_replication_type        = var.storage_account_replication
   account_kind                    = var.storage_account_kind
   allow_nested_items_to_be_public = false
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true
   tags                            = module.tags.common_tags
   lifecycle {
     prevent_destroy = false

@@ -1,0 +1,30 @@
+{
+	"name": "BinaryDataDestination",
+	"properties": {
+		"description": "It describes the destination store.",
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Directory": {
+				"type": "String"
+			},
+			"filename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": {
+					"value": "@{dataset().Directory}",
+					"type": "Expression"
+				},
+				"container": "juror-ingestion"
+			}
+		}
+	}
+}

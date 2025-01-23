@@ -3,8 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "GetParentFolders",
-				"description": "Get list of parent folders (like 20241213)",
+				"name": "GetLADataSubfolders",
 				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
@@ -24,8 +23,10 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
-						"recursive": false,
-						"enablePartitionDiscovery": false
+						"recursive": true,
+						"modifiedDatetimeStart": null,
+						"modifiedDatetimeEnd": null,
+						"wildcardFolderPath": "*/LA_Data"
 					},
 					"formatSettings": {
 						"type": "BinaryReadSettings"
@@ -33,12 +34,11 @@
 				}
 			},
 			{
-				"name": "FilterParentFolders",
-				"description": "Filter to get only folders",
+				"name": "FilterSubfolders",
 				"type": "Filter",
 				"dependsOn": [
 					{
-						"activity": "GetParentFolders",
+						"activity": "GetLADataSubfolders",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -47,7 +47,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetParentFolders').output.childItems",
+						"value": "@activity('GetLADataSubfolders').output.childItems",
 						"type": "Expression"
 					},
 					"condition": {
@@ -57,11 +57,11 @@
 				}
 			},
 			{
-				"name": "ForEachParentFolder",
+				"name": "ForEachSubfolder",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "FilterParentFolders",
+						"activity": "FilterSubfolders",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -70,13 +70,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('FilterParentFolders').output.value",
+						"value": "@activity('FilterSubfolders').output.value",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "GetLADataContent",
-							"type": "GetMetadata",
+							"name": "CopyFolderContent",
+							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
 								"retry": 0,
@@ -86,141 +86,47 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataset": {
-									"referenceName": "ds_er_juror_ing_b",
-									"type": "DatasetReference"
-								},
-								"fieldList": [
-									"childItems"
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": {
-										"value": "@concat(item().name, '/LA_Data')",
-										"type": "Expression"
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
 									}
 								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							}
-						},
-						{
-							"name": "GetAllFilesFromSubfolders",
-							"type": "GetMetadata",
-							"dependsOn": [
-								{
-									"activity": "GetLADataContent",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
 							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataset": {
+							"inputs": [
+								{
 									"referenceName": "ds_er_juror_ing_b",
 									"type": "DatasetReference"
-								},
-								"fieldList": [
-									"childItems"
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": {
-										"value": "@concat(item().name, '/LA_Data/*')",
-										"type": "Expression"
-									}
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							}
-						},
-						{
-							"name": "FilterOnlyFiles",
-							"type": "Filter",
-							"dependsOn": [
-								{
-									"activity": "GetAllFilesFromSubfolders",
-									"dependencyConditions": [
-										"Succeeded"
-									]
 								}
 							],
-							"userProperties": [],
-							"typeProperties": {
-								"items": {
-									"value": "@activity('GetAllFilesFromSubfolders').output.childItems",
-									"type": "Expression"
-								},
-								"condition": {
-									"value": "@equals(item().type, 'File')",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "ForEachFile",
-							"type": "ForEach",
-							"dependsOn": [
+							"outputs": [
 								{
-									"activity": "FilterOnlyFiles",
-									"dependencyConditions": [
-										"Succeeded"
-									]
+									"referenceName": "ds_er_juror_ing_b",
+									"type": "DatasetReference"
 								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"items": {
-									"value": "@activity('FilterOnlyFiles').output.value",
-									"type": "Expression"
-								},
-								"activities": [
-									{
-										"name": "CopyAFile",
-										"type": "Copy",
-										"dependsOn": [],
-										"policy": {
-											"retry": 0,
-											"retryIntervalInSeconds": 30,
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"source": {
-												"type": "BinarySource",
-												"storeSettings": {
-													"type": "AzureBlobStorageReadSettings",
-													"recursive": true
-												}
-											},
-											"sink": {
-												"type": "BinarySink",
-												"storeSettings": {
-													"type": "AzureBlobStorageWriteSettings"
-												}
-											},
-											"enableStaging": false
-										}
-									}
-								]
-							}
+							]
 						}
 					]
 				}
 			}
 		],
+		"parameters": {
+			"ParentFolderPath": {
+				"type": "string",
+				"defaultValue": "20241213"
+			}
+		},
 		"annotations": []
 	}
 }

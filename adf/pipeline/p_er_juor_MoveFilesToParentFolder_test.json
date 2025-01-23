@@ -1,0 +1,226 @@
+{
+	"name": "p_er_juor_MoveFilesToParentFolder_test",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetParentFolders",
+				"description": "Get list of parent folders (like 20241213)",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_er_juror_ing_b",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": false,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "BinaryReadSettings"
+					}
+				}
+			},
+			{
+				"name": "FilterParentFolders",
+				"description": "Filter to get only folders",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "GetParentFolders",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetParentFolders').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().type, 'Folder')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEachParentFolder",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "FilterParentFolders",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('FilterParentFolders').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "GetLADataContent",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_er_juror_ing_b",
+									"type": "DatasetReference"
+								},
+								"fieldList": [
+									"childItems"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": {
+										"value": "@concat(item().name, '/LA_Data')",
+										"type": "Expression"
+									}
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							}
+						},
+						{
+							"name": "GetAllFilesFromSubfolders",
+							"type": "GetMetadata",
+							"dependsOn": [
+								{
+									"activity": "GetLADataContent",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_er_juror_ing_b",
+									"type": "DatasetReference"
+								},
+								"fieldList": [
+									"childItems"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": {
+										"value": "@concat(item().name, '/LA_Data/*')",
+										"type": "Expression"
+									}
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							}
+						},
+						{
+							"name": "FilterOnlyFiles",
+							"type": "Filter",
+							"dependsOn": [
+								{
+									"activity": "GetAllFilesFromSubfolders",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@activity('GetAllFilesFromSubfolders').output.childItems",
+									"type": "Expression"
+								},
+								"condition": {
+									"value": "@equals(item().type, 'File')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "ForEachFile",
+							"type": "ForEach",
+							"dependsOn": [
+								{
+									"activity": "FilterOnlyFiles",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@activity('FilterOnlyFiles').output.value",
+									"type": "Expression"
+								},
+								"activities": [
+									{
+										"name": "CopyAFile",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "BinarySource",
+												"storeSettings": {
+													"type": "AzureBlobStorageReadSettings",
+													"recursive": true
+												}
+											},
+											"sink": {
+												"type": "BinarySink",
+												"storeSettings": {
+													"type": "AzureBlobStorageWriteSettings"
+												}
+											},
+											"enableStaging": false
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}

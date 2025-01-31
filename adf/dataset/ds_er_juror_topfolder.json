@@ -15,10 +15,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": {
-					"value": "@dataset().ParentFolder",
-					"type": "Expression"
-				},
 				"container": "juror-ingestion"
 			}
 		}

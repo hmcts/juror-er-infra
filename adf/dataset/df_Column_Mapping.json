@@ -11,7 +11,8 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": "column_mapping.csv",
-				"folderPath": "config"
+				"folderPath": "config",
+				"fileSystem": "juror-etl"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

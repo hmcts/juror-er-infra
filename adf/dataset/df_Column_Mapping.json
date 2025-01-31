@@ -2,17 +2,16 @@
 	"name": "df_Column_Mapping",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureBlobStorage1",
+			"referenceName": "AzureFileStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation",
+				"type": "AzureFileStorageLocation",
 				"fileName": "column_mapping.csv",
-				"folderPath": "config",
-				"container": "juror-etl"
+				"folderPath": "config"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

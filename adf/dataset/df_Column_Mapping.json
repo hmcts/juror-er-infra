@@ -2,14 +2,14 @@
 	"name": "df_Column_Mapping",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureFileStorage1",
+			"referenceName": "AzureDataLakeStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureFileStorageLocation",
+				"type": "AzureBlobFSLocation",
 				"fileName": "column_mapping.csv",
 				"folderPath": "config"
 			},

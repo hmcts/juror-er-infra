@@ -142,7 +142,13 @@
 							"outputs": [
 								{
 									"referenceName": "ds_juror_etl_csv",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"filename": {
+											"value": "@concat(pipeline().parameters.ParentFolder,'_',item().name)",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}

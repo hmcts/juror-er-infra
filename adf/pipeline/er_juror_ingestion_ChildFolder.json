@@ -25,7 +25,9 @@
 							}
 						}
 					},
-					"fieldList": [],
+					"fieldList": [
+						"childItems"
+					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
 						"enablePartitionDiscovery": false
@@ -135,7 +137,10 @@
 									"referenceName": "ds_juror_ing_csv",
 									"type": "DatasetReference",
 									"parameters": {
-										"folderName": "*"
+										"folderName": {
+											"value": "@string('*')",
+											"type": "Expression"
+										}
 									}
 								}
 							],

@@ -1,0 +1,26 @@
+{
+	"name": "ds_er_juror_ing_bin_P",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pFolder": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().pFolder",
+					"type": "Expression"
+				},
+				"fileSystem": "juror-ingestion"
+			}
+		}
+	}
+}

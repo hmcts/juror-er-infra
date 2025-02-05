@@ -12,8 +12,7 @@ module "datafactory" {
 module "tags" {
   source = "github.com/hmcts/terraform-module-common-tags?ref=master"
 
-  builtFrom   = "hmcts/terraform-module-mssql"
+  builtFrom   = "hmcts/juror-er-infra"
   environment = var.env
-  product     = "sds-platform"
+  product     = "dlrm-er"
 }
-

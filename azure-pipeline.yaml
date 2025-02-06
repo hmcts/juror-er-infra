@@ -20,7 +20,7 @@ variables:
   - name: build
     value: $(Build.BuildNumber)
   - name: product
-    value: cft-platform
+    value: baubais
   - name: terraformInitSubscription
     value: 04d27a32-7a07-48b3-95b8-3c8691e1a263
   - name: workingDirectory
@@ -39,7 +39,7 @@ parameters:
   - name: environment_components
     type: object
     default:
-      - deployment: "AzureDataFactory_Staging"
+      - deployment: "staging"
         environment: "stg"
         component: "data-factory"
         service_connection: "DTS-SHAREDSERVICES-STG"

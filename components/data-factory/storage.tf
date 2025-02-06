@@ -26,5 +26,6 @@ module "storage" {
   containers               = var.containers
   enable_versioning        = false
   enable_hns               = true
+  default_action           = "Allow"
   common_tags              = module.tags.common_tags
 }

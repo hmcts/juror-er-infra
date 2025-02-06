@@ -25,5 +25,6 @@ module "storage" {
   account_replication_type = var.storage_account_replication
   containers               = var.containers
   enable_versioning        = false
+  enable_hns               = true
   common_tags              = module.tags.common_tags
 }

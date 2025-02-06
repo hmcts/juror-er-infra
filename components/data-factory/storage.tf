@@ -12,3 +12,18 @@ resource "azurerm_storage_account" "adf_juror_sa" {
     prevent_destroy = false
   }
 }
+
+module "storage" {
+  source = "github.com/hmcts/cnp-module-storage-account?ref=4.x"
+
+  env                      = var.env
+  storage_account_name     = lower(replace("synapse${var.product}${var.env}", "-", ""))
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_kind             = var.storage_account_kind
+  account_tier             = var.storage_account_tier
+  account_replication_type = var.storage_account_replication
+  containers               = var.containers
+  enable_versioning        = false
+  common_tags              = module.tags.common_tags
+}

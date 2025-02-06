@@ -3,7 +3,7 @@ module "datafactory" {
   env                  = var.env
   github_configuration = var.github_configuration
 
-  product   = "baubais"
+  product   = var.product
   component = "data-factory"
 
   common_tags = module.tags.common_tags
@@ -14,5 +14,5 @@ module "tags" {
 
   builtFrom   = "hmcts/juror-er-infra"
   environment = var.env
-  product     = "dlrm-er"
+  product     = var.product
 }

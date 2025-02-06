@@ -47,3 +47,8 @@ variable "subnet1_name" {
 variable "subnet1_address_space" {
   description = "The IP for Subnet1"
 }
+
+variable "subscription_id" {
+  description = "The subscription id"
+  type        = string
+}

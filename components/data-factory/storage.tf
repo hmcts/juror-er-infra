@@ -20,8 +20,8 @@ module "storage" {
   storage_account_name     = lower(replace("synapse${var.product}${var.env}", "-", ""))
   resource_group_name      = var.resource_group_name
   location                 = var.location
-  account_kind             = var.storage_account_kind
-  account_tier             = var.storage_account_tier
+  account_kind             = var.storage_account_kind_synapse
+  account_tier             = var.storage_account_tier_synapse
   account_replication_type = var.storage_account_replication
   containers               = var.containers
   enable_versioning        = false

@@ -12,6 +12,11 @@ variable "storage_account_tier" {
   default     = "Premium"
 }
 
+variable "storage_account_tier_synapse" {
+  type        = string
+  description = "The storage account tier"
+  default     = "Standard"
+}
 variable "storage_account_replication" {
   type        = string
   description = "The storage account replication type"
@@ -22,6 +27,12 @@ variable "storage_account_kind" {
   type        = string
   description = "Defines the Kind of account."
   default     = "BlockBlobStorage"
+}
+
+variable "storage_account_kind_synapse" {
+  type        = string
+  description = "Defines the Kind of account."
+  default     = "StorageV2"
 }
 
 variable "storage_account_name" {

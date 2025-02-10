@@ -1,9 +1,9 @@
 env                   = "stg"
 storage_account_name  = "baubaisadfsa"
-vnet_name             = "baubais-adf-vnet"
+vnet_name             = "adf-vnet"
 vnet_address_space    = ["10.0.2.0/27"]
 resource_group_name   = "baubais-data-factory-rg-stg"
-subnet1_name          = "baubais-adf-privateendpoints"
+subnet1_name          = "adf-privateendpoints"
 subnet1_address_space = ["10.0.2.0/28"]
 github_configuration = {
   hmcts = {
@@ -16,4 +16,6 @@ github_configuration = {
   }
 }
 
-subscription_id = "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
+subscription_id       = "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
+subnet2_name          = "synapse-privateendpoints"
+subnet2_address_space = ["10.0.2.16/29"]

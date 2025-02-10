@@ -65,8 +65,8 @@ variable "subscription_id" {
 }
 
 variable "subnet2_name" {
-  description = "The Name for Subnet1"
+  description = "The Name for Subnet2"
 }
 variable "subnet2_address_space" {
-  description = "The IP for Subnet1"
+  description = "The IP for Subnet2"
 }

@@ -85,3 +85,47 @@ resource "azurerm_synapse_spark_pool" "this" {
   spark_version = "3.4"
   tags          = module.tags.common_tags
 }
+
+locals {
+  deploy_pe        = false
+  dlrm_admin_group = "DTS DLRM Synapse workspace contributors"
+}
+module "synapse_pe" {
+  for_each = local.deploy_pe ? toset(["sql", "sqlOnDemand", "dev"]) : []
+  source   = "../../modules/azure-private-endpoint"
+
+  name             = "${var.product}-synapse-${each.key}-pe-${var.env}"
+  resource_group   = var.resource_group_name
+  location         = var.location
+  subnet_id        = azurerm_subnet.private_endpoints[0].id
+  common_tags      = module.tags.common_tags
+  resource_name    = azurerm_synapse_workspace.this.name
+  resource_id      = azurerm_synapse_workspace.this.id
+  subresource_name = each.value
+}
+
+resource "azurerm_synapse_firewall_rule" "allowall" {
+  name                 = "AllowAll"
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  start_ip_address     = "0.0.0.0"
+  end_ip_address       = "255.255.255.255"
+}
+resource "azurerm_synapse_role_assignment" "this" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Contributor"
+  principal_id         = data.azuread_group.admin_group.object_id # Platops
+  depends_on           = [azurerm_synapse_firewall_rule.allowall]
+}
+
+data "azuread_group" "dlrm_group" {
+  display_name     = local.dlrm_admin_group
+  security_enabled = true
+}
+
+
+resource "azurerm_synapse_role_assignment" "dlrm" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Contributor"
+  principal_id         = data.azuread_group.admin_group.object_id # DTS DLRM Synapse workspace contributors
+  depends_on           = [azurerm_synapse_firewall_rule.allowall]
+}

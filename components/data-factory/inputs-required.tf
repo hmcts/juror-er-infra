@@ -63,3 +63,10 @@ variable "subscription_id" {
   description = "The subscription id"
   type        = string
 }
+
+variable "subnet2_name" {
+  description = "The Name for Subnet2"
+}
+variable "subnet2_address_space" {
+  description = "The IP for Subnet2"
+}

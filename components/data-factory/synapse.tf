@@ -126,6 +126,6 @@ data "azuread_group" "dlrm_group" {
 resource "azurerm_synapse_role_assignment" "dlrm" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse Contributor"
-  principal_id         = data.azuread_group.admin_group.object_id # DTS DLRM Synapse workspace contributors
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
   depends_on           = [azurerm_synapse_firewall_rule.allowall]
 }

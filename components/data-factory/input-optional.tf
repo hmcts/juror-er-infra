@@ -44,3 +44,22 @@ variable "enable_synapse_spark_pool" {
   type        = bool
   default     = true
 }
+
+variable "github_main_branch" {
+  description = "Main branch of the GitHub repository"
+  type        = string
+  default     = "main"
+
+}
+
+variable "github_repository_name" {
+  description = "Name of the GitHub repository"
+  type        = string
+  default     = "juror-er-infra"
+}
+variable "github_root_folder" {
+  description = "Root folder of the GitHub repository"
+  type        = string
+  default     = "/synapse"
+
+}

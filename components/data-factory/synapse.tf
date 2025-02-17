@@ -45,6 +45,13 @@ resource "azurerm_synapse_workspace" "this" {
     delete = "2h"
   }
 
+  github_repo {
+    account_name    = "hmcts"
+    branch_name     = var.github_main_branch
+    repository_name = var.github_repository_name
+    root_folder     = var.github_root_folder
+    git_url         = "https://github.com"
+  }
   tags = module.tags.common_tags
 }
 
@@ -128,4 +135,16 @@ resource "azurerm_synapse_role_assignment" "dlrm" {
   role_name            = "Synapse Contributor"
   principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
   depends_on           = [azurerm_synapse_firewall_rule.allowall]
+}
+
+resource "azurerm_role_assignment" "baubaiscontributor" {
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = azurerm_storage_account.adf_juror_sa.id
+}
+
+resource "azurerm_role_assignment" "teamcontributor" {
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = azurerm_storage_account.adf_juror_sa.id
 }

@@ -1,5 +1,5 @@
 {
-	"name": "Notebook 1",
+	"name": "L1_er_juror_ingestion",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "73fef50b-f2e9-47fd-bd17-189fbaf8c79c"
+				"spark.autotune.trackingId": "63bb07e7-44bb-4a72-b67a-a600fd831aea"
 			}
 		},
 		"metadata": {

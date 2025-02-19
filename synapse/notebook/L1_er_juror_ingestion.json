@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1935348a-ed1f-4044-ae14-2d1404149a87"
+				"spark.autotune.trackingId": "f373edc9-a86b-48ee-93d2-a4e7dba36d8e"
 			}
 		},
 		"metadata": {
@@ -82,7 +82,18 @@
 					"import time\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 3
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Initialize Spark session with the required packages\n",
+					"spark = SparkSession.builder \\\n",
+					"    .appName(\"JurorIngestion\") \\\n",
+					"    .config(\"spark.jars.packages\", \"com.crealytics:spark-excel_2.12:0.13.5,org.apache.xmlbeans:xmlbeans:3.1.0,org.apache.poi:poi-ooxml-schemas:4.1.2,org.apache.poi:poi-ooxml:4.1.2,org.apache.poi:poi:4.1.2\") \\\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -153,12 +164,12 @@
 					"    try:\n",
 					"        base_dir = f\"{date_folder}_{third_folder}\"\n",
 					"        \n",
-					"        # Handle Excel files separately - move to quarantine with a note\n",
+					"        # Handle Excel files separately - move to excel with a note\n",
 					"        if source_path.lower().endswith(('.xlsx', '.xls')):\n",
-					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/quarantine/{base_dir}/{clean_file_name(file_name)}\"\n",
-					"            print(f\"Excel file detected, moving to quarantine: {dest_path}\")\n",
+					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/excel/{base_dir}/{clean_file_name(file_name)}\"\n",
+					"            print(f\"Excel file detected, moving to CSV: {dest_path}\")\n",
 					"            mssparkutils.fs.cp(source_path, dest_path, True)\n",
-					"            return True, f\"quarantine/{base_dir}/{clean_file_name(file_name)} (Excel file)\"\n",
+					"            return True, f\"CSV/{base_dir}/{clean_file_name(file_name)} (Excel file)\"\n",
 					"        \n",
 					"        # Process CSV files\n",
 					"        try:\n",
@@ -229,7 +240,7 @@
 					"    \n",
 					"    # Quarantine files (Excel, corrupted, unreadable)\n",
 					"    quarantine_files = [f for f in moved_files['data_success'] if 'quarantine/' in f]\n",
-					"    print_section(\"Quarantined Files (Excel/Corrupted/Unreadable)\", quarantine_files, \"⚠\")\n",
+					"    print_section(\"Quarantined Files (Corrupted/Unreadable)\", quarantine_files, \"⚠\")\n",
 					"    \n",
 					"    # Metadata files\n",
 					"    print_section(\"Metadata Files\", moved_files['metadata_success'])\n",
@@ -241,6 +252,7 @@
 					"    print(\"\\n=== FINAL COUNTS ===\")\n",
 					"    print(\"-\" * 100)\n",
 					"    print(f\"Successfully Processed CSV Files: {len(normal_files)}\")\n",
+					"    print(f\"Successfully Processed Excel Files: {len(normal_files)}\")\n",
 					"    print(f\"Empty Files: {len(empty_files)}\")\n",
 					"    print(f\"Quarantined Files: {len(quarantine_files)}\")\n",
 					"    print(f\"Metadata Files: {len(moved_files['metadata_success'])}\")\n",
@@ -300,7 +312,7 @@
 					"# Print final detailed summary\n",
 					"print_detailed_summary(moved_files)"
 				],
-				"execution_count": 4
+				"execution_count": 6
 			}
 		]
 	}

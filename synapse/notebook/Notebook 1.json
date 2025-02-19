@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0d87effb-a883-44a7-8133-5f63c643251e"
+				"spark.autotune.trackingId": "1026e7bd-5b9c-4ed9-9f5c-e73b907da1a9"
 			}
 		},
 		"metadata": {
@@ -51,8 +51,13 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"from pyspark.sql import SparkSession\n",
-					"\n",
+					"from pyspark.sql import SparkSession"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"# Initialize Spark session\n",
 					"spark = SparkSession.builder \\\n",
 					"    .appName(\"CheckSparkExcelPackage\") \\\n",
@@ -80,7 +85,7 @@
 					"# Print the Spark session configuration\n",
 					"print(spark.sparkContext.getConf().getAll())"
 				],
-				"execution_count": 2
+				"execution_count": null
 			}
 		]
 	}

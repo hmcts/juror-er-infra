@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1c987bda-99b7-4c51-ad47-9954a9cadc90"
+				"spark.autotune.trackingId": "0d87effb-a883-44a7-8133-5f63c643251e"
 			}
 		},
 		"metadata": {
@@ -80,7 +80,7 @@
 					"# Print the Spark session configuration\n",
 					"print(spark.sparkContext.getConf().getAll())"
 				],
-				"execution_count": null
+				"execution_count": 2
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fbe19b9b-13ac-4f95-b9bc-e0335bf047d2"
+				"spark.autotune.trackingId": "1935348a-ed1f-4044-ae14-2d1404149a87"
 			}
 		},
 		"metadata": {
@@ -48,6 +48,32 @@
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# ER_Juror Data Ingestion"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 1. Import Libaries"
+				]
+			},
 			{
 				"cell_type": "code",
 				"source": [

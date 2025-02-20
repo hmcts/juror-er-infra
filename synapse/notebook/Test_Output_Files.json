@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "78bc9cd7-7b78-4f56-a4c3-82e957ac617f"
+				"spark.autotune.trackingId": "916a1ecb-08e5-430f-a7a4-8b9ee0a6467f"
 			}
 		},
 		"metadata": {
@@ -54,10 +54,13 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 13
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
 				"source": [
 					"# Initialize Spark Session if not already initialized\n",
 					"spark = SparkSession.builder.appName(\"ParquetReader\").getOrCreate()\n",
@@ -95,25 +98,15 @@
 					"    return df\n",
 					"\n",
 					"# Example usage for specific file\n",
-					"file_path = f\"{base_path}/20241217_002-Broxtowe.parquet\"\n",
+					"file_path = f\"{base_path}/20241217_213-Salford.parquet\"\n",
 					"df = analyze_parquet(file_path)\n",
 					"\n",
 					"# Optional: Save sample to CSV for easier viewing\n",
 					"sample_path = f\"{base_path}/sample_output\"\n",
-					"df.limit(100).write.mode(\"overwrite\").csv(f\"{sample_path}/broxtowe_sample\", header=True)\n",
-					"print(f\"\\nSaved 100 row sample to: {sample_path}/broxtowe_sample\")"
-				],
-				"execution_count": 15
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"collapsed": false
-				},
-				"source": [
+					"df.limit(100).write.mode(\"overwrite\").csv(f\"{sample_path}/213_sample\", header=True)\n",
 					"display(df)"
 				],
-				"execution_count": 17
+				"execution_count": 21
 			}
 		]
 	}

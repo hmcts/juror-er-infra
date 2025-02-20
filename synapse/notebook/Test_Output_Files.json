@@ -1,0 +1,120 @@
+{
+	"name": "Test_Output_Files",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "78bc9cd7-7b78-4f56-a4c3-82e957ac617f"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import *"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Initialize Spark Session if not already initialized\n",
+					"spark = SparkSession.builder.appName(\"ParquetReader\").getOrCreate()\n",
+					"\n",
+					"# Define storage paths\n",
+					"storage_account = \"baubaisadfsastg\"\n",
+					"base_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
+					"\n",
+					"# Function to analyze parquet file\n",
+					"def analyze_parquet(file_path):\n",
+					"    \"\"\"Analyze a parquet file and print useful information\"\"\"\n",
+					"    print(f\"Reading parquet file from: {file_path}\")\n",
+					"    \n",
+					"    # Read the parquet file\n",
+					"    df = spark.read.parquet(file_path)\n",
+					"    \n",
+					"    # Get basic information\n",
+					"    print(\"\\nBasic Information:\")\n",
+					"    print(f\"Number of rows: {df.count()}\")\n",
+					"    print(f\"Number of columns: {len(df.columns)}\")\n",
+					"    \n",
+					"    # Print schema\n",
+					"    print(\"\\nSchema:\")\n",
+					"    df.printSchema()\n",
+					"    \n",
+					"    # Show sample data\n",
+					"    print(\"\\nSample Data (5 rows):\")\n",
+					"    df.show(5, truncate=False)\n",
+					"    \n",
+					"    # Get summary statistics for all columns\n",
+					"    print(\"\\nSummary Statistics:\")\n",
+					"    df.summary().show()\n",
+					"    \n",
+					"    # Return the dataframe for further analysis if needed\n",
+					"    return df\n",
+					"\n",
+					"# Example usage for specific file\n",
+					"file_path = f\"{base_path}/20241217_002-Broxtowe.parquet\"\n",
+					"df = analyze_parquet(file_path)\n",
+					"\n",
+					"# Optional: Save sample to CSV for easier viewing\n",
+					"sample_path = f\"{base_path}/sample_output\"\n",
+					"df.limit(100).write.mode(\"overwrite\").csv(f\"{sample_path}/broxtowe_sample\", header=True)\n",
+					"print(f\"\\nSaved 100 row sample to: {sample_path}/broxtowe_sample\")"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(df)"
+				],
+				"execution_count": 17
+			}
+		]
+	}
+}

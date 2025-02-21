@@ -1,5 +1,5 @@
 {
-	"name": "L2_Tranfromation",
+	"name": "L2_Tranfromation_MappingColumns",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "25ad39ec-a2e0-4d77-8fab-76bc533c7970"
+				"spark.autotune.trackingId": "4ea3ce6e-b9eb-449e-8eaf-21984d2337d9"
 			}
 		},
 		"metadata": {

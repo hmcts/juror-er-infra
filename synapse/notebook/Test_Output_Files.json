@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "be1d0556-26bf-4a54-bdcf-33273d1dc081"
+				"spark.autotune.trackingId": "9104aa7c-4c32-426a-afeb-7a1721bc844e"
 			}
 		},
 		"metadata": {
@@ -54,7 +54,7 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 3
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -98,7 +98,7 @@
 					"    return df\n",
 					"\n",
 					"# Example usage for specific file\n",
-					"file_path = f\"{base_path}/**\"\n",
+					"file_path = f\"{base_path}/part-00000-4ca11e8b-dc1b-4028-b016-2f13b31d1e37-c000.parquet\"\n",
 					"df = analyze_parquet(file_path)\n",
 					"\n",
 					"# Optional: Save sample to CSV for easier viewing\n",
@@ -106,7 +106,7 @@
 					"df.limit(100).write.mode(\"overwrite\").csv(f\"{sample_path}/all_sample\", header=True)\n",
 					"display(df)"
 				],
-				"execution_count": 6
+				"execution_count": 5
 			}
 		]
 	}

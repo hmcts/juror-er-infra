@@ -1,5 +1,5 @@
 {
-	"name": "p_datasetIntoPostgresql",
+	"name": "p_juror_potgresql",
 	"properties": {
 		"activities": [
 			{

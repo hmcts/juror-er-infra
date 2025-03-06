@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "22fce89e-a10b-4c87-88d5-4583aa7dc467"
+				"spark.autotune.trackingId": "e63a7384-2e67-4bb2-b0e1-27e36a18529f"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"import os\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 36
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -74,7 +74,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 37
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -293,6 +293,9 @@
 					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
 					"    error_folder = f\"{transform_folder}/errors\"\n",
+					"    log_file_path = f\"{transform_folder}/processed_files_log.json\"\n",
+					"    \n",
+					"    # Read column mapping\n",
 					"    mapping_file = f\"{config_folder}/col_mapping.json\"\n",
 					"    try:\n",
 					"        column_mapping = read_column_mapping(spark, mapping_file)\n",
@@ -300,9 +303,22 @@
 					"    except Exception as e:\n",
 					"        logging.fatal(f\"Fatal error reading mapping file: {str(e)}\")\n",
 					"        return\n",
+					"    \n",
+					"    # Read the log of processed files\n",
+					"    try:\n",
+					"        processed_files_log = spark.read.json(log_file_path).select(\"file\").rdd.flatMap(lambda x: x).collect()\n",
+					"    except Exception as e:\n",
+					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
+					"        processed_files_log = []\n",
+					"    \n",
 					"    all_files = list_files(folder, ['.csv', '.xlsx', '.xls'])\n",
 					"    logging.info(f\"Total files to process: {len(all_files)}\")\n",
-					"    results = [process_file(spark, file_path, reverse_mapping, transform_folder, error_folder) for file_path in all_files]\n",
+					"    \n",
+					"    # Filter out files that have already been processed\n",
+					"    new_files = [file for file in all_files if file not in processed_files_log]\n",
+					"    logging.info(f\"New files to process: {len(new_files)}\")\n",
+					"    \n",
+					"    results = [process_file(spark, file_path, reverse_mapping, transform_folder, error_folder) for file_path in new_files]\n",
 					"    summary_df = spark.createDataFrame(results)\n",
 					"    summary_df.write.mode(\"overwrite\").json(f\"{transform_folder}/processing_summary.json\")\n",
 					"    logging.info(\"\\nProcessing Summary:\")\n",
@@ -321,11 +337,20 @@
 					"            output_file = file['output']\n",
 					"            df = spark.read.parquet(output_file)\n",
 					"            logging.info(f\"File: {output_file}, Columns: {len(df.columns)}\")\n",
+					"    \n",
+					"    # Update the log of processed files\n",
+					"    new_processed_files_log = spark.createDataFrame([(file,) for file in new_files], [\"file\"])\n",
+					"    if processed_files_log:\n",
+					"        existing_log_df = spark.createDataFrame([(file,) for file in processed_files_log], [\"file\"])\n",
+					"        updated_log_df = existing_log_df.union(new_processed_files_log).distinct()\n",
+					"    else:\n",
+					"        updated_log_df = new_processed_files_log\n",
+					"    updated_log_df.write.mode(\"overwrite\").json(log_file_path)\n",
 					"\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 38
+				"execution_count": 6
 			}
 		]
 	}

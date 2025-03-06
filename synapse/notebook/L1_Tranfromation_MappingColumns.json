@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f53c1635-8430-4d94-87d7-89b2bfc19b54"
+				"spark.autotune.trackingId": "565b2114-0c99-430b-9d96-30d302b9f68f"
 			}
 		},
 		"metadata": {
@@ -418,8 +418,8 @@
 					"\n",
 					"    # Storage paths from configuration \n",
 					"    storage_account = \"baubaisadfsastg\"\n",
-					"    csv_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/csv\"\n",
-					"    excel_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/excel\"\n",
+					"    csv_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
+					"    excel_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
 					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
 					"    error_folder = f\"{transform_folder}/errors\"\n",

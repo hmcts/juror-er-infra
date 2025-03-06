@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "11d97e88-f523-4955-ae25-54be8adee0fc"
+				"spark.autotune.trackingId": "22fce89e-a10b-4c87-88d5-4583aa7dc467"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"import os\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 30
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -74,7 +74,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 31
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -312,7 +312,6 @@
 					"    \n",
 					"    successful_files = [r for r in results if r['status'] == 'success']\n",
 					"    if successful_files:\n",
-					"             \n",
 					"        # Generate summary report\n",
 					"        logging.info(\"\\nSummary Report:\")\n",
 					"        logging.info(f\"Total files transformed: {len(successful_files)}\")\n",
@@ -324,12 +323,9 @@
 					"            logging.info(f\"File: {output_file}, Columns: {len(df.columns)}\")\n",
 					"\n",
 					"if __name__ == \"__main__\":\n",
-					"    main()\n",
-					"\n",
-					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 32
+				"execution_count": 38
 			}
 		]
 	}

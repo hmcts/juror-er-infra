@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8e702002-c118-45ce-b899-99920fea0b55"
+				"spark.autotune.trackingId": "dc28d088-3258-47ce-8268-33f7f2e5a526"
 			}
 		},
 		"metadata": {
@@ -59,7 +59,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 34
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -70,7 +70,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 35
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -309,6 +309,13 @@
 					"        col(\"Elector Surname\").alias(\"lname\"),\n",
 					"        col(\"Elector Forename\").alias(\"fname\"),\n",
 					"        col(\"Elector DOB\").alias(\"dob\"),\n",
+					"        when(col(\"Flasg/Markers\").isNotNull(), col(\"Flasg/Markers\"))\n",
+					"        .when(col(\"flags_original\").isNotNull(), col(\"flags_original\"))\n",
+					"        .when(col(\"Flag\").isNotNull(), col(\"Flag\"))\n",
+					"        .when(col(\"Other Markers\").isNotNull(), col(\"Other Markers\"))\n",
+					"        .when(col(\"Markers\").isNotNull(), col(\"Markers\"))\n",
+					"        .when(col(\"Jury_Flag\").isNotNull(), col(\"Jury_Flag\"))\n",
+					"        .otherwise(lit(None)).cast(\"string\").alias(\"flags\")\n",
 					"        col(\"Flasg/Markers\").alias(\"flags\"),\n",
 					"        col(\"Address1\").alias(\"address\"),\n",
 					"        col(\"Address2\").alias(\"address2\"),\n",
@@ -376,7 +383,7 @@
 					"    \n",
 					"    print(f\"\\nProcessing completed. {voters_temp_df.count()} records written to {output_path}\")"
 				],
-				"execution_count": 36
+				"execution_count": 49
 			}
 		]
 	}

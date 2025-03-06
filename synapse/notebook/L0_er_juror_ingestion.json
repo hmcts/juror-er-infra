@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f44d022f-649b-4ab1-9e6a-5a806c11b1de"
+				"spark.autotune.trackingId": "c602e4b0-9472-4c86-abee-cef0f2d5c9d7"
 			}
 		},
 		"metadata": {
@@ -194,7 +194,7 @@
 					"        \n",
 					"        # Handle Excel files\n",
 					"        if file_type == 'excel':\n",
-					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/excel/{folder_name}.xlsx\"\n",
+					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_name}.xlsx\"\n",
 					"            print(f\"Moving Excel file to: {dest_path}\")\n",
 					"            mssparkutils.fs.cp(source_path, dest_path, True)\n",
 					"            return True, f\"excel/{folder_name}.xlsx\"\n",
@@ -211,7 +211,7 @@
 					"                return True, f\"empty/{folder_name}.csv\"\n",
 					"            \n",
 					"            # Process non-empty CSV - save directly as folder_name.csv\n",
-					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/csv/{folder_name}.csv\"\n",
+					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_name}.csv\"\n",
 					"            print(f\"Processing CSV file with {row_count} rows to: {dest_path}\")\n",
 					"            \n",
 					"            # Write as single file with header\n",

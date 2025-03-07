@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e4a0d85a-9aac-4158-9888-879cbe99f1e9"
+				"spark.autotune.trackingId": "b7900709-4814-41ea-a6dc-9f18fecb8837"
 			}
 		},
 		"metadata": {
@@ -80,7 +80,6 @@
 					"   - `get_file_type`: Determine the file type (CSV or Excel).\n",
 					"   - `process_folder`: Recursively process the 'files' folder and return all files.\n",
 					"   - `get_folder_parts`: Extract folder information for naming.\n",
-					"   - `process_metadata_file`: Process metadata files.\n",
 					"   - `process_file`: Process CSV or Excel files, transform the data, and save as Parquet files.\n",
 					"   - `transform_data`: Transform the data by cleaning text columns and splitting names.\n",
 					"   - `split_elector_name`: Split the 'Elector Name' field into surname and forename components.\n",

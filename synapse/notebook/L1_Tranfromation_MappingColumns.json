@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f7d4d4b1-a3b8-4e75-9a92-0f419ea0b245"
+				"spark.autotune.trackingId": "e4a0d85a-9aac-4158-9888-879cbe99f1e9"
 			}
 		},
 		"metadata": {
@@ -49,6 +49,69 @@
 		},
 		"cells": [
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# L1_er_juror_transformation_mappingcolumns"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Code Explanation\n",
+					"\n",
+					"The code is designed to process CSV and Excel files from a specified folder in Azure Blob Storage, transform the data, and save the transformed data as Parquet files into a mapping folder. The main steps involved are:\n",
+					"\n",
+					"1. **Initialize Spark Session**: Set up a Spark session with the required packages for reading Excel files.\n",
+					"2. **Define Helper Functions**:\n",
+					"   - `get_file_type`: Determine the file type (CSV or Excel).\n",
+					"   - `process_folder`: Recursively process the 'files' folder and return all files.\n",
+					"   - `get_folder_parts`: Extract folder information for naming.\n",
+					"   - `process_metadata_file`: Process metadata files.\n",
+					"   - `process_file`: Process CSV or Excel files, transform the data, and save as Parquet files.\n",
+					"   - `transform_data`: Transform the data by cleaning text columns and splitting names.\n",
+					"   - `split_elector_name`: Split the 'Elector Name' field into surname and forename components.\n",
+					"   - `process_name_components`: Process name components separately.\n",
+					"   - `read_mapping`: Read all mapping files in the directory and return a set of mapped files.\n",
+					"   - `print_detailed_summary`: Print a detailed summary of moved files.\n",
+					"3. **Main Function**:\n",
+					"   - Scan the source path for files to process.\n",
+					"   - Read the log of processed files.\n",
+					"   - Read the mapping of already processed files.\n",
+					"   - Filter out files that have already been processed.\n",
+					"   - Process each new file, transform the data, and save as Parquet files.\n",
+					"   - Print a detailed summary of moved files.\n",
+					"   - Update the log of processed files.\n",
+					""
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 1. Initialize Spark Session and Load Libaries"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"import logging\n",
@@ -60,7 +123,7 @@
 					"import os\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 31
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -74,30 +137,24 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 32
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 3. Read Column Mapping"
+				]
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def extract_la_code(file_path):\n",
-					"    try:\n",
-					"        path_parts = file_path.split('/')\n",
-					"        for part in path_parts:\n",
-					"            if '_' in part and len(part) > 9 and part[:8].isdigit() and part[8] == '_':\n",
-					"                la_code = os.path.splitext(part[9:])[0]\n",
-					"                logging.info(f\"Extracted LA_Code: {la_code}\")\n",
-					"                return la_code\n",
-					"        for i, part in enumerate(path_parts):\n",
-					"            if part.lower() in ['csv', 'excel'] and i+1 < len(path_parts):\n",
-					"                la_code = path_parts[i+1]\n",
-					"                logging.info(f\"Extracted LA_Code from folder: {la_code}\")\n",
-					"                return la_code\n",
-					"        logging.warning(\"Could not extract LA_Code from path\")\n",
-					"        return None\n",
-					"    except Exception as e:\n",
-					"        logging.error(f\"Error extracting LA_Code: {str(e)}\")\n",
-					"        return None\n",
-					"\n",
 					"def read_column_mapping(spark, config_path):\n",
 					"    \"\"\"Read and parse the column mapping configuration\"\"\"\n",
 					"    try:\n",
@@ -112,16 +169,158 @@
 					"            mapping_dict = json.loads(json_str)\n",
 					"            return mapping_dict[\"mappings\"]\n",
 					"        except Exception as e2:\n",
-					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")\n",
-					"\n",
+					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 4. Get Reverse Mapping"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def get_reverse_mapping(column_mapping):\n",
 					"    \"\"\"Create a reverse mapping for easy lookup\"\"\"\n",
 					"    reverse_map = {}\n",
 					"    for standard_name, details in column_mapping.items():\n",
 					"        for alias in details[\"aliases\"]:\n",
 					"            reverse_map[alias.lower()] = standard_name\n",
-					"    return reverse_map\n",
-					"\n",
+					"    return reverse_map"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### 5. List Folders"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def list_files(folder_path, extensions):\n",
+					"    \"\"\"List all files with specific extensions in a folder\"\"\"\n",
+					"    try:\n",
+					"        files = mssparkutils.fs.ls(folder_path)\n",
+					"        return [f.path for f in files if any(f.name.lower().endswith(ext) for ext in extensions)]\n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Error listing files: {str(e)}\")\n",
+					"        return []"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### 6.1 Read CSV Files"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def read_file(spark, file_path):\n",
+					"    if file_path.lower().endswith('.csv'):\n",
+					"        logging.info(\"Reading as CSV file\")\n",
+					"        return spark.read.option(\"header\", \"true\").option(\"inferSchema\", \"true\").csv(file_path)\n",
+					"    elif file_path.lower().endswith(('.xlsx', '.xls')):\n",
+					"        logging.info(\"Reading as Excel file\")\n",
+					"        return read_excel_file(spark, file_path)\n",
+					"    else:\n",
+					"        raise ValueError(f\"Unsupported file format: {file_path}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### 6.2 Read Excel Files"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def read_excel_file(spark, file_path):\n",
+					"    try:\n",
+					"        return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").load(file_path)\n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Error reading Excel without sheet specification: {str(e)}\")\n",
+					"        try:\n",
+					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetName\", \"Sheet1\").load(file_path)\n",
+					"        except Exception as e2:\n",
+					"            logging.error(f\"Error reading Excel with Sheet1: {str(e2)}\")\n",
+					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetIndex\", 0).load(file_path)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def standardize_column_names(df, reverse_mapping):\n",
+					"    for col in df.columns:\n",
+					"        std_name = reverse_mapping.get(col.lower())\n",
+					"        if std_name:\n",
+					"            df = df.withColumnRenamed(col, std_name)\n",
+					"            logging.info(f\"Renamed column: {col} -> {std_name}\")\n",
+					"    return df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def transform_data(df, creation_date, la_code=None):\n",
+					"    for col_name in df.columns:\n",
+					"        if isinstance(df.schema[col_name].dataType, StringType):\n",
+					"            logging.info(f\"Cleaning text column: {col_name}\")\n",
+					"            df = df.withColumn(col_name, upper(trim(df[col_name])))\n",
+					"    df = split_elector_name(df)\n",
+					"    df = process_name_components(df)\n",
+					"    if \"Elector Forename\" not in df.columns:\n",
+					"        df = df.withColumn(\"Elector Forename\", lit(None).cast(StringType()))\n",
+					"    if \"Elector Surname\" not in df.columns:\n",
+					"        df = df.withColumn(\"Elector Surname\", lit(None).cast(StringType()))\n",
+					"    if creation_date:\n",
+					"        df = df.withColumn(\"Creation Date\", lit(creation_date))\n",
+					"    if la_code:\n",
+					"        df = df.withColumn(\"LA Code\", lit(la_code))\n",
+					"    return df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def split_elector_name(df):\n",
 					"    \"\"\"Split the 'Elector Name' field into surname and forename components.\"\"\"\n",
 					"    if \"Elector Name\" in df.columns:\n",
@@ -133,157 +332,26 @@
 					"                                upper(trim(concat_ws(\" \", \n",
 					"                                                     slice(col(\"name_parts\"), 2, size(col(\"name_parts\"))))))).otherwise(lit(None)))\n",
 					"        df = df.drop(\"name_parts\")\n",
-					"    return df\n",
-					"\n",
+					"    return df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def process_name_components(df):\n",
 					"    \"\"\"Process name components separately\"\"\"\n",
 					"    name_columns = [\"Elector Title\", \"Elector Forename\", \"Elector Surname\", \"Elector Middlename\", \"Suffix\", \"Initials\"]\n",
 					"    for col_name in name_columns:\n",
 					"        if col_name in df.columns:\n",
 					"            df = df.withColumn(col_name, when(col(col_name).isNotNull(), upper(trim(col(col_name)))).otherwise(None))\n",
-					"    return df\n",
-					"\n",
-					"def list_files(folder_path, extensions):\n",
-					"    \"\"\"List all files with specific extensions in a folder\"\"\"\n",
-					"    try:\n",
-					"        files = mssparkutils.fs.ls(folder_path)\n",
-					"        return [f.path for f in files if any(f.name.lower().endswith(ext) for ext in extensions)]\n",
-					"    except Exception as e:\n",
-					"        logging.error(f\"Error listing files: {str(e)}\")\n",
-					"        return []\n",
-					"\n",
-					"def process_file(spark, file_path, reverse_mapping, output_path, error_path):\n",
-					"    \"\"\"Process individual file with error handling\"\"\"\n",
-					"    try:\n",
-					"        file_name = os.path.basename(file_path)\n",
-					"        if not any(file_name.lower().endswith(ext) for ext in ['.csv', '.xlsx', '.xls']):\n",
-					"            logging.info(f\"Skipping unsupported file format: {file_path}\")\n",
-					"            return {\"file\": file_name, \"status\": \"skipped\", \"output\": None}\n",
-					"        \n",
-					"        logging.info(f\"\\nProcessing file: {file_name} from path: {file_path}\")\n",
-					"        la_code = extract_la_code(file_path)\n",
-					"        creation_date = extract_creation_date(file_path)\n",
-					"        df = read_file(spark, file_path)\n",
-					"        \n",
-					"        if df.rdd.isEmpty():\n",
-					"            logging.warning(f\"File {file_path} is empty. Skipping processing.\")\n",
-					"            return {\"file\": file_name, \"status\": \"skipped\", \"output\": None}\n",
-					"        \n",
-					"        logging.info(f\"Original columns: {df.columns}\")\n",
-					"        logging.info(f\"Row count: {df.count()}\")\n",
-					"        df = standardize_column_names(df, reverse_mapping)\n",
-					"        logging.info(f\"Mapped columns: {df.columns}\")\n",
-					"        df = transform_data(df, creation_date, la_code)\n",
-					"        output_file = generate_output_filename(file_path, output_path)\n",
-					"        temp_output_path = f\"{output_file}_temp\"\n",
-					"        logging.info(f\"Saving to temporary path: {temp_output_path}\")\n",
-					"        df.coalesce(1).write.mode(\"overwrite\").parquet(temp_output_path)\n",
-					"        \n",
-					"        # List the part files in the temporary output path\n",
-					"        part_files = mssparkutils.fs.ls(temp_output_path)\n",
-					"        part_file = next(f for f in part_files if f.name.startswith(\"part-\") and f.name.endswith(\".parquet\"))\n",
-					"        \n",
-					"        # Move the part file to the desired output file name\n",
-					"        mssparkutils.fs.mv(part_file.path, output_file)\n",
-					"        mssparkutils.fs.rm(temp_output_path, recurse=True)\n",
-					"        \n",
-					"        logging.info(f\"Saved to: {output_file}\")\n",
-					"        return {\"file\": file_name, \"status\": \"success\", \"output\": output_file}\n",
-					"    except Exception as e:\n",
-					"        logging.error(f\"ERROR processing {file_path}: {str(e)}\")\n",
-					"        error_report = {\"file\": file_name, \"status\": \"error\", \"error\": str(e)}\n",
-					"        save_error_report(spark, error_report, error_path)\n",
-					"        return error_report\n",
-					"\n",
-					"def extract_creation_date(file_path):\n",
-					"    try:\n",
-					"        path_parts = file_path.split('/')\n",
-					"        for part in path_parts:\n",
-					"            if len(part) >= 8 and part[:8].isdigit():\n",
-					"                return datetime.strptime(part[:8], '%Y%m%d').date()\n",
-					"        return None\n",
-					"    except ValueError as e:\n",
-					"        logging.error(f\"Could not parse date from path: {str(e)}\")\n",
-					"        return None\n",
-					"\n",
-					"def read_file(spark, file_path):\n",
-					"    if file_path.lower().endswith('.csv'):\n",
-					"        logging.info(\"Reading as CSV file\")\n",
-					"        return spark.read.option(\"header\", \"true\").option(\"inferSchema\", \"true\").csv(file_path)\n",
-					"    elif file_path.lower().endswith(('.xlsx', '.xls')):\n",
-					"        logging.info(\"Reading as Excel file\")\n",
-					"        return read_excel_file(spark, file_path)\n",
-					"    else:\n",
-					"        raise ValueError(f\"Unsupported file format: {file_path}\")\n",
-					"\n",
-					"def read_excel_file(spark, file_path):\n",
-					"    try:\n",
-					"        return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").load(file_path)\n",
-					"    except Exception as e:\n",
-					"        logging.error(f\"Error reading Excel without sheet specification: {str(e)}\")\n",
-					"        try:\n",
-					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetName\", \"Sheet1\").load(file_path)\n",
-					"        except Exception as e2:\n",
-					"            logging.error(f\"Error reading Excel with Sheet1: {str(e2)}\")\n",
-					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetIndex\", 0).load(file_path)\n",
-					"\n",
-					"def standardize_column_names(df, reverse_mapping):\n",
-					"    for col in df.columns:\n",
-					"        std_name = reverse_mapping.get(col.lower())\n",
-					"        if std_name:\n",
-					"            df = df.withColumnRenamed(col, std_name)\n",
-					"            logging.info(f\"Renamed column: {col} -> {std_name}\")\n",
-					"    return df\n",
-					"\n",
-					"def generate_output_filename(file_path, output_path):\n",
-					"    path_parts = file_path.split('/')\n",
-					"    base_folder = next((part for part in reversed(path_parts) if '_' in part and not part.endswith(('.csv', '.xlsx', '.xls'))), None)\n",
-					"    output_filename = f\"{base_folder}.parquet\" if base_folder else f\"{os.path.splitext(os.path.basename(file_path))[0]}.parquet\"\n",
-					"    return f\"{output_path}/{output_filename}\"\n",
-					"\n",
-					"def save_error_report(spark, error_report, error_path):\n",
-					"    error_file = f\"{error_path}/{os.path.splitext(error_report['file'])[0]}_error.json\"\n",
-					"    try:\n",
-					"        spark.createDataFrame([error_report]).write.mode(\"overwrite\").json(error_file)\n",
-					"        logging.info(f\"Error report saved to: {error_file}\")\n",
-					"    except Exception as e:\n",
-					"        logging.error(f\"Could not save error report: {str(e)}\")\n",
-					"\n",
-					"def transform_data(df, creation_date, la_code=None):\n",
-					"    for col_name in df.columns:\n",
-					"        if isinstance(df.schema[col_name].dataType, StringType):\n",
-					"            logging.info(f\"Cleaning text column: {col_name}\")\n",
-					"            df = df.withColumn(col_name, upper(trim(df[col_name])))\n",
-					"    df = split_elector_name(df)\n",
-					"    df = process_name_components(df)\n",
-					"    if \"Elector Forename\" in df.columns:\n",
-					"        df = add_suffix(df)\n",
-					"        df = add_middlename(df)\n",
-					"        df = add_initials(df)\n",
-					"    if creation_date:\n",
-					"        logging.info(f\"Adding creation date: {creation_date}\")\n",
-					"        df = df.withColumn(\"CreationDate\", lit(creation_date.isoformat()))\n",
-					"    df = df.withColumn(\"LA_Code\", lit(la_code) if la_code else lit(None))\n",
-					"    return df\n",
-					"\n",
-					"def add_suffix(df):\n",
-					"    if \"Suffix\" in df.columns:\n",
-					"        logging.info(\"Adding Suffix to Elector Forename\")\n",
-					"        df = df.withColumn(\"Elector Forename\", when(col(\"Suffix\").isNotNull() & (length(trim(col(\"Suffix\"))) > 0), concat(df[\"Elector Forename\"], lit(\" \"), df[\"Suffix\"])).otherwise(df[\"Elector Forename\"]))\n",
-					"    return df\n",
-					"\n",
-					"def add_middlename(df):\n",
-					"    if \"Elector Middlename\" in df.columns:\n",
-					"        logging.info(\"Adding Middlename to Elector Forename\")\n",
-					"        df = df.withColumn(\"Elector Forename\", when(col(\"Elector Middlename\").isNotNull() & (length(trim(col(\"Elector Middlename\"))) > 0), concat(df[\"Elector Forename\"], lit(\" \"), df[\"Elector Middlename\"])).otherwise(df[\"Elector Forename\"]))\n",
-					"    return df\n",
-					"\n",
-					"def add_initials(df):\n",
-					"    if \"Initials\" in df.columns:\n",
-					"        logging.info(\"Adding Initials to Elector Forename\")\n",
-					"        df = df.withColumn(\"Elector Forename\", when(col(\"Initials\").isNotNull() & (length(trim(col(\"Initials\"))) > 0), concat(df[\"Elector Forename\"], lit(\" \"), df[\"Initials\"])).otherwise(df[\"Elector Forename\"]))\n",
-					"    return df\n",
-					"\n",
+					"    return df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def process_file(source_path, date_folder, third_folder, file_name, storage_account, mapped_files):\n",
 					"    \"\"\"Process CSV or Excel file with corrected folder structure\"\"\"\n",
 					"    try:\n",
@@ -319,8 +387,13 @@
 					"        return True, mapping_path\n",
 					"    except Exception as e:\n",
 					"        logging.error(f\"Error processing file {source_path}: {str(e)}\")\n",
-					"        return False, None\n",
-					"\n",
+					"        return False, None"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def read_mapping(mapping_path):\n",
 					"    \"\"\"Read all mapping files in the directory and return a set of mapped files\"\"\"\n",
 					"    try:\n",
@@ -333,106 +406,82 @@
 					"        return mapped_files\n",
 					"    except Exception as e:\n",
 					"        logging.error(f\"Error reading mapping files: {str(e)}\")\n",
-					"        return set()\n",
-					"\n",
-					"def process_folder(path, storage_account, moved_files):\n",
-					"    \"\"\"Process the 'files' folder and return all files\"\"\"\n",
-					"    all_files = []\n",
-					"    try:\n",
-					"        files = mssparkutils.fs.ls(path)\n",
-					"        for file_info in files:\n",
-					"            if not file_info.isDir and should_process_file(file_info.path):\n",
-					"                logging.info(f\"Found file: {file_info.path}\")\n",
-					"                all_files.append(file_info.path)\n",
-					"    except Exception as e:\n",
-					"        logging.error(f\"Error accessing path {path}: {str(e)}\")\n",
-					"    return all_files\n",
-					"\n",
+					"        return set()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def print_detailed_summary(moved_files):\n",
 					"    \"\"\"Print detailed summary of moved files\"\"\"\n",
 					"    print(\"\\nSummary of Moved Files:\")\n",
 					"    print(f\"Data Files Successfully Moved: {len(moved_files['data_success'])}\")\n",
 					"    for file in moved_files['data_success']:\n",
 					"        print(f\"  - {file}\")\n",
-					"    print(f\"Metadata Files Successfully Moved: {len(moved_files['metadata_success'])}\")\n",
-					"    for file in moved_files['metadata_success']:\n",
-					"        print(f\"  - {file}\")\n",
 					"    print(f\"Failed Files: {len(moved_files['failed'])}\")\n",
 					"    for file in moved_files['failed']:\n",
 					"        print(f\"  - {file}\")\n",
 					"    print(f\"Quarantined Files: {len(moved_files['quarantine'])}\")\n",
 					"    for file in moved_files['quarantine']:\n",
-					"        print(f\"  - {file}\")\n",
-					"\n",
+					"        print(f\"  - {file}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def main():\n",
+					"    spark = create_spark_session()\n",
 					"    storage_account = \"baubaisadfsastg\"\n",
-					"    source_path = f\"abfss://juror-ingestion@{storage_account}.dfs.core.windows.net\"\n",
-					"    log_file_path = f\"abfss://juror-ingestion@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
-					"    mapping_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/mapping/mapping.json\"\n",
+					"    folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
+					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
+					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
+					"    error_folder = f\"{transform_folder}/errors\"\n",
+					"    log_file_path = f\"{transform_folder}/processed_files_log.json\"\n",
 					"    \n",
-					"    moved_files = {\n",
-					"        'data_success': [],\n",
-					"        'metadata_success': [],\n",
-					"        'failed': [],\n",
-					"        'quarantine': []\n",
-					"    }\n",
-					"    \n",
-					"    logging.info(f\"Scanning source path: {source_path}\")\n",
-					"    files = process_folder(source_path, storage_account, moved_files)\n",
-					"    logging.info(f\"Found {len(files)} files to process\")\n",
+					"    # Read column mapping\n",
+					"    mapping_file = f\"{config_folder}/col_mapping.json\"\n",
+					"    try:\n",
+					"        column_mapping = read_column_mapping(spark, mapping_file)\n",
+					"        reverse_mapping = get_reverse_mapping(column_mapping)\n",
+					"    except Exception as e:\n",
+					"        logging.fatal(f\"Fatal error reading mapping file: {str(e)}\")\n",
+					"        return\n",
 					"    \n",
 					"    # Read the log of processed files\n",
 					"    try:\n",
 					"        processed_files_log = spark.read.json(log_file_path).select(\"file\").rdd.flatMap(lambda x: x).collect()\n",
-					"        logging.info(f\"Read processed files log with {len(processed_files_log)} entries\")\n",
 					"    except Exception as e:\n",
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        processed_files_log = []\n",
 					"    \n",
-					"    # Read the mapping of already processed files\n",
-					"    mapped_files = read_mapping(mapping_path)\n",
-					"    logging.info(f\"Read mapping with {len(mapped_files)} entries\")\n",
+					"    all_files = list_files(folder, ['.csv', '.xlsx', '.xls'])\n",
+					"    logging.info(f\"Total files to process: {len(all_files)}\")\n",
 					"    \n",
 					"    # Filter out files that have already been processed\n",
-					"    new_files = [file for file in files if file not in processed_files_log]\n",
+					"    new_files = [file for file in all_files if file not in processed_files_log]\n",
 					"    logging.info(f\"New files to process: {len(new_files)}\")\n",
 					"    \n",
-					"    for file_path in new_files:\n",
-					"        try:\n",
-					"            file_name = file_path.split('/')[-1]\n",
-					"            \n",
-					"            if is_metadata_file(file_path):\n",
-					"                logging.info(f\"Processing metadata file: {file_path}\")\n",
-					"                success, new_path = process_metadata_file(file_path, file_name, storage_account)\n",
-					"                if success:\n",
-					"                    moved_files['metadata_success'].append(new_path)\n",
-					"                else:\n",
-					"                    moved_files['failed'].append(f\"{file_path} (metadata move failed)\")\n",
-					"                continue\n",
-					"            \n",
-					"            if not should_process_file(file_path):\n",
-					"                logging.info(f\"Skipping unsupported file format: {file_path}\")\n",
-					"                continue\n",
-					"            \n",
-					"            date_folder, third_folder = get_folder_parts(file_path)\n",
-					"            if date_folder and third_folder:\n",
-					"                logging.info(f\"Processing data file: {file_path}\")\n",
-					"                success, new_path = process_file(file_path, date_folder, third_folder, \n",
-					"                                                 file_name, storage_account, mapped_files)\n",
-					"                if success:\n",
-					"                    moved_files['data_success'].append(new_path)\n",
-					"                else:\n",
-					"                    moved_files['failed'].append(f\"{file_path} (processing failed)\")\n",
-					"            else:\n",
-					"                logging.warning(f\"Invalid folder structure for file: {file_path}\")\n",
-					"                moved_files['failed'].append(f\"{file_path} (invalid folder structure)\")\n",
-					"                \n",
-					"        except Exception as e:\n",
-					"            logging.error(f\"Error processing {file_path}: {str(e)}\")\n",
-					"            moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
-					"            continue\n",
+					"    results = [process_file(spark, file_path, reverse_mapping, transform_folder, error_folder) for file_path in new_files]\n",
+					"    summary_df = spark.createDataFrame(results)\n",
+					"    summary_df.write.mode(\"overwrite\").json(f\"{transform_folder}/processing_summary.json\")\n",
+					"    logging.info(\"\\nProcessing Summary:\")\n",
+					"    logging.info(f\"Total files processed: {len(results)}\")\n",
+					"    logging.info(f\"Successful: {len([r for r in results if r['status'] == 'success'])}\")\n",
+					"    logging.info(f\"Failed: {len([r for r in results if r['status'] == 'error'])}\")\n",
 					"    \n",
-					"    print_detailed_summary(moved_files)\n",
+					"    successful_files = [r for r in results if r['status'] == 'success']\n",
+					"    if successful_files:\n",
+					"        # Generate summary report\n",
+					"        logging.info(\"\\nSummary Report:\")\n",
+					"        logging.info(f\"Total files transformed: {len(successful_files)}\")\n",
+					"        logging.info(f\"Total errors: {len([r for r in results if r['status'] == 'error'])}\")\n",
+					"        \n",
+					"        for file in successful_files:\n",
+					"            output_file = file['output']\n",
+					"            df = spark.read.parquet(output_file)\n",
+					"            logging.info(f\"File: {output_file}, Columns: {len(df.columns)}\")\n",
 					"    \n",
 					"    # Update the log of processed files\n",
 					"    new_processed_files_log = spark.createDataFrame([(file,) for file in new_files], [\"file\"])\n",
@@ -442,12 +491,11 @@
 					"    else:\n",
 					"        updated_log_df = new_processed_files_log\n",
 					"    updated_log_df.write.mode(\"overwrite\").json(log_file_path)\n",
-					"    logging.info(\"Updated processed files log\")\n",
 					"\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 34
+				"execution_count": null
 			}
 		]
 	}

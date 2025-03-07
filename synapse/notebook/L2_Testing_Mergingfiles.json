@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c03e4a22-b81c-4a64-94b8-db921c00013f"
+				"spark.autotune.trackingId": "b598ef77-a125-4552-9049-8fdc7b18d93d"
 			}
 		},
 		"metadata": {
@@ -49,17 +49,104 @@
 		},
 		"cells": [
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Implementation Sequence\n",
+					"\n",
+					"Start with Setup Functions\n",
+					"\n",
+					"configure_logging()\n",
+					"load_config()\n",
+					"create_spark_session() \n",
+					"\n",
+					"Column Mapping Functions\n",
+					"\n",
+					"normalize_column_name()\n",
+					"get_standard_column_map()\n",
+					"Replace or modify your existing read_column_mapping() function\n",
+					"\n",
+					"\n",
+					"Data Processing Core Functions\n",
+					"\n",
+					"standardize_columns() (implement this to replace process_df_with_mapping())\n",
+					"process_parquet_files()\n",
+					"\n",
+					"\n",
+					"Data Transformation Functions\n",
+					"\n",
+					"merge_dataframes()\n",
+					"remove_duplicates() (implement this to handle deduplication)\n",
+					"transform_to_target_schema()\n",
+					"\n",
+					"\n",
+					"Validation and Quality Control\n",
+					"\n",
+					"validate_output_schema()\n",
+					"\n",
+					"\n",
+					"Main Function\n",
+					"\n",
+					"Rewrite your main function to use all the new components"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"from pyspark.sql import SparkSession, Window\n",
 					"from pyspark.sql.functions import *\n",
 					"from pyspark.sql.types import *\n",
 					"import json\n",
+					"import logging\n",
 					"from datetime import datetime\n",
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 9
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def configure_logging():\n",
+					"    \"\"\"Set up proper logging with rotating file handler\"\"\"\n",
+					"    log_format = '%(asctime)s [%(levelname)s] %(message)s'\n",
+					"    logging.basicConfig(level=logging.INFO, format=log_format)\n",
+					"    \n",
+					"    # Add a handler that writes to a log file\n",
+					"    file_handler = logging.FileHandler('electoral_etl.log')\n",
+					"    file_handler.setFormatter(logging.Formatter(log_format))\n",
+					"    \n",
+					"    # Get the root logger and add the file handler\n",
+					"    root_logger = logging.getLogger()\n",
+					"    root_logger.addHandler(file_handler)\n",
+					"    \n",
+					"    return root_logger"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def load_config():\n",
+					"    \"\"\"Load configuration from environment or config file\"\"\"\n",
+					"    return {\n",
+					"        \"storage_account\": \"baubaisadfsastg\",\n",
+					"        \"input_paths\": {\n",
+					"            \"transform_folder\": \"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/transformation\",\n",
+					"            \"config_folder\": \"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/config/schema\"\n",
+					"        },\n",
+					"        \"output_paths\": {\n",
+					"            \"voters_temp\": \"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp\"\n",
+					"        }\n",
+					"    }"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -70,7 +157,47 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 10
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Column Mapping"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def normalize_column_name(name):\n",
+					"    \"\"\"Normalize column name for comparison (lowercase, remove spaces)\"\"\"\n",
+					"    if name is None:\n",
+					"        return None\n",
+					"    return re.sub(r'[^a-zA-Z0-9]', '', name.lower())\n",
+					"\n",
+					"def get_standard_column_map(column_mapping):\n",
+					"    \"\"\"Create a normalized mapping for easier column matching\"\"\"\n",
+					"    normalized_map = {}\n",
+					"    \n",
+					"    # Map standard names\n",
+					"    for standard_name, variations in column_mapping.items():\n",
+					"        normalized_std = normalize_column_name(standard_name)\n",
+					"        normalized_map[normalized_std] = standard_name\n",
+					"        \n",
+					"        # Map all variations\n",
+					"        for variation in variations:\n",
+					"            normalized_var = normalize_column_name(variation)\n",
+					"            normalized_map[normalized_var] = standard_name\n",
+					"    \n",
+					"    return normalized_map"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -97,6 +224,249 @@
 					"            return mapping_dict[\"mappings\"]\n",
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Data Processing Core Functions"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def normalize_column_name(name):\n",
+					"    \"\"\"Normalize column name for comparison (lowercase, remove spaces)\"\"\"\n",
+					"    if name is None:\n",
+					"        return None\n",
+					"    return re.sub(r'[^a-zA-Z0-9]', '', name.lower())\n",
+					"\n",
+					"def get_standard_column_map(column_mapping):\n",
+					"    \"\"\"Create a normalized mapping for easier column matching\"\"\"\n",
+					"    normalized_map = {}\n",
+					"    \n",
+					"    # Map standard names\n",
+					"    for standard_name, variations in column_mapping.items():\n",
+					"        normalized_std = normalize_column_name(standard_name)\n",
+					"        normalized_map[normalized_std] = standard_name\n",
+					"        \n",
+					"        # Map all variations\n",
+					"        for variation in variations:\n",
+					"            normalized_var = normalize_column_name(variation)\n",
+					"            normalized_map[normalized_var] = standard_name\n",
+					"    \n",
+					"    return normalized_map"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def process_parquet_files(spark, folder_path, column_mapping, logger):\n",
+					"    \"\"\"Process all parquet files with better progress tracking\"\"\"\n",
+					"    from notebookutils import mssparkutils\n",
+					"    \n",
+					"    # Get normalized column mapping\n",
+					"    norm_mapping = get_standard_column_map(column_mapping)\n",
+					"    \n",
+					"    # Get all parquet files recursively\n",
+					"    all_files = []\n",
+					"    for item in mssparkutils.fs.ls(folder_path):\n",
+					"        if item.path.endswith(\".parquet\"):\n",
+					"            all_files.append(item.path)\n",
+					"        elif item.isDir:\n",
+					"            # Recursive search in subdirectories\n",
+					"            all_files.extend([f.path for f in mssparkutils.fs.ls(item.path) \n",
+					"                             if f.path.endswith(\".parquet\")])\n",
+					"    \n",
+					"    total_files = len(all_files)\n",
+					"    logger.info(f\"Found {total_files} parquet files to process\")\n",
+					"    \n",
+					"    # Process files in parallel when possible\n",
+					"    standardized_dfs = []\n",
+					"    for i, file_path in enumerate(all_files, 1):\n",
+					"        try:\n",
+					"            logger.info(f\"Processing file {i}/{total_files}: {file_path}\")\n",
+					"            df = spark.read.parquet(file_path)\n",
+					"            \n",
+					"            # Map columns according to the standardized mapping\n",
+					"            mapped_df = standardize_columns(df, norm_mapping)\n",
+					"            \n",
+					"            if mapped_df.columns:\n",
+					"                standardized_dfs.append(mapped_df)\n",
+					"                logger.info(f\"Successfully mapped {len(mapped_df.columns)} columns\")\n",
+					"            else:\n",
+					"                logger.warning(f\"No mappable columns found in {file_path}\")\n",
+					"                \n",
+					"        except Exception as e:\n",
+					"            logger.error(f\"Error processing {file_path}: {str(e)}\")\n",
+					"    \n",
+					"    return standardized_dfs"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Data Transformation Functions"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def merge_dataframes(dfs, partition_columns=None):\n",
+					"    \"\"\"Merge dataframes with optional partitioning for better performance\"\"\"\n",
+					"    if not dfs:\n",
+					"        raise ValueError(\"No dataframes to merge\")\n",
+					"    \n",
+					"    # Determine common schema\n",
+					"    merged_df = dfs[0]\n",
+					"    for df in dfs[1:]:\n",
+					"        merged_df = merged_df.unionByName(df, allowMissingColumns=True)\n",
+					"    \n",
+					"    # Optimize storage if partition columns are specified\n",
+					"    if partition_columns and all(col in merged_df.columns for col in partition_columns):\n",
+					"        return merged_df.repartition(*partition_columns)\n",
+					"    \n",
+					"    # Default behavior - repartition to a reasonable number based on data size\n",
+					"    count = merged_df.count()\n",
+					"    num_partitions = max(1, min(200, count // 100000))  # Adjust based on your cluster\n",
+					"    return merged_df.repartition(num_partitions)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"remove_duplicates() (implement this to handle deduplication)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"transform_to_target_schema() (extract this from your existing code)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Validation"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def validate_output_schema(df, required_columns):\n",
+					"    \"\"\"Validate that the output dataframe meets requirements\"\"\"\n",
+					"    missing_columns = [col for col in required_columns if col not in df.columns]\n",
+					"    \n",
+					"    if missing_columns:\n",
+					"        raise ValueError(f\"Output schema missing required columns: {missing_columns}\")\n",
+					"    \n",
+					"    # Check for null values in key fields\n",
+					"    for col in [\"poll_number\", \"lname\", \"fname\"]:\n",
+					"        if col in df.columns:\n",
+					"            null_count = df.filter(df[col].isNull()).count()\n",
+					"            if null_count > 0:\n",
+					"                logging.warning(f\"Found {null_count} records with null values in {col}\")\n",
+					"    \n",
+					"    # Return True if validation passes\n",
+					"    return True"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def main():\n",
+					"    \"\"\"Main ETL process with better structure\"\"\"\n",
+					"    # Setup\n",
+					"    logger = configure_logging()\n",
+					"    config = load_config()\n",
+					"    spark = create_spark_session()\n",
+					"    \n",
+					"    try:\n",
+					"        # Read configuration\n",
+					"        logger.info(\"Reading column mapping configuration\")\n",
+					"        column_mapping = read_column_mapping(\n",
+					"            spark, \n",
+					"            f\"{config['input_paths']['config_folder']}/col_mapping.json\"\n",
+					"        )\n",
+					"        \n",
+					"        # Process files\n",
+					"        logger.info(\"Processing source files\")\n",
+					"        standardized_dfs = process_parquet_files(\n",
+					"            spark, \n",
+					"            config['input_paths']['transform_folder'],\n",
+					"            column_mapping,\n",
+					"            logger\n",
+					"        )\n",
+					"        \n",
+					"        # Merge data\n",
+					"        logger.info(\"Merging standardized dataframes\")\n",
+					"        merged_df = merge_dataframes(standardized_dfs, [\"postcode_start\"])\n",
+					"        \n",
+					"        # Handle duplicates\n",
+					"        logger.info(\"Removing duplicates\")\n",
+					"        deduplicated_df = remove_duplicates(merged_df)\n",
+					"        \n",
+					"        # Transform to target schema\n",
+					"        logger.info(\"Transforming to target schema\")\n",
+					"        target_df = transform_to_target_schema(deduplicated_df)\n",
+					"        \n",
+					"        # Validate output\n",
+					"        logger.info(\"Validating output schema\")\n",
+					"        required_columns = [\"poll_number\", \"lname\", \"fname\", \"zip\", \"hash_id\"]\n",
+					"        validate_output_schema(target_df, required_columns)\n",
+					"        \n",
+					"        # Write output\n",
+					"        output_path = config['output_paths']['voters_temp']\n",
+					"        logger.info(f\"Writing {target_df.count()} records to {output_path}\")\n",
+					"        \n",
+					"        # Use partitioning for optimal storage and query performance\n",
+					"        target_df.write.partitionBy(\"postcode_start\").mode(\"overwrite\").parquet(output_path)\n",
+					"        \n",
+					"        logger.info(\"ETL process completed successfully\")\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        logger.error(f\"ETL process failed: {str(e)}\")\n",
+					"        raise\n",
+					"    finally:\n",
+					"        # Log final statistics\n",
+					"        logger.info(\"ETL process finished\")\n",
+					"if __name__ == \"__main__\":\n",
+					"        main()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"\n",
 					"def get_all_mapped_columns(column_mapping):\n",
 					"    \"\"\"Get a set of all the column names in the mapping\"\"\"\n",
@@ -382,7 +752,7 @@
 					"    \n",
 					"    print(f\"\\nProcessing completed. {voters_temp_df.count()} records written to {output_path}\")"
 				],
-				"execution_count": 11
+				"execution_count": null
 			}
 		]
 	}

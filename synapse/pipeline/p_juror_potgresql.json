@@ -48,6 +48,33 @@
 					},
 					"snapshot": true
 				}
+			},
+			{
+				"name": "L2_Testing_Mergingfiles",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L1_Tranfromation_MappingColumns",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L2_Testing_Mergingfiles",
+						"type": "NotebookReference"
+					},
+					"snapshot": true
+				}
 			}
 		],
 		"annotations": []

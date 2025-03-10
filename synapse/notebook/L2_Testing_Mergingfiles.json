@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "465841df-9b6c-4aa2-80b0-664fb914652e"
+				"spark.autotune.trackingId": "5bf9b25f-f274-4fa2-8ace-015202c82248"
 			}
 		},
 		"metadata": {
@@ -745,7 +745,7 @@
 					"    \n",
 					"    try:\n",
 					"        # 1. Get configuration and mapping\n",
-					"        column_mapping = read_column_mapping(spark, f\"{config['config_path']}/col_mapping.json\")\n",
+					"        column_mapping = read_column_mapping(spark, f\"{config['config_path']}/col_mapping_schema.json\")\n",
 					"        \n",
 					"        # 2. Identify new files\n",
 					"        new_file_paths, all_file_paths = get_new_files(spark, config[\"input_path\"], process_log_path)\n",

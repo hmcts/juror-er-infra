@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b598ef77-a125-4552-9049-8fdc7b18d93d"
+				"spark.autotune.trackingId": "465841df-9b6c-4aa2-80b0-664fb914652e"
 			}
 		},
 		"metadata": {
@@ -174,6 +174,12 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"def normalize_column_name(name):\n",
 					"    \"\"\"Normalize column name for comparison (lowercase, remove spaces)\"\"\"\n",
@@ -196,35 +202,6 @@
 					"            normalized_map[normalized_var] = standard_name\n",
 					"    \n",
 					"    return normalized_map"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"def read_column_mapping(spark, config_path):\n",
-					"    \"\"\"Read and parse the column mapping configuration\"\"\"\n",
-					"    try:\n",
-					"        # Read the JSON file\n",
-					"        mapping_df = spark.read.text(config_path)\n",
-					"        \n",
-					"        # Combine all lines into a single string\n",
-					"        json_str = mapping_df.agg(concat_ws(\"\", collect_list(\"value\"))).collect()[0][0]\n",
-					"        \n",
-					"        # Parse the JSON string\n",
-					"        mapping_dict = json.loads(json_str)\n",
-					"        return mapping_dict[\"mappings\"]\n",
-					"    except Exception as e:\n",
-					"        print(f\"Error reading mapping file: {str(e)}\")\n",
-					"        try:\n",
-					"            # Fallback to using wholeTextFiles\n",
-					"            mapping_rdd = spark.sparkContext.wholeTextFiles(config_path)\n",
-					"            json_str = mapping_rdd.values().first()\n",
-					"            mapping_dict = json.loads(json_str)\n",
-					"            return mapping_dict[\"mappings\"]\n",
-					"        except Exception as e2:\n",
-					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")\n",
-					""
 				],
 				"execution_count": null
 			},
@@ -243,6 +220,12 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"def normalize_column_name(name):\n",
 					"    \"\"\"Normalize column name for comparison (lowercase, remove spaces)\"\"\"\n",
@@ -270,6 +253,12 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"def process_parquet_files(spark, folder_path, column_mapping, logger):\n",
 					"    \"\"\"Process all parquet files with better progress tracking\"\"\"\n",
@@ -329,6 +318,12 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"def merge_dataframes(dfs, partition_columns=None):\n",
 					"    \"\"\"Merge dataframes with optional partitioning for better performance\"\"\"\n",
@@ -353,33 +348,12 @@
 			},
 			{
 				"cell_type": "code",
-				"source": [
-					"remove_duplicates() (implement this to handle deduplication)"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"transform_to_target_schema() (extract this from your existing code)"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "markdown",
 				"metadata": {
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
+					"editable": false,
+					"run_control": {
+						"frozen": true
 					}
 				},
-				"source": [
-					"### Validation"
-				]
-			},
-			{
-				"cell_type": "code",
 				"source": [
 					"def validate_output_schema(df, required_columns):\n",
 					"    \"\"\"Validate that the output dataframe meets requirements\"\"\"\n",
@@ -401,356 +375,423 @@
 				"execution_count": null
 			},
 			{
-				"cell_type": "code",
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
 				"source": [
-					"def main():\n",
-					"    \"\"\"Main ETL process with better structure\"\"\"\n",
-					"    # Setup\n",
-					"    logger = configure_logging()\n",
-					"    config = load_config()\n",
-					"    spark = create_spark_session()\n",
-					"    \n",
-					"    try:\n",
-					"        # Read configuration\n",
-					"        logger.info(\"Reading column mapping configuration\")\n",
-					"        column_mapping = read_column_mapping(\n",
-					"            spark, \n",
-					"            f\"{config['input_paths']['config_folder']}/col_mapping.json\"\n",
-					"        )\n",
-					"        \n",
-					"        # Process files\n",
-					"        logger.info(\"Processing source files\")\n",
-					"        standardized_dfs = process_parquet_files(\n",
-					"            spark, \n",
-					"            config['input_paths']['transform_folder'],\n",
-					"            column_mapping,\n",
-					"            logger\n",
-					"        )\n",
-					"        \n",
-					"        # Merge data\n",
-					"        logger.info(\"Merging standardized dataframes\")\n",
-					"        merged_df = merge_dataframes(standardized_dfs, [\"postcode_start\"])\n",
-					"        \n",
-					"        # Handle duplicates\n",
-					"        logger.info(\"Removing duplicates\")\n",
-					"        deduplicated_df = remove_duplicates(merged_df)\n",
-					"        \n",
-					"        # Transform to target schema\n",
-					"        logger.info(\"Transforming to target schema\")\n",
-					"        target_df = transform_to_target_schema(deduplicated_df)\n",
-					"        \n",
-					"        # Validate output\n",
-					"        logger.info(\"Validating output schema\")\n",
-					"        required_columns = [\"poll_number\", \"lname\", \"fname\", \"zip\", \"hash_id\"]\n",
-					"        validate_output_schema(target_df, required_columns)\n",
-					"        \n",
-					"        # Write output\n",
-					"        output_path = config['output_paths']['voters_temp']\n",
-					"        logger.info(f\"Writing {target_df.count()} records to {output_path}\")\n",
-					"        \n",
-					"        # Use partitioning for optimal storage and query performance\n",
-					"        target_df.write.partitionBy(\"postcode_start\").mode(\"overwrite\").parquet(output_path)\n",
-					"        \n",
-					"        logger.info(\"ETL process completed successfully\")\n",
-					"        \n",
-					"    except Exception as e:\n",
-					"        logger.error(f\"ETL process failed: {str(e)}\")\n",
-					"        raise\n",
-					"    finally:\n",
-					"        # Log final statistics\n",
-					"        logger.info(\"ETL process finished\")\n",
-					"if __name__ == \"__main__\":\n",
-					"        main()"
-				],
-				"execution_count": null
+					"## "
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Read Configuration and Mapping"
+				]
 			},
 			{
 				"cell_type": "code",
 				"source": [
+					"def read_column_mapping(spark, config_path):\n",
+					"    \"\"\"Read and parse the column mapping configuration\"\"\"\n",
+					"    try:\n",
+					"        # Read the JSON file\n",
+					"        mapping_df = spark.read.text(config_path)\n",
+					"        \n",
+					"        # Combine all lines into a single string\n",
+					"        json_str = mapping_df.agg(concat_ws(\"\", collect_list(\"value\"))).collect()[0][0]\n",
+					"        \n",
+					"        # Parse the JSON string\n",
+					"        mapping_dict = json.loads(json_str)\n",
+					"        return mapping_dict[\"mappings\"]\n",
+					"    except Exception as e:\n",
+					"        print(f\"Error reading mapping file: {str(e)}\")\n",
+					"        try:\n",
+					"            # Fallback to using wholeTextFiles\n",
+					"            mapping_rdd = spark.sparkContext.wholeTextFiles(config_path)\n",
+					"            json_str = mapping_rdd.values().first()\n",
+					"            mapping_dict = json.loads(json_str)\n",
+					"            return mapping_dict[\"mappings\"]\n",
+					"        except Exception as e2:\n",
+					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")\n",
 					"\n",
-					"def get_all_mapped_columns(column_mapping):\n",
-					"    \"\"\"Get a set of all the column names in the mapping\"\"\"\n",
-					"    all_cols = set()\n",
-					"    \n",
-					"    # Add standard column names\n",
-					"    for standard_name in column_mapping.keys():\n",
-					"        all_cols.add(standard_name)\n",
-					"    \n",
-					"    # Add all variations\n",
-					"    for variations in column_mapping.values():\n",
-					"        for variation in variations:\n",
-					"            all_cols.add(variation)\n",
-					"    \n",
-					"    # Add additional required columns that might not be in the mapping\n",
-					"    additional_cols = [\n",
-					"        \"CreationDate\", \"LA_Code\", \"Flasg/Markers\", \"Date Of Attainment\",\n",
-					"        \"Elector Number Suffix\"\n",
-					"    ]\n",
-					"    for col in additional_cols:\n",
-					"        all_cols.add(col)\n",
-					"    \n",
-					"    return all_cols\n",
-					"\n",
-					"def merge_transform_to_voters_temp(spark, transform_folder, config_folder, output_path):\n",
-					"    \"\"\"\n",
-					"    Merge all files in the transformation folder into a single voters_temp parquet file\n",
-					"    using the column mapping schema\n",
-					"    \"\"\"\n",
+					"    pass"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Identify and Process New Files"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def get_new_files(spark, input_path, process_log_path):\n",
+					"    \"\"\"Identify which files are new and need processing\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
 					"    \n",
-					"    print(f\"Merging files from {transform_folder} to single voters_temp parquet\")\n",
+					"    # Get all files in the input directory\n",
+					"    all_files = []\n",
+					"    for item in mssparkutils.fs.ls(input_path):\n",
+					"        if item.path.endswith(\".parquet\"):\n",
+					"            all_files.append(item.path)\n",
 					"    \n",
-					"    # Read the column mapping schema\n",
-					"    mapping_file = f\"{config_folder}/col_mapping.json\"\n",
-					"    try:\n",
-					"        column_mapping = read_column_mapping(spark, mapping_file)\n",
-					"        print(f\"Successfully read column mapping with {len(column_mapping)} mappings\")\n",
-					"        \n",
-					"        # Get all mapped columns\n",
-					"        mapped_columns = get_all_mapped_columns(column_mapping)\n",
-					"        print(f\"Found {len(mapped_columns)} mapped columns\")\n",
-					"    except Exception as e:\n",
-					"        print(f\"Error reading column mapping: {str(e)}\")\n",
-					"        raise e\n",
-					"    \n",
-					"    # Read all parquet files from the transformation folder\n",
-					"    try:\n",
-					"        print(\"Listing files in transformation folder...\")\n",
-					"        all_files = []\n",
-					"        for item in mssparkutils.fs.ls(transform_folder):\n",
-					"            if item.path.endswith(\".parquet\"):\n",
-					"                all_files.append(item.path)\n",
-					"                print(f\"Found parquet file: {item.path}\")\n",
-					"            elif item.isDir:\n",
-					"                # Check for parquet files in subdirectories\n",
-					"                try:\n",
-					"                    subitems = mssparkutils.fs.ls(item.path)\n",
-					"                    for subitem in subitems:\n",
-					"                        if subitem.path.endswith(\".parquet\"):\n",
-					"                            all_files.append(subitem.path)\n",
-					"                            print(f\"Found parquet file in subfolder: {subitem.path}\")\n",
-					"                except Exception as sub_e:\n",
-					"                    print(f\"Error listing subfolder {item.path}: {str(sub_e)}\")\n",
-					"        \n",
-					"        print(f\"Found {len(all_files)} parquet files to process\")\n",
-					"        \n",
-					"        if len(all_files) == 0:\n",
-					"            raise ValueError(\"No parquet files found in the transformation folder\")\n",
-					"        \n",
-					"        # Read and process each file\n",
-					"        dfs = []\n",
-					"        for file_path in all_files:\n",
-					"            try:\n",
-					"                # Read the parquet file\n",
-					"                df = spark.read.parquet(file_path)\n",
-					"                \n",
-					"                # Keep all columns - don't filter based on mapping\n",
-					"                # Instead, we'll make sure to include required columns for the target schema\n",
-					"                dfs.append(df)\n",
-					"                \n",
-					"                # Print which mapped columns are present\n",
-					"                current_cols = set(df.columns)\n",
-					"                mapped_present = [col for col in current_cols if col.lower() in [c.lower() for c in mapped_columns]]\n",
-					"                print(f\"Read {df.count()} records from {file_path}\")\n",
-					"                print(f\"File has {len(mapped_present)}/{len(current_cols)} columns that match the mapping\")\n",
-					"            except Exception as e:\n",
-					"                print(f\"Error processing file {file_path}: {str(e)}\")\n",
-					"        \n",
-					"        if not dfs:\n",
-					"            raise ValueError(\"No valid data found in any parquet file\")\n",
-					"        \n",
-					"        # Merge all dataframes\n",
-					"        try:\n",
-					"            print(\"Attempting to merge dataframes with schema flexibility...\")\n",
-					"            all_data = dfs[0]\n",
-					"            for df in dfs[1:]:\n",
-					"                try:\n",
-					"                    all_data = all_data.unionByName(df, allowMissingColumns=True)\n",
-					"                except Exception as union_e:\n",
-					"                    print(f\"Error during union: {str(union_e)}\")\n",
-					"                    print(\"Falling back to simpler approach\")\n",
-					"                    \n",
-					"                    # Get just the common columns\n",
-					"                    common_cols = list(set(all_data.columns).intersection(set(df.columns)))\n",
-					"                    if common_cols:\n",
-					"                        print(f\"Using {len(common_cols)} common columns\")\n",
-					"                        try:\n",
-					"                            all_data = all_data.select(*common_cols).union(df.select(*common_cols))\n",
-					"                        except Exception as simpler_e:\n",
-					"                            print(f\"Even simpler union failed: {str(simpler_e)}\")\n",
-					"                            print(\"Skipping this dataframe\")\n",
-					"                    else:\n",
-					"                        print(\"No common columns found, skipping this dataframe\")\n",
-					"            \n",
-					"            print(f\"Merged {all_data.count()} records from all files\")\n",
-					"            \n",
-					"        except Exception as merge_e:\n",
-					"            print(f\"Error during merge: {str(merge_e)}\")\n",
-					"            \n",
-					"            # Last resort: try merging with the bare minimum columns\n",
-					"            print(\"Trying one last approach with minimum columns...\")\n",
-					"            min_cols = [\"Elector Number\", \"Elector Surname\", \"Elector Forename\", \"PostCode\"]\n",
-					"            valid_dfs = []\n",
-					"            \n",
-					"            for df in dfs:\n",
-					"                # Check if dataframe has the minimum required columns\n",
-					"                missing_cols = [col for col in min_cols if col not in df.columns]\n",
-					"                if not missing_cols:\n",
-					"                    valid_dfs.append(df.select(*min_cols))\n",
-					"                else:\n",
-					"                    print(f\"Dataframe missing required columns: {missing_cols}\")\n",
-					"            \n",
-					"            if valid_dfs:\n",
-					"                all_data = valid_dfs[0]\n",
-					"                for df in valid_dfs[1:]:\n",
-					"                    all_data = all_data.union(df)\n",
-					"                print(f\"Created minimal merged dataset with {all_data.count()} records\")\n",
-					"        \n",
-					"    except Exception as e:\n",
-					"        print(f\"Error processing parquet files: {str(e)}\")\n",
-					"        raise e\n",
-					"    \n",
-					"    # Show the original schema\n",
-					"    print(\"Original schema after merging:\")\n",
-					"    all_data.printSchema()\n",
-					"    \n",
-					"    # Handle duplicates\n",
-					"    print(\"Handling duplicates...\")\n",
-					"    \n",
-					"    # First check if CreationDate exists, if not add it with current date\n",
-					"    if \"CreationDate\" not in all_data.columns:\n",
-					"        print(\"Warning: 'CreationDate' column not found, adding current date\")\n",
-					"        all_data = all_data.withColumn(\"CreationDate\", lit(datetime.now().strftime(\"%Y-%m-%d\")))\n",
-					"    \n",
-					"    # Now check for Elector Number\n",
-					"    if \"Elector Number\" in all_data.columns:\n",
-					"        try:\n",
-					"            # Try with CreationDate\n",
-					"            window_spec = Window.partitionBy(\"Elector Number\").orderBy(desc(\"CreationDate\"))\n",
-					"            deduplicated_data = all_data.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
-					"                                .filter(col(\"row_num\") == 1) \\\n",
-					"                                .drop(\"row_num\")\n",
-					"            print(f\"After deduplication: {deduplicated_data.count()} records\")\n",
-					"        except Exception as e:\n",
-					"            print(f\"Error during deduplication with CreationDate: {str(e)}\")\n",
-					"            print(\"Falling back to simpler deduplication\")\n",
-					"            \n",
-					"            # Fallback to simple deduplication without ordering\n",
-					"            deduplicated_data = all_data.dropDuplicates([\"Elector Number\"])\n",
-					"            print(f\"After simple deduplication: {deduplicated_data.count()} records\")\n",
+					"    # Read process log to get previously processed files\n",
+					"    if mssparkutils.fs.exists(process_log_path):\n",
+					"        processed_files = spark.read.parquet(process_log_path) \\\n",
+					"                              .select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
 					"    else:\n",
-					"        print(\"Warning: 'Elector Number' column not found, skipping deduplication\")\n",
-					"        deduplicated_data = all_data\n",
+					"        processed_files = []\n",
 					"    \n",
-					"    # Transform to target schema\n",
-					"    print(\"Transforming to target schema...\")\n",
+					"    # Identify new files\n",
+					"    new_files = [f for f in all_files if f not in processed_files]\n",
 					"    \n",
-					"    # First, ensure all expected columns exist\n",
-					"    required_cols = [\n",
-					"        \"Elector Number\", \"Elector Number Prefix\", \"Elector Markers\", \"Elector Title\",\n",
-					"        \"Elector Surname\", \"Elector Forename\", \"Elector DOB\", \"Flasg/Markers\",\n",
-					"        \"PostCode\", \"Address1\", \"Address2\", \"Address3\", \"Address4\", \"Address5\", \"Address6\",\n",
-					"        \"LA_Code\", \"CreationDate\"\n",
-					"    ]\n",
+					"    return new_files, all_files"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Read and Standardize Files"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def process_input_files(spark, file_paths, column_mapping):\n",
+					"    \"\"\"Read and standardize columns from input files\"\"\"\n",
+					"    processed_dfs = []\n",
 					"    \n",
-					"    # Add missing columns as null\n",
-					"    for col_name in required_cols:\n",
-					"        if col_name not in deduplicated_data.columns:\n",
-					"            deduplicated_data = deduplicated_data.withColumn(col_name, lit(None))\n",
+					"    for file_path in file_paths:\n",
+					"        try:\n",
+					"            # Read the file\n",
+					"            df = spark.read.parquet(file_path)\n",
+					"            \n",
+					"            # Standardize column names based on mapping\n",
+					"            standardized_df = standardize_columns(df, column_mapping)\n",
+					"            \n",
+					"            # Add source metadata\n",
+					"            standardized_df = standardized_df.withColumn(\"source_file\", lit(file_path))\n",
+					"            standardized_df = standardized_df.withColumn(\"process_timestamp\", current_timestamp())\n",
+					"            \n",
+					"            processed_dfs.append(standardized_df)\n",
+					"            \n",
+					"        except Exception as e:\n",
+					"            print(f\"Error processing {file_path}: {str(e)}\")\n",
 					"    \n",
-					"    # Transform to target schema\n",
-					"    target_data = deduplicated_data.select(\n",
-					"        # Standard fields with proper mapping\n",
-					"        lit(None).cast(\"string\").alias(\"loc_code\"),\n",
-					"        lit(None).cast(\"string\").alias(\"part_no\"),\n",
+					"    return processed_dfs"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Merge Files with Standardized Schema"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def merge_dataframes(dfs):\n",
+					"    \"\"\"Merge all dataframes with standardized schema\"\"\"\n",
+					"    if not dfs:\n",
+					"        raise ValueError(\"No dataframes to merge\")\n",
 					"        \n",
-					"        # Extract digits from LA_Code for register_lett\n",
-					"        when(col(\"LA_Code\").isNotNull(), \n",
-					"             regexp_replace(col(\"LA_Code\"), \"[^0-9]\", \"\").cast(\"int\"))\n",
-					"        .otherwise(lit(None)).alias(\"register_lett\"),\n",
+					"    # Merge using unionByName to handle schema variations\n",
+					"    merged_df = dfs[0]\n",
+					"    for df in dfs[1:]:\n",
+					"        merged_df = merged_df.unionByName(df, allowMissingColumns=True)\n",
 					"        \n",
-					"        # Use Elector Number for poll_number\n",
-					"        when(col(\"Elector Number\").isNotNull(), \n",
-					"             col(\"Elector Number\").cast(\"int\"))\n",
-					"        .otherwise(lit(None)).alias(\"poll_number\"),\n",
-					"        \n",
-					"        col(\"Elector Markers\").alias(\"new_marker\"),\n",
-					"        col(\"Elector Title\").alias(\"title\"),\n",
-					"        col(\"Elector Surname\").alias(\"lname\"),\n",
-					"        col(\"Elector Forename\").alias(\"fname\"),\n",
-					"        col(\"Elector DOB\").alias(\"dob\"),\n",
-					"        when(col(\"Flasg/Markers\").isNotNull(), col(\"Flasg/Markers\"))\n",
-					"        .when(col(\"flags_original\").isNotNull(), col(\"flags_original\"))\n",
-					"        .when(col(\"Flag\").isNotNull(), col(\"Flag\"))\n",
-					"        .when(col(\"Other Markers\").isNotNull(), col(\"Other Markers\"))\n",
-					"        .when(col(\"Markers\").isNotNull(), col(\"Markers\"))\n",
-					"        .when(col(\"Jury_Flag\").isNotNull(), col(\"Jury_Flag\"))\n",
-					"        .otherwise(lit(None)).cast(\"string\").alias(\"flags\"),\n",
-					"        col(\"Address1\").alias(\"address\"),\n",
-					"        col(\"Address2\").alias(\"address2\"),\n",
-					"        col(\"Address3\").alias(\"address3\"),\n",
-					"        col(\"Address4\").alias(\"address4\"),\n",
-					"        col(\"Address5\").alias(\"address5\"),\n",
-					"        col(\"Address6\").alias(\"address6\"),\n",
-					"        col(\"PostCode\").alias(\"zip\"),\n",
-					"        lit(None).cast(\"timestamp\").alias(\"date_selected1\"),\n",
-					"        lit(None).cast(\"timestamp\").alias(\"date_selected2\"),\n",
-					"        lit(None).cast(\"timestamp\").alias(\"date_selected3\"),\n",
-					"        \n",
-					"        # Extract digits from LA_Code for rec_num\n",
-					"        when(col(\"LA_Code\").isNotNull(), \n",
-					"             regexp_replace(col(\"LA_Code\"), \"[^0-9]\", \"\").cast(\"int\"))\n",
-					"        .otherwise(lit(None)).alias(\"rec_num\"),\n",
-					"        \n",
-					"        lit(None).cast(\"string\").alias(\"perm_disqual\"),\n",
-					"        lit(None).cast(\"string\").alias(\"source_id\"),\n",
-					"        \n",
-					"        # Generate postcode_start from zip\n",
-					"        when(col(\"PostCode\").isNotNull(),\n",
-					"             split(trim(col(\"PostCode\")), \" \")[0]\n",
-					"        ).otherwise(lit(None)).alias(\"postcode_start\"),\n",
-					"        \n",
-					"        # Hash ID for sensitive information\n",
+					"    return merged_df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Deduplicate Based on Latest Data"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def remove_duplicates_by_extraction_date(df):\n",
+					"    \"\"\"Keep only the latest record for each Elector Number + LA_Code combination\"\"\"\n",
+					"    # Use your window partitioning approach\n",
+					"    window_spec = Window.partitionBy(\"Elector Number\", \"LA_Code\") \\\n",
+					"                        .orderBy(desc(\"CreationDate\"))\n",
+					"    \n",
+					"    deduplicated = df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
+					"                     .filter(col(\"row_num\") == 1) \\\n",
+					"                     .drop(\"row_num\")\n",
+					"                     \n",
+					"    return deduplicated"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Apply Hashing for Sensitive Data"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def apply_hashing(df):\n",
+					"    \"\"\"Apply hashing to sensitive fields\"\"\"\n",
+					"    return df.withColumn(\n",
+					"        \"hash_id\",\n",
 					"        xxhash64(concat_ws(\",\", \n",
 					"            coalesce(col(\"Elector Forename\"), lit(\"\")),\n",
 					"            coalesce(col(\"Elector Surname\"), lit(\"\")),\n",
 					"            coalesce(col(\"Elector DOB\"), lit(\"\")),\n",
 					"            coalesce(col(\"Address1\"), lit(\"\"))\n",
-					"        )).alias(\"hash_id\"),\n",
+					"        ))\n",
+					"    )"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Transform to Target Schema"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def transform_to_target_schema(df, column_mapping):\n",
+					"    \"\"\"Transform to the PostgreSQL target schema\"\"\"\n",
+					"    # Your implementation with all the field mappings\n",
+					"    # (loc_code, part_no, register_lett, poll_number, etc.)\n",
+					"    pass"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Merge with Existing Data"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def merge_with_existing_data(spark, new_data, output_path):\n",
+					"    \"\"\"Merge new data with existing data using proper incremental logic\"\"\"\n",
+					"    # Check if existing data is available\n",
+					"    if mssparkutils.fs.exists(output_path):\n",
+					"        existing_data = spark.read.parquet(output_path)\n",
 					"        \n",
-					"        # Preserve original creation date\n",
-					"        col(\"CreationDate\")\n",
-					"    )\n",
+					"        # Identify primary keys (poll_number and register_lett in target schema)\n",
+					"        primary_keys = [\"poll_number\", \"register_lett\"]\n",
+					"        \n",
+					"        # Create a view of the new data\n",
+					"        new_data.createOrReplaceTempView(\"new_data\")\n",
+					"        existing_data.createOrReplaceTempView(\"existing_data\")\n",
+					"        \n",
+					"        # Perform a merge operation to update existing records and add new ones\n",
+					"        merged_data = spark.sql(\"\"\"\n",
+					"            SELECT n.* \n",
+					"            FROM new_data n\n",
+					"            LEFT ANTI JOIN existing_data e\n",
+					"            ON n.poll_number = e.poll_number AND n.register_lett = e.register_lett\n",
+					"            \n",
+					"            UNION ALL\n",
+					"            \n",
+					"            SELECT \n",
+					"                CASE \n",
+					"                    WHEN n.poll_number IS NOT NULL THEN n.poll_number \n",
+					"                    ELSE e.poll_number \n",
+					"                END as poll_number,\n",
+					"                -- Include all other fields following the same pattern\n",
+					"                -- ...\n",
+					"                COALESCE(n.creation_date, e.creation_date) as creation_date\n",
+					"            FROM existing_data e\n",
+					"            LEFT JOIN new_data n\n",
+					"            ON e.poll_number = n.poll_number AND e.register_lett = n.register_lett\n",
+					"            WHERE n.poll_number IS NULL OR n.creation_date > e.creation_date\n",
+					"        \"\"\")\n",
+					"        \n",
+					"        return merged_data\n",
+					"    else:\n",
+					"        # No existing data, just return the new data\n",
+					"        return new_data"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Write Output and Update Process Log"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def write_output_and_update_log(merged_data, new_file_paths, output_path, process_log_path):\n",
+					"    \"\"\"Write the merged data and update the process log\"\"\"\n",
+					"    # Write merged data\n",
+					"    merged_data.write.mode(\"overwrite\").parquet(output_path)\n",
 					"    \n",
-					"    # Show the transformed schema \n",
-					"    print(\"Target schema:\")\n",
-					"    target_data.printSchema()\n",
+					"    # Update process log\n",
+					"    if new_file_paths:\n",
+					"        new_log_entries = [(file_path, current_timestamp()) for file_path in new_file_paths]\n",
+					"        new_log_df = spark.createDataFrame(new_log_entries, [\"file_path\", \"process_timestamp\"])\n",
+					"        \n",
+					"        if mssparkutils.fs.exists(process_log_path):\n",
+					"            existing_log = spark.read.parquet(process_log_path)\n",
+					"            updated_log = existing_log.union(new_log_df)\n",
+					"        else:\n",
+					"            updated_log = new_log_df\n",
+					"            \n",
+					"        updated_log.write.mode(\"overwrite\").parquet(process_log_path)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Main Pipeline Function"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def run_incremental_load():\n",
+					"    \"\"\"Main function to run the incremental load process\"\"\"\n",
+					"    # Initialize\n",
+					"    spark = setup_spark_session()\n",
+					"    config = load_config()\n",
+					"    process_log_path = f\"{config['output_path']}_process_log\"\n",
 					"    \n",
-					"    # Write to a single parquet file\n",
-					"    print(f\"Writing {target_data.count()} records to {output_path}\")\n",
-					"    target_data.coalesce(1).write.mode(\"overwrite\").parquet(output_path)\n",
-					"    \n",
-					"    print(\"Successfully created voters_temp parquet file\")\n",
-					"    return target_data\n",
-					"\n",
-					"if __name__ == \"__main__\":\n",
-					"    # Paths\n",
-					"    storage_account = \"baubaisadfsastg\"\n",
-					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
-					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
-					"    output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
-					"    \n",
-					"    # Create Spark session\n",
-					"    spark = create_spark_session()\n",
-					"    \n",
-					"    # Merge files from transformation folder using column mapping schema\n",
-					"    voters_temp_df = merge_transform_to_voters_temp(spark, transform_folder, config_folder, output_path)\n",
-					"    \n",
-					"    # Show sample of final data\n",
-					"    print(\"\\nSample of final voters_temp data:\")\n",
-					"    voters_temp_df.show(5)\n",
-					"    \n",
-					"    print(f\"\\nProcessing completed. {voters_temp_df.count()} records written to {output_path}\")"
+					"    try:\n",
+					"        # 1. Get configuration and mapping\n",
+					"        column_mapping = read_column_mapping(spark, f\"{config['config_path']}/col_mapping.json\")\n",
+					"        \n",
+					"        # 2. Identify new files\n",
+					"        new_file_paths, all_file_paths = get_new_files(spark, config[\"input_path\"], process_log_path)\n",
+					"        \n",
+					"        if not new_file_paths:\n",
+					"            print(\"No new files to process\")\n",
+					"            return\n",
+					"            \n",
+					"        print(f\"Found {len(new_file_paths)} new files to process\")\n",
+					"        \n",
+					"        # 3. Process new files\n",
+					"        processed_dfs = process_input_files(spark, new_file_paths, column_mapping)\n",
+					"        \n",
+					"        if not processed_dfs:\n",
+					"            print(\"No data to process after reading files\")\n",
+					"            return\n",
+					"            \n",
+					"        # 4. Merge new data\n",
+					"        merged_new_data = merge_dataframes(processed_dfs)\n",
+					"        \n",
+					"        # 5. Deduplicate new data\n",
+					"        deduplicated_data = remove_duplicates_by_extraction_date(merged_new_data)\n",
+					"        \n",
+					"        # 6. Apply hashing\n",
+					"        hashed_data = apply_hashing(deduplicated_data)\n",
+					"        \n",
+					"        # 7. Transform to target schema\n",
+					"        transformed_data = transform_to_target_schema(hashed_data, column_mapping)\n",
+					"        \n",
+					"        # 8. Merge with existing data\n",
+					"        final_data = merge_with_existing_data(spark, transformed_data, config[\"output_path\"])\n",
+					"        \n",
+					"        # 9. Write output and update log\n",
+					"        write_output_and_update_log(\n",
+					"            final_data, \n",
+					"            new_file_paths, \n",
+					"            config[\"output_path\"],\n",
+					"            process_log_path\n",
+					"        )\n",
+					"        \n",
+					"        print(f\"Successfully processed {len(new_file_paths)} files\")\n",
+					"        print(f\"Total records in output: {final_data.count()}\")\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        print(f\"Error in incremental load process: {str(e)}\")\n",
+					"        raise"
 				],
 				"execution_count": null
 			}

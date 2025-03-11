@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "abed23c7-4c36-4548-a75e-f761b8cc1369"
+				"spark.autotune.trackingId": "104e9717-2bbc-4eb6-9913-fb8ca1b615ab"
 			}
 		},
 		"metadata": {
@@ -240,6 +240,19 @@
 				"source": [
 					"#### 6.1 Read CSV Files"
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def get_file_type(file_path):\n",
+					"    \"\"\"Determine if file is CSV or Excel\"\"\"\n",
+					"    if file_path.lower().endswith(('.xlsx', '.xls')):\n",
+					"        return 'excel'\n",
+					"    elif file_path.lower().endswith('.csv'):\n",
+					"        return 'csv'\n",
+					"    return None"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -548,8 +561,7 @@
 					"    new_files = [file for file in all_files if file not in processed_files_log]\n",
 					"    logging.info(f\"New files to process: {len(new_files)}\")\n",
 					"    \n",
-					"    results = [process_file(spark, file_path, reverse_mapping, transform_folder, error_folder, mapped_files) \n",
-					"           for file_path in new_files]\n",
+					"    results = [process_file(file_path, reverse_mapping, transform_folder, error_folder) for file_path in new_files]\n",
 					"    summary_df = spark.createDataFrame(results)\n",
 					"    summary_df.write.mode(\"overwrite\").json(f\"{transform_folder}/processing_summary.json\")\n",
 					"    logging.info(\"\\nProcessing Summary:\")\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d5c57edc-6c79-44bc-a7f3-e9fdf3c0c294"
+				"spark.autotune.trackingId": "8546e213-bb85-4242-8e07-58772b407f11"
 			}
 		},
 		"metadata": {
@@ -131,9 +131,12 @@
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"\n",
 					"def create_spark_session():\n",
-					"    \"\"\"Create and return a Spark session\"\"\"\n",
+					"    \"\"\"Create and return a Spark session with Delta Lake support\"\"\"\n",
 					"    return SparkSession.builder \\\n",
 					"        .appName(\"Electoral Data ETL\") \\\n",
+					"        .config(\"spark.jars.packages\", \"io.delta:delta-core_2.12:1.0.0\") \\\n",
+					"        .config(\"spark.sql.extensions\", \"io.delta.sql.DeltaSparkSessionExtension\") \\\n",
+					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
 				"execution_count": null

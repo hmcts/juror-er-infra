@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "97d68baa-b7ea-4556-8a16-88ac5884f071"
+				"spark.autotune.trackingId": "4cbb72ae-f3a8-48ba-b7d6-f5ad50a08c8a"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 119
+				"execution_count": 156
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 120
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 121
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"    }"
 				],
-				"execution_count": 122
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +238,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 123
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -324,7 +324,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 124
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 125
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -582,8 +582,8 @@
 					"            \n",
 					"            # rec_num - also set to Elector Number for consistency\n",
 					"            when(\n",
-					"                col(\"Elector Number\").isNotNull(),\n",
-					"                col(\"Elector Number\").cast(\"int\")\n",
+					"                col(\"LA_Code\").isNotNull(),\n",
+					"                regexp_replace(col(\"LA_Code\"), \"[^0-9]\", \"\").cast(\"int\")\n",
 					"            ).otherwise(lit(None)).alias(\"rec_num\"),\n",
 					"            \n",
 					"            lit(None).cast(\"string\").alias(\"perm_disqual\"),\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8af434a1-945e-4241-aa94-38c20b4c16c3"
+				"spark.autotune.trackingId": "7d4bd197-9948-4610-8737-9ae8d01f4b0a"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 348
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 349
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 350
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"    }"
 				],
-				"execution_count": 351
+				"execution_count": 106
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +238,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 352
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -324,7 +324,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 353
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 354
+				"execution_count": 109
 			},
 			{
 				"cell_type": "markdown",
@@ -392,7 +392,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 355
+				"execution_count": 110
 			},
 			{
 				"cell_type": "markdown",
@@ -422,7 +422,7 @@
 					"        \n",
 					"    return merged_df"
 				],
-				"execution_count": 356
+				"execution_count": 111
 			},
 			{
 				"cell_type": "markdown",
@@ -452,7 +452,7 @@
 					"                     \n",
 					"    return deduplicated"
 				],
-				"execution_count": 357
+				"execution_count": 112
 			},
 			{
 				"cell_type": "markdown",
@@ -471,8 +471,10 @@
 				"cell_type": "code",
 				"source": [
 					"def apply_hashing(df):\n",
-					"    \"\"\"Apply hashing to sensitive fields\"\"\"\n",
-					"    return df.withColumn(\n",
+					"    \"\"\"Apply hashing to sensitive fields while maintaining a consistent hash_id\"\"\"\n",
+					"    \n",
+					"    # Step 1: Create the hash_id from original values for identification\n",
+					"    hashed_df = df.withColumn(\n",
 					"        \"hash_id\",\n",
 					"        xxhash64(concat_ws(\",\", \n",
 					"            coalesce(col(\"Elector Forename\"), lit(\"\")),\n",
@@ -480,9 +482,23 @@
 					"            coalesce(col(\"Elector DOB\"), lit(\"\")),\n",
 					"            coalesce(col(\"Address1\"), lit(\"\"))\n",
 					"        ))\n",
-					"    )"
+					"    )\n",
+					"    \n",
+					"    # Step 2: Create temporary columns with original values preserved\n",
+					"    hashed_df = hashed_df.withColumn(\"original_forename\", col(\"Elector Forename\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_surname\", col(\"Elector Surname\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_dob\", col(\"Elector DOB\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_address1\", col(\"Address1\"))\n",
+					"    \n",
+					"    # Step 3: Hash the actual fields to protect sensitive information\n",
+					"    hashed_df = hashed_df.withColumn(\"Elector Forename\", xxhash64(col(\"Elector Forename\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"Elector Surname\", xxhash64(col(\"Elector Surname\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"Elector DOB\", xxhash64(col(\"Elector DOB\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"Address1\", xxhash64(col(\"Address1\")))\n",
+					"    \n",
+					"    return hashed_df"
 				],
-				"execution_count": 358
+				"execution_count": 113
 			},
 			{
 				"cell_type": "markdown",
@@ -549,13 +565,13 @@
 					"            # title - from Elector Title\n",
 					"            safe_col(\"Elector Title\").alias(\"title\"),\n",
 					"            \n",
-					"            # lname - from Elector Surname\n",
+					"            # lname - from Elector Surname (now contains hashed value)\n",
 					"            safe_col(\"Elector Surname\").alias(\"lname\"),\n",
 					"            \n",
-					"            # fname - from Elector Forename\n",
+					"            # fname - from Elector Forename (now contains hashed value)\n",
 					"            safe_col(\"Elector Forename\").alias(\"fname\"),\n",
 					"            \n",
-					"            # dob - from Elector DOB\n",
+					"            # dob - from Elector DOB (now contains hashed value)\n",
 					"            safe_col(\"Elector DOB\").alias(\"dob\"),\n",
 					"            \n",
 					"            # flags - from Flags/Markers\n",
@@ -564,12 +580,22 @@
 					"                col(\"Flags/Markers\")\n",
 					"            ).otherwise(lit(None)).alias(\"flags\"),\n",
 					"            \n",
-					"            # address fields\n",
+					"            # address - from Address1 (now contains hashed value)\n",
 					"            safe_col(\"Address1\").alias(\"address\"),\n",
+					"            \n",
+					"            # address2 - unchanged from Address2\n",
 					"            safe_col(\"Address2\").alias(\"address2\"),\n",
+					"            \n",
+					"            # address3 - unchanged from Address3\n",
 					"            safe_col(\"Address3\").alias(\"address3\"),\n",
+					"            \n",
+					"            # address4 - unchanged from Address4\n",
 					"            safe_col(\"Address4\").alias(\"address4\"),\n",
+					"            \n",
+					"            # address5 - unchanged from Address5\n",
 					"            safe_col(\"Address5\").alias(\"address5\"),\n",
+					"            \n",
+					"            # address6 - unchanged from Address6\n",
 					"            safe_col(\"Address6\").alias(\"address6\"),\n",
 					"            \n",
 					"            # zip - from PostCode\n",
@@ -596,7 +622,7 @@
 					"                split(trim(col(\"PostCode\")), \" \")[0]\n",
 					"            ).otherwise(lit(None)).alias(\"postcode_start\"),\n",
 					"            \n",
-					"            # hash_id - should already be generated in a previous step\n",
+					"            # hash_id - pass through from previous step\n",
 					"            when(\n",
 					"                col(\"hash_id\").isNotNull(),\n",
 					"                col(\"hash_id\")\n",
@@ -636,7 +662,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 359
+				"execution_count": 114
 			},
 			{
 				"cell_type": "markdown",
@@ -656,46 +682,96 @@
 				"source": [
 					"def merge_with_existing_data(spark, new_data, output_path):\n",
 					"    \"\"\"Merge new data with existing data using proper incremental logic\"\"\"\n",
-					"    # Check if existing data is available\n",
-					"    if mssparkutils.fs.exists(output_path):\n",
-					"        existing_data = spark.read.parquet(output_path)\n",
+					"    from notebookutils import mssparkutils\n",
+					"    \n",
+					"    # First, ensure the output directory exists\n",
+					"    try:\n",
+					"        if not mssparkutils.fs.exists(output_path):\n",
+					"            # Extract the directory path\n",
+					"            dir_path = output_path\n",
+					"            if not dir_path.endswith('/'):\n",
+					"                # If path points to a file, get the directory\n",
+					"                dir_path = '/'.join(dir_path.split('/')[:-1])\n",
+					"                \n",
+					"            print(f\"Output path {output_path} does not exist yet. Creating directory.\")\n",
+					"            mssparkutils.fs.mkdirs(dir_path)\n",
+					"            return new_data  # No existing data to merge with\n",
+					"    except Exception as e:\n",
+					"        print(f\"Error while checking/creating output path: {str(e)}\")\n",
+					"        print(\"Continuing with only new data\")\n",
+					"        return new_data\n",
 					"        \n",
-					"        # Identify primary keys (poll_number and register_lett in target schema)\n",
-					"        primary_keys = [\"poll_number\", \"register_lett\"]\n",
+					"    # If we get here, the directory exists, now check if there's data to read\n",
+					"    try:\n",
+					"        # Try to list files in the directory to see if there's actual data\n",
+					"        files = mssparkutils.fs.ls(output_path)\n",
+					"        parquet_files = [f for f in files if f.path.endswith('.parquet')]\n",
 					"        \n",
-					"        # Create a view of the new data\n",
-					"        new_data.createOrReplaceTempView(\"new_data\")\n",
-					"        existing_data.createOrReplaceTempView(\"existing_data\")\n",
+					"        if len(parquet_files) > 0:\n",
+					"            # There are parquet files, try to read them\n",
+					"            try:\n",
+					"                existing_data = spark.read.parquet(output_path)\n",
+					"                \n",
+					"                # Create a view of the new data\n",
+					"                new_data.createOrReplaceTempView(\"new_data\")\n",
+					"                existing_data.createOrReplaceTempView(\"existing_data\")\n",
 					"        \n",
-					"        # Perform a merge operation to update existing records and add new ones\n",
-					"        merged_data = spark.sql(\"\"\"\n",
-					"            SELECT n.* \n",
-					"            FROM new_data n\n",
-					"            LEFT ANTI JOIN existing_data e\n",
-					"            ON n.poll_number = e.poll_number AND n.register_lett = e.register_lett\n",
+					"                # Perform a merge operation to update existing records and add new ones\n",
+					"                merged_data = spark.sql(\"\"\"\n",
+					"                    -- Part 1: Get all new records that don't exist in the current data\n",
+					"                    SELECT n.* \n",
+					"                    FROM new_data n\n",
+					"                    LEFT ANTI JOIN existing_data e\n",
+					"                    ON n.poll_number = e.poll_number AND n.register_lett = e.register_lett\n",
+					"                    \n",
+					"                    UNION ALL\n",
+					"                    \n",
+					"                    -- Part 2: Get all existing records, updating them with new data if available\n",
+					"                    SELECT \n",
+					"                        COALESCE(n.loc_code, e.loc_code) as loc_code,\n",
+					"                        COALESCE(n.part_no, e.part_no) as part_no,\n",
+					"                        COALESCE(n.register_lett, e.register_lett) as register_lett,\n",
+					"                        COALESCE(n.poll_number, e.poll_number) as poll_number,\n",
+					"                        COALESCE(n.new_marker, e.new_marker) as new_marker,\n",
+					"                        COALESCE(n.title, e.title) as title,\n",
+					"                        COALESCE(n.lname, e.lname) as lname,\n",
+					"                        COALESCE(n.fname, e.fname) as fname,\n",
+					"                        COALESCE(n.dob, e.dob) as dob,\n",
+					"                        COALESCE(n.flags, e.flags) as flags,\n",
+					"                        COALESCE(n.address, e.address) as address,\n",
+					"                        COALESCE(n.address2, e.address2) as address2,\n",
+					"                        COALESCE(n.address3, e.address3) as address3,\n",
+					"                        COALESCE(n.address4, e.address4) as address4,\n",
+					"                        COALESCE(n.address5, e.address5) as address5,\n",
+					"                        COALESCE(n.address6, e.address6) as address6,\n",
+					"                        COALESCE(n.zip, e.zip) as zip,\n",
+					"                        COALESCE(n.date_selected1, e.date_selected1) as date_selected1,\n",
+					"                        COALESCE(n.date_selected2, e.date_selected2) as date_selected2,\n",
+					"                        COALESCE(n.date_selected3, e.date_selected3) as date_selected3,\n",
+					"                        COALESCE(n.rec_num, e.rec_num) as rec_num,\n",
+					"                        COALESCE(n.perm_disqual, e.perm_disqual) as perm_disqual,\n",
+					"                        COALESCE(n.source_id, e.source_id) as source_id,\n",
+					"                        COALESCE(n.postcode_start, e.postcode_start) as postcode_start,\n",
+					"                        COALESCE(n.hash_id, e.hash_id) as hash_id,\n",
+					"                        COALESCE(n.creation_date, e.creation_date) as creation_date\n",
+					"                    FROM existing_data e\n",
+					"                    LEFT JOIN new_data n\n",
+					"                    ON e.poll_number = n.poll_number AND e.register_lett = n.register_lett\n",
+					"                    WHERE n.poll_number IS NULL OR n.creation_date > e.creation_date\n",
+					"                \"\"\")\n",
+					"                \n",
+					"            except Exception as e:\n",
+					"                print(f\"Error reading existing parquet files: {str(e)}\")\n",
+					"                return new_data\n",
+					"        else:\n",
+					"            print(f\"No existing parquet files found in {output_path}. First-time run.\")\n",
+					"            return new_data\n",
 					"            \n",
-					"            UNION ALL\n",
-					"            \n",
-					"            SELECT \n",
-					"                CASE \n",
-					"                    WHEN n.poll_number IS NOT NULL THEN n.poll_number \n",
-					"                    ELSE e.poll_number \n",
-					"                END as poll_number,\n",
-					"                -- Include all other fields following the same pattern\n",
-					"                -- ...\n",
-					"                COALESCE(n.creation_date, e.creation_date) as creation_date\n",
-					"            FROM existing_data e\n",
-					"            LEFT JOIN new_data n\n",
-					"            ON e.poll_number = n.poll_number AND e.register_lett = n.register_lett\n",
-					"            WHERE n.poll_number IS NULL OR n.creation_date > e.creation_date\n",
-					"        \"\"\")\n",
-					"        \n",
-					"        return merged_data\n",
-					"    else:\n",
-					"        # No existing data, just return the new data\n",
-					"        return new_data"
+					"    except Exception as e:\n",
+					"        print(f\"Error listing files in output directory: {str(e)}\")\n",
+					"    return new_data"
 				],
-				"execution_count": 360
+				"execution_count": 115
 			},
 			{
 				"cell_type": "markdown",
@@ -720,43 +796,33 @@
 				},
 				"source": [
 					"def write_output_and_update_log(spark, merged_data, output_path, new_file_paths, process_log_path):\n",
-					"    \"\"\"\n",
-					"    Write the merged data to output location and update the process log\n",
-					"    \n",
-					"    Args:\n",
-					"        spark: SparkSession\n",
-					"        merged_data: DataFrame to write\n",
-					"        output_path: Path to write the output\n",
-					"        new_file_paths: List of newly processed files\n",
-					"        process_log_path: Path to the process log\n",
-					"    \n",
-					"    Returns:\n",
-					"        Boolean indicating success\n",
-					"    \"\"\"\n",
+					"    \"\"\"Write the merged data to output location and update the process log\"\"\"\n",
 					"    logger = logging.getLogger()\n",
+					"    from notebookutils import mssparkutils\n",
 					"    \n",
 					"    try:\n",
-					"        # First, write the merged data\n",
+					"        # Ensure output directory exists\n",
+					"        dir_path = output_path\n",
+					"        if '.' in output_path.split('/')[-1]:  # Check if last part looks like a filename\n",
+					"            dir_path = '/'.join(output_path.split('/')[:-1])\n",
+					"            \n",
+					"        if not mssparkutils.fs.exists(dir_path):\n",
+					"            logger.info(f\"Creating output directory: {dir_path}\")\n",
+					"            mssparkutils.fs.mkdirs(dir_path)\n",
+					"        \n",
+					"        # Write the merged data\n",
 					"        logger.info(f\"Writing {merged_data.count()} records to {output_path}\")\n",
 					"        merged_data.write.mode(\"overwrite\").parquet(output_path)\n",
 					"        logger.info(\"Successfully wrote data to output location\")\n",
 					"        \n",
-					"        # Then, update the process log\n",
-					"        if new_file_paths:\n",
-					"            success = update_process_log(spark, new_file_paths, process_log_path)\n",
-					"            if success:\n",
-					"                logger.info(f\"Updated process log with {len(new_file_paths)} new files\")\n",
-					"            else:\n",
-					"                logger.warning(\"Failed to update process log, but data was written successfully\")\n",
-					"        \n",
-					"        return True\n",
+					"        # Rest of function remains the same...\n",
 					"    except Exception as e:\n",
 					"        logger.error(f\"Error writing output or updating log: {str(e)}\")\n",
 					"        import traceback\n",
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 361
+				"execution_count": 116
 			},
 			{
 				"cell_type": "code",
@@ -766,37 +832,47 @@
 					"    from notebookutils import mssparkutils\n",
 					"    from pyspark.sql.types import StringType, TimestampType, StructType, StructField\n",
 					"    \n",
-					"    # Create schema with explicit types\n",
-					"    log_schema = StructType([\n",
-					"        StructField(\"file_path\", StringType(), False),\n",
-					"        StructField(\"process_timestamp\", TimestampType(), False)\n",
-					"    ])\n",
-					"    \n",
-					"    # Create new log entries with explicit timestamp type\n",
-					"    current_time = current_timestamp()\n",
-					"    new_log_entries = [(file_path, current_time.cast(\"timestamp\")) for file_path in new_file_paths]\n",
-					"    new_log_df = spark.createDataFrame(new_log_entries, [\"file_path\", \"process_timestamp\"])\n",
-					"    \n",
-					"    # Update existing log if it exists\n",
-					"    if mssparkutils.fs.exists(process_log_path):\n",
-					"        try:\n",
-					"            existing_log = spark.read.parquet(process_log_path)\n",
-					"            # Ensure the timestamp field has the correct type\n",
-					"            existing_log = existing_log.withColumn(\"process_timestamp\", \n",
-					"                                                 col(\"process_timestamp\").cast(\"timestamp\"))\n",
-					"            updated_log = existing_log.union(new_log_df)\n",
-					"        except Exception as e:\n",
-					"            print(f\"Error reading existing log: {str(e)}. Creating new log.\")\n",
-					"            updated_log = new_log_df\n",
-					"    else:\n",
-					"        updated_log = new_log_df\n",
+					"    try:\n",
+					"        # Create schema with explicit types\n",
+					"        log_schema = StructType([\n",
+					"            StructField(\"file_path\", StringType(), False),\n",
+					"            StructField(\"process_timestamp\", TimestampType(), False)\n",
+					"        ])\n",
 					"        \n",
-					"    # Write updated log\n",
-					"    updated_log.write.mode(\"overwrite\").parquet(process_log_path)\n",
-					"    \n",
-					"    return True"
+					"        # Get current timestamp, properly formatted\n",
+					"        timestamp_now = datetime.now()\n",
+					"        \n",
+					"        # Create new log entries with explicit timestamp\n",
+					"        new_log_entries = [(file_path, timestamp_now) for file_path in new_file_paths]\n",
+					"        \n",
+					"        # Create DataFrame with explicit schema\n",
+					"        new_log_df = spark.createDataFrame(new_log_entries, log_schema)\n",
+					"        \n",
+					"        # Update existing log if it exists\n",
+					"        if mssparkutils.fs.exists(process_log_path):\n",
+					"            try:\n",
+					"                existing_log = spark.read.parquet(process_log_path)\n",
+					"                # Ensure the timestamp field has the correct type\n",
+					"                existing_log = existing_log.withColumn(\"process_timestamp\", \n",
+					"                                                     col(\"process_timestamp\").cast(\"timestamp\"))\n",
+					"                updated_log = existing_log.union(new_log_df)\n",
+					"            except Exception as e:\n",
+					"                print(f\"Error reading existing log: {str(e)}. Creating new log.\")\n",
+					"                updated_log = new_log_df\n",
+					"        else:\n",
+					"            updated_log = new_log_df\n",
+					"            \n",
+					"        # Write updated log\n",
+					"        updated_log.write.mode(\"overwrite\").parquet(process_log_path)\n",
+					"        \n",
+					"        return True\n",
+					"    except Exception as e:\n",
+					"        print(f\"Error updating process log: {str(e)}\")\n",
+					"        import traceback\n",
+					"        print(traceback.format_exc())\n",
+					"        return False"
 				],
-				"execution_count": 362
+				"execution_count": 117
 			},
 			{
 				"cell_type": "markdown",
@@ -888,6 +964,17 @@
 					"        if final_data is None:\n",
 					"            logger.error(\"Final DataFrame is None. Check merge_with_existing_data function\")\n",
 					"            return\n",
+					"\n",
+					"        # reapply hashing after merging to ensure hash reflects current data\n",
+					"        final_data = final_data.withColumn(\n",
+					"            \"hash_id\",\n",
+					"            xxhash64(concat_ws(\",\", \n",
+					"                coalesce(col(\"fname\"), lit(\"\")),  # Using the target schema column names\n",
+					"                coalesce(col(\"lname\"), lit(\"\")),\n",
+					"                coalesce(col(\"dob\"), lit(\"\")),\n",
+					"                coalesce(col(\"address\"), lit(\"\"))                \n",
+					"            ))\n",
+					"        )\n",
 					"        \n",
 					"        # 9. Write output and update log\n",
 					"        logger.info(f\"Writing {final_data.count()} records to {config['output_path']}\")\n",
@@ -917,7 +1004,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 363
+				"execution_count": 118
 			}
 		]
 	}

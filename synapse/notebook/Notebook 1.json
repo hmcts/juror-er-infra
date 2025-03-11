@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f5166877-fe6f-4b28-ac40-70e4389ff14c"
+				"spark.autotune.trackingId": "e6892fdb-6cbe-45cc-8534-a5e115178ee7"
 			}
 		},
 		"metadata": {
@@ -509,20 +509,6 @@
 					"    main()"
 				],
 				"execution_count": 2
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"import logging\n",
-					"from pyspark.sql import SparkSession\n",
-					"from pyspark.sql.functions import *\n",
-					"from pyspark.sql.types import *\n",
-					"import json\n",
-					"from datetime import datetime\n",
-					"import os\n",
-					"from notebookutils import mssparkutils"
-				],
-				"execution_count": 1
 			}
 		]
 	}

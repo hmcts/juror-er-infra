@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "765621b6-8667-45fe-9ec7-3d2b914a9a1c"
+				"spark.autotune.trackingId": "8013c5dd-4f62-48b0-b360-a977c3ccd3cb"
 			}
 		},
 		"metadata": {
@@ -58,6 +58,16 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(df_single)"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
 				"source": [
 					"# Read the data\n",
 					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp\")\n",
@@ -70,16 +80,6 @@
 					""
 				],
 				"execution_count": 2
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"collapsed": false
-				},
-				"source": [
-					"display(df_single)"
-				],
-				"execution_count": 3
 			},
 			{
 				"cell_type": "code",

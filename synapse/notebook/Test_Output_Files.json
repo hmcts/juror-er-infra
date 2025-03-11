@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e81fbd41-2ead-46c7-86e6-7c92bbb1f74d"
+				"spark.autotune.trackingId": "e8b26bce-6b6d-4473-813f-43498d731047"
 			}
 		},
 		"metadata": {
@@ -54,7 +54,7 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 1
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -67,7 +67,7 @@
 					"\n",
 					"# Define storage paths\n",
 					"storage_account = \"baubaisadfsastg\"\n",
-					"base_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
+					"base_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
 					"\n",
 					"# Function to analyze parquet file\n",
 					"def analyze_parquet(file_path):\n",
@@ -98,14 +98,14 @@
 					"    return df\n",
 					"\n",
 					"# Example usage for specific file\n",
-					"file_path = f\"{base_path}/part-00013-66a47fff-7f4f-4e6d-b130-d96702abe5e5-c000.snappy.parquet\"\n",
+					"file_path = f\"{base_path}/20231204_256-Calderdale.parquet\"\n",
 					"df = analyze_parquet(file_path)\n",
 					"\n",
 					"# Optional: Save sample to CSV for easier viewing\n",
 					"\n",
 					"display(df)"
 				],
-				"execution_count": 2
+				"execution_count": null
 			}
 		]
 	}

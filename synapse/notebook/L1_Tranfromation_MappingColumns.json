@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d2bd1631-fdb4-4c53-b7c9-949939fa7a71"
+				"spark.autotune.trackingId": "938ea4ee-b20e-4867-a562-8596713e9ebc"
 			}
 		},
 		"metadata": {
@@ -124,7 +124,7 @@
 					"from pyspark.sql import Window\n",
 					"from pyspark.sql.types import StructType, StructField, StringType"
 				],
-				"execution_count": 183
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -141,7 +141,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 184
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -175,7 +175,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 185
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -201,7 +201,7 @@
 					"            reverse_map[alias.lower()] = standard_name\n",
 					"    return reverse_map"
 				],
-				"execution_count": 186
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -228,7 +228,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 187
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -254,7 +254,7 @@
 					"        return 'csv'\n",
 					"    return None"
 				],
-				"execution_count": 188
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -269,7 +269,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file format: {file_path}\")"
 				],
-				"execution_count": 189
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -298,7 +298,7 @@
 					"            logging.error(f\"Error reading Excel with Sheet1: {str(e2)}\")\n",
 					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetIndex\", 0).load(file_path)"
 				],
-				"execution_count": 190
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -311,7 +311,7 @@
 					"            logging.info(f\"Renamed column: {col} -> {std_name}\")\n",
 					"    return df"
 				],
-				"execution_count": 191
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -333,7 +333,7 @@
 					"        df = df.withColumn(\"LA Code\", lit(la_code))\n",
 					"    return df"
 				],
-				"execution_count": 192
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"        df = df.drop(\"name_parts\")\n",
 					"    return df"
 				],
-				"execution_count": 193
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -364,7 +364,7 @@
 					"            df = df.withColumn(col_name, when(col(col_name).isNotNull(), upper(trim(col(col_name)))).otherwise(None))\n",
 					"    return df"
 				],
-				"execution_count": 194
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -415,7 +415,7 @@
 					"        logging.error(f\"Error writing delta table: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 195
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -457,7 +457,7 @@
 					"            \"error\": error_message\n",
 					"        }"
 				],
-				"execution_count": 196
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -476,7 +476,7 @@
 					"        logging.error(f\"Error reading mapping files: {str(e)}\")\n",
 					"        return set()"
 				],
-				"execution_count": 197
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -494,7 +494,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 198
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -640,7 +640,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 199
+				"execution_count": null
 			}
 		]
 	}

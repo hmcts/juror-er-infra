@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d6cfe840-b505-49f8-a53a-d50468e11688"
+				"spark.autotune.trackingId": "d2bd1631-fdb4-4c53-b7c9-949939fa7a71"
 			}
 		},
 		"metadata": {
@@ -120,9 +120,11 @@
 					"import json\n",
 					"from datetime import datetime\n",
 					"import os\n",
-					"from notebookutils import mssparkutils"
+					"from notebookutils import mssparkutils\n",
+					"from pyspark.sql import Window\n",
+					"from pyspark.sql.types import StructType, StructField, StringType"
 				],
-				"execution_count": 65
+				"execution_count": 183
 			},
 			{
 				"cell_type": "code",
@@ -139,7 +141,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 66
+				"execution_count": 184
 			},
 			{
 				"cell_type": "markdown",
@@ -173,7 +175,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 67
+				"execution_count": 185
 			},
 			{
 				"cell_type": "markdown",
@@ -199,7 +201,7 @@
 					"            reverse_map[alias.lower()] = standard_name\n",
 					"    return reverse_map"
 				],
-				"execution_count": 68
+				"execution_count": 186
 			},
 			{
 				"cell_type": "markdown",
@@ -226,7 +228,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 69
+				"execution_count": 187
 			},
 			{
 				"cell_type": "markdown",
@@ -252,7 +254,7 @@
 					"        return 'csv'\n",
 					"    return None"
 				],
-				"execution_count": 70
+				"execution_count": 188
 			},
 			{
 				"cell_type": "code",
@@ -267,7 +269,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file format: {file_path}\")"
 				],
-				"execution_count": 71
+				"execution_count": 189
 			},
 			{
 				"cell_type": "markdown",
@@ -296,7 +298,7 @@
 					"            logging.error(f\"Error reading Excel with Sheet1: {str(e2)}\")\n",
 					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetIndex\", 0).load(file_path)"
 				],
-				"execution_count": 72
+				"execution_count": 190
 			},
 			{
 				"cell_type": "code",
@@ -309,7 +311,7 @@
 					"            logging.info(f\"Renamed column: {col} -> {std_name}\")\n",
 					"    return df"
 				],
-				"execution_count": 73
+				"execution_count": 191
 			},
 			{
 				"cell_type": "code",
@@ -331,7 +333,7 @@
 					"        df = df.withColumn(\"LA Code\", lit(la_code))\n",
 					"    return df"
 				],
-				"execution_count": 74
+				"execution_count": 192
 			},
 			{
 				"cell_type": "code",
@@ -349,7 +351,7 @@
 					"        df = df.drop(\"name_parts\")\n",
 					"    return df"
 				],
-				"execution_count": 75
+				"execution_count": 193
 			},
 			{
 				"cell_type": "code",
@@ -362,7 +364,7 @@
 					"            df = df.withColumn(col_name, when(col(col_name).isNotNull(), upper(trim(col(col_name)))).otherwise(None))\n",
 					"    return df"
 				],
-				"execution_count": 76
+				"execution_count": 194
 			},
 			{
 				"cell_type": "code",
@@ -413,27 +415,30 @@
 					"        logging.error(f\"Error writing delta table: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 77
+				"execution_count": 195
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def process_file(file_path, reverse_mapping, transform_folder, error_folder):\n",
-					"    \"\"\"Process a file with standardized column names\"\"\"\n",
 					"    try:\n",
-					"        # Extract file name from path\n",
+					"        # Basic file processing and transformation\n",
 					"        file_name = os.path.basename(file_path)\n",
+					"        base_name = file_name.split('.')[0]\n",
 					"        \n",
-					"        # Read the file based on its extension\n",
+					"        # Read and transform the file\n",
 					"        df = read_file(spark, file_path)\n",
-					"        \n",
-					"        # Standardize column names\n",
 					"        df = standardize_column_names(df, reverse_mapping)\n",
 					"        \n",
-					"        # Create output path\n",
-					"        output_path = f\"{transform_folder}/{file_name.split('.')[0]}.parquet\"\n",
+					"        # Add metadata columns\n",
+					"        if \"CreationDate\" not in df.columns:\n",
+					"            df = df.withColumn(\"CreationDate\", lit(datetime.now().strftime('%Y%m%d')))\n",
+					"        if \"LA_Code\" not in df.columns and \"_\" in base_name:\n",
+					"            la_code = base_name.split('_')[1].split('-')[0]\n",
+					"            df = df.withColumn(\"LA_Code\", lit(la_code))\n",
 					"        \n",
-					"        # Write to parquet\n",
+					"        # Write to output location\n",
+					"        output_path = f\"{transform_folder}/{base_name}.parquet\"\n",
 					"        df.write.mode(\"overwrite\").parquet(output_path)\n",
 					"        \n",
 					"        return {\n",
@@ -446,25 +451,13 @@
 					"    except Exception as e:\n",
 					"        error_message = str(e)\n",
 					"        logging.error(f\"Error processing file {file_path}: {error_message}\")\n",
-					"        \n",
-					"        # Move file to error folder if needed\n",
-					"        try:\n",
-					"            if mssparkutils.fs.exists(error_folder) == False:\n",
-					"                mssparkutils.fs.mkdirs(error_folder)\n",
-					"            \n",
-					"            error_file_path = f\"{error_folder}/{os.path.basename(file_path)}\"\n",
-					"            mssparkutils.fs.cp(file_path, error_file_path)\n",
-					"            logging.info(f\"Moved problematic file to error folder: {error_file_path}\")\n",
-					"        except Exception as move_error:\n",
-					"            logging.error(f\"Failed to move file to error folder: {str(move_error)}\")\n",
-					"        \n",
 					"        return {\n",
 					"            \"status\": \"error\",\n",
 					"            \"file\": file_path,\n",
 					"            \"error\": error_message\n",
 					"        }"
 				],
-				"execution_count": 78
+				"execution_count": 196
 			},
 			{
 				"cell_type": "code",
@@ -483,7 +476,7 @@
 					"        logging.error(f\"Error reading mapping files: {str(e)}\")\n",
 					"        return set()"
 				],
-				"execution_count": 79
+				"execution_count": 197
 			},
 			{
 				"cell_type": "code",
@@ -501,13 +494,12 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 80
+				"execution_count": 198
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def main():\n",
-					"    logging.basicConfig(level=logging.INFO)\n",
 					"    spark = create_spark_session()\n",
 					"    storage_account = \"baubaisadfsastg\"\n",
 					"    folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
@@ -516,18 +508,15 @@
 					"    error_folder = f\"{transform_folder}/errors\"\n",
 					"    log_file_path = f\"{transform_folder}/processed_files_log.json\"\n",
 					"    \n",
-					"    logging.info(\"Starting ETL process\")\n",
+					"    # Ensure all required directories exist\n",
+					"    for path in [transform_folder, error_folder]:\n",
+					"        if not mssparkutils.fs.exists(path):\n",
+					"            logging.info(f\"Creating directory: {path}\")\n",
+					"            mssparkutils.fs.mkdirs(path)\n",
 					"    \n",
 					"    # Check if the log file exists\n",
 					"    if not mssparkutils.fs.exists(log_file_path):\n",
 					"        logging.info(f\"Log file does not exist: {log_file_path}\")\n",
-					"        # Create the directory if it doesn't exist\n",
-					"        log_dir = os.path.dirname(log_file_path)\n",
-					"        if not mssparkutils.fs.exists(log_dir):\n",
-					"            logging.info(f\"Creating log directory: {log_dir}\")\n",
-					"            mssparkutils.fs.mkdirs(log_dir)\n",
-					"        # Initialize empty processed files log\n",
-					"        mapped_files = set()  # Empty set for now, or you can initialize it with existing mappings\n",
 					"        processed_files_log = []\n",
 					"    else:\n",
 					"        try:\n",
@@ -547,13 +536,6 @@
 					"        logging.fatal(f\"Fatal error reading mapping file: {str(e)}\")\n",
 					"        return\n",
 					"    \n",
-					"    # Read the log of processed files\n",
-					"    try:\n",
-					"        processed_files_log = spark.read.json(log_file_path).select(\"file\").rdd.flatMap(lambda x: x).collect()\n",
-					"    except Exception as e:\n",
-					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
-					"        processed_files_log = []\n",
-					"    \n",
 					"    all_files = list_files(folder, ['.csv', '.xlsx', '.xls'])\n",
 					"    logging.info(f\"Total files to process: {len(all_files)}\")\n",
 					"    \n",
@@ -561,25 +543,85 @@
 					"    new_files = [file for file in all_files if file not in processed_files_log]\n",
 					"    logging.info(f\"New files to process: {len(new_files)}\")\n",
 					"    \n",
-					"    results = [process_file(file_path, reverse_mapping, transform_folder, error_folder) for file_path in new_files]\n",
-					"    summary_df = spark.createDataFrame(results)\n",
-					"    summary_df.write.mode(\"overwrite\").json(f\"{transform_folder}/processing_summary.json\")\n",
+					"    # Process the files and collect results\n",
+					"    results = []\n",
+					"    for file_path in new_files:\n",
+					"        result = process_file(file_path, reverse_mapping, transform_folder, error_folder)\n",
+					"        results.append(result)\n",
+					"        logging.info(f\"Processed file: {file_path}, Status: {result['status']}\")\n",
+					"    \n",
+					"    # Create and save summary report\n",
+					"    try:\n",
+					"        if results:\n",
+					"            # Create DataFrame from results\n",
+					"            summary_schema = StructType([\n",
+					"                StructField(\"status\", StringType(), True),\n",
+					"                StructField(\"file\", StringType(), True),\n",
+					"                StructField(\"output\", StringType(), True),\n",
+					"                StructField(\"row_count\", LongType(), True),\n",
+					"                StructField(\"column_count\", IntegerType(), True),\n",
+					"                StructField(\"error\", StringType(), True)\n",
+					"            ])\n",
+					"            \n",
+					"            # Convert results to proper format for DataFrame\n",
+					"            summary_rows = []\n",
+					"            for r in results:\n",
+					"                row = {\n",
+					"                    \"status\": r.get(\"status\"),\n",
+					"                    \"file\": r.get(\"file\"),\n",
+					"                    \"output\": r.get(\"output\"),\n",
+					"                    \"row_count\": r.get(\"row_count\", 0),\n",
+					"                    \"column_count\": r.get(\"column_count\", 0),\n",
+					"                    \"error\": r.get(\"error\", \"\")\n",
+					"                }\n",
+					"                summary_rows.append(row)\n",
+					"            \n",
+					"            summary_df = spark.createDataFrame(summary_rows, summary_schema)\n",
+					"            summary_df.write.mode(\"overwrite\").json(f\"{transform_folder}/processing_summary.json\")\n",
+					"            logging.info(\"Successfully wrote processing summary to file\")\n",
+					"        else:\n",
+					"            logging.warning(\"No results to write to summary\")\n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Error creating or writing summary DataFrame: {str(e)}\")\n",
+					"        import traceback\n",
+					"        logging.error(traceback.format_exc())\n",
+					"    \n",
+					"    # Log summary information regardless of DataFrame creation success\n",
+					"    successful_files = [r for r in results if r.get(\"status\") == \"success\"]\n",
+					"    failed_files = [r for r in results if r.get(\"status\") == \"error\"]\n",
+					"    \n",
 					"    logging.info(\"\\nProcessing Summary:\")\n",
 					"    logging.info(f\"Total files processed: {len(results)}\")\n",
-					"    logging.info(f\"Successful: {len([r for r in results if r['status'] == 'success'])}\")\n",
-					"    logging.info(f\"Failed: {len([r for r in results if r['status'] == 'error'])}\")\n",
+					"    logging.info(f\"Successful: {len(successful_files)}\")\n",
+					"    logging.info(f\"Failed: {len(failed_files)}\")\n",
 					"    \n",
-					"    successful_files = [r for r in results if r['status'] == 'success']\n",
 					"    if successful_files:\n",
-					"        # Generate summary report\n",
-					"        logging.info(\"\\nSummary Report:\")\n",
+					"        # Generate detailed summary report\n",
+					"        logging.info(\"\\nDetailed Summary Report:\")\n",
 					"        logging.info(f\"Total files transformed: {len(successful_files)}\")\n",
-					"        logging.info(f\"Total errors: {len([r for r in results if r['status'] == 'error'])}\")\n",
 					"        \n",
-					"        for file in successful_files:\n",
-					"            output_file = file['output']\n",
-					"            df = spark.read.parquet(output_file)\n",
-					"            logging.info(f\"File: {output_file}, Columns: {len(df.columns)}\")\n",
+					"        total_rows = sum(r.get(\"row_count\", 0) for r in successful_files)\n",
+					"        logging.info(f\"Total rows processed: {total_rows}\")\n",
+					"        \n",
+					"        # Print details for each successful file\n",
+					"        for i, file in enumerate(successful_files[:10]):  # Limit to first 10 for readability\n",
+					"            output_file = file.get(\"output\", \"\")\n",
+					"            row_count = file.get(\"row_count\", 0)\n",
+					"            col_count = file.get(\"column_count\", 0)\n",
+					"            logging.info(f\"  {i+1}. File: {os.path.basename(output_file)}, Rows: {row_count}, Columns: {col_count}\")\n",
+					"        \n",
+					"        if len(successful_files) > 10:\n",
+					"            logging.info(f\"  ... and {len(successful_files) - 10} more files\")\n",
+					"    \n",
+					"    if failed_files:\n",
+					"        logging.info(\"\\nFailed Files:\")\n",
+					"        for i, file in enumerate(failed_files[:10]):  # Limit to first 10 for readability\n",
+					"            file_path = file.get(\"file\", \"\")\n",
+					"            error = file.get(\"error\", \"Unknown error\")\n",
+					"            logging.info(f\"  {i+1}. File: {os.path.basename(file_path)}, Error: {error[:100]}...\")  # Trim long errors\n",
+					"        \n",
+					"        if len(failed_files) > 10:\n",
+					"            logging.info(f\"  ... and {len(failed_files) - 10} more files\")\n",
 					"    \n",
 					"    # Update the log of processed files\n",
 					"    new_processed_files_log = spark.createDataFrame([(file,) for file in new_files], [\"file\"])\n",
@@ -588,12 +630,17 @@
 					"        updated_log_df = existing_log_df.union(new_processed_files_log).distinct()\n",
 					"    else:\n",
 					"        updated_log_df = new_processed_files_log\n",
-					"    updated_log_df.write.mode(\"overwrite\").json(log_file_path)\n",
+					"    \n",
+					"    try:\n",
+					"        updated_log_df.write.mode(\"overwrite\").json(log_file_path)\n",
+					"        logging.info(f\"Updated processed files log with {len(new_files)} new entries\")\n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Failed to update processed files log: {str(e)}\")\n",
 					"\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 81
+				"execution_count": 199
 			}
 		]
 	}

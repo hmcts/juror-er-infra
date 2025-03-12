@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7288a5fa-e1e1-4670-aad7-6ab18cac2103"
+				"spark.autotune.trackingId": "fa1aeb50-203c-4630-9123-cfe6f205087d"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 46
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 47
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 48
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"    }"
 				],
-				"execution_count": 49
+				"execution_count": 65
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +238,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 50
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -324,7 +324,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 51
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 52
+				"execution_count": 68
 			},
 			{
 				"cell_type": "markdown",
@@ -392,7 +392,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 53
+				"execution_count": 69
 			},
 			{
 				"cell_type": "markdown",
@@ -449,7 +449,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 54
+				"execution_count": 70
 			},
 			{
 				"cell_type": "markdown",
@@ -484,7 +484,7 @@
 					"    logging.info(f\"Deduplication: {df.count()} rows before, {deduplicated.count()} rows after\")\n",
 					"    return deduplicated"
 				],
-				"execution_count": 55
+				"execution_count": 71
 			},
 			{
 				"cell_type": "markdown",
@@ -502,36 +502,35 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def apply_hashing(df):\n",
-					"    \"\"\"Apply hashing to sensitive fields while maintaining a consistent hash_id\"\"\"\n",
-					"    \n",
-					"    # Step 1: Create the hash_id from original values for identification\n",
-					"    return df.withColumn(\n",
+					"def apply_hashing_to_voters(df):\n",
+					"    \"\"\"Apply hashing specifically for voters_temp table column structure\"\"\"\n",
+					"    # Create hash_id from original values\n",
+					"    hashed_df = df.withColumn(\n",
 					"        \"hash_id\",\n",
-					"        xxhash64(concat_ws(\",\", \n",
-					"            coalesce(col(\"Elector Forename\"), lit(\"\")),\n",
-					"            coalesce(col(\"Elector Surname\"), lit(\"\")),\n",
-					"            coalesce(col(\"Elector DOB\"), lit(\"\")),\n",
-					"            coalesce(col(\"Address1\"), lit(\"\")),\n",
-					"            coalesce(col(\"CreationDate\"), lit(\"\"))  # Include creation date in hash\n",
+					"        xxhash64(concat_ws(\",\",\n",
+					"            coalesce(col(\"fname\"), lit(\"\")),\n",
+					"            coalesce(col(\"lname\"), lit(\"\")),\n",
+					"            coalesce(col(\"dob\"), lit(\"\")),\n",
+					"            coalesce(col(\"address\"), lit(\"\")),\n",
+					"            coalesce(col(\"creation_date\"), lit(\"\"))\n",
 					"        ))\n",
 					"    )\n",
 					"    \n",
-					"    # Step 2: Create temporary columns with original values preserved\n",
-					"    hashed_df = hashed_df.withColumn(\"original_forename\", col(\"Elector Forename\"))\n",
-					"    hashed_df = hashed_df.withColumn(\"original_surname\", col(\"Elector Surname\"))\n",
-					"    hashed_df = hashed_df.withColumn(\"original_dob\", col(\"Elector DOB\"))\n",
-					"    hashed_df = hashed_df.withColumn(\"original_address1\", col(\"Address1\"))\n",
+					"    # Create backup columns with original values\n",
+					"    hashed_df = hashed_df.withColumn(\"original_fname\", col(\"fname\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_lname\", col(\"lname\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_dob\", col(\"dob\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_address\", col(\"address\"))\n",
 					"    \n",
-					"    # Step 3: Hash the actual fields to protect sensitive information\n",
-					"    hashed_df = hashed_df.withColumn(\"Elector Forename\", xxhash64(col(\"Elector Forename\")))\n",
-					"    hashed_df = hashed_df.withColumn(\"Elector Surname\", xxhash64(col(\"Elector Surname\")))\n",
-					"    hashed_df = hashed_df.withColumn(\"Elector DOB\", xxhash64(col(\"Elector DOB\")))\n",
-					"    hashed_df = hashed_df.withColumn(\"Address1\", xxhash64(col(\"Address1\")))\n",
+					"    # Hash the sensitive fields\n",
+					"    hashed_df = hashed_df.withColumn(\"fname\", xxhash64(col(\"fname\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"lname\", xxhash64(col(\"lname\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"dob\", xxhash64(col(\"dob\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"address\", xxhash64(col(\"address\")))\n",
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 56
+				"execution_count": 72
 			},
 			{
 				"cell_type": "markdown",
@@ -663,7 +662,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 57
+				"execution_count": 73
 			},
 			{
 				"cell_type": "markdown",
@@ -772,7 +771,7 @@
 					"        print(f\"Error listing files in output directory: {str(e)}\")\n",
 					"    return new_data"
 				],
-				"execution_count": 58
+				"execution_count": 74
 			},
 			{
 				"cell_type": "markdown",
@@ -823,7 +822,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 59
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -873,7 +872,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 60
+				"execution_count": 76
 			},
 			{
 				"cell_type": "markdown",
@@ -1024,7 +1023,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 61
+				"execution_count": 77
 			}
 		]
 	}

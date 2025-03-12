@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3c69305e-f177-444f-b56f-c87fc8e02636"
+				"spark.autotune.trackingId": "31294acf-6e3b-46d5-995f-d9aded3a64a4"
 			}
 		},
 		"metadata": {
@@ -54,13 +54,13 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 1
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"# Read the data\n",
-					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp\")\n",
+					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated\")\n",
 					"\n",
 					"# Coalesce to a single partition\n",
 					"df_single = df.coalesce(1)\n",
@@ -69,14 +69,14 @@
 					"df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"df_single.count()"
 				],
-				"execution_count": 3
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -92,7 +92,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 4
+				"execution_count": 23
 			}
 		]
 	}

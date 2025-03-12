@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2552b6f9-26e6-4a4a-b0f2-b671092380f6"
+				"spark.autotune.trackingId": "000aafa5-37c0-4a63-89d6-5036b687a82c"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 303
+				"execution_count": 326
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 304
+				"execution_count": 327
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 305
+				"execution_count": 328
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 306
+				"execution_count": 329
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 307
+				"execution_count": 330
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 308
+				"execution_count": 331
 			},
 			{
 				"cell_type": "markdown",
@@ -299,7 +299,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 309
+				"execution_count": 332
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +371,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 310
+				"execution_count": 333
 			},
 			{
 				"cell_type": "code",
@@ -392,7 +392,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 311
+				"execution_count": 334
 			},
 			{
 				"cell_type": "code",
@@ -409,7 +409,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 312
+				"execution_count": 335
 			},
 			{
 				"cell_type": "code",
@@ -436,7 +436,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 313
+				"execution_count": 336
 			},
 			{
 				"cell_type": "markdown",
@@ -477,7 +477,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 314
+				"execution_count": 337
 			},
 			{
 				"cell_type": "markdown",
@@ -544,7 +544,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 315
+				"execution_count": 338
 			},
 			{
 				"cell_type": "markdown",
@@ -570,7 +570,7 @@
 					"    # Only use columns that actually exist\n",
 					"    id_columns = []\n",
 					"    if \"Elector Number\" in actual_columns:\n",
-					"        id_columns.append(\"Elector Number\")\n",
+					"        id_columns.append(\"`Elector Number`\")  # Note the backticks for escaping\n",
 					"    if \"LA_Code\" in actual_columns:\n",
 					"        id_columns.append(\"LA_Code\")\n",
 					"    \n",
@@ -593,28 +593,35 @@
 					"        print(\"NO ID COLUMNS FOUND! Returning original DataFrame\")\n",
 					"        return df\n",
 					"    \n",
-					"    # Use SQL-based deduplication for better performance\n",
-					"    df.createOrReplaceTempView(\"records_to_deduplicate\")\n",
+					"    print(f\"USING ID COLUMNS: {id_columns}\")\n",
+					"    print(f\"USING DATE COLUMN: {date_column}\")\n",
 					"    \n",
-					"    # Build SQL query for deduplication\n",
-					"    partition_cols_str = \", \".join(id_columns)\n",
-					"    order_by_clause = f\"ORDER BY {date_column} DESC\" if date_column else \"\"\n",
-					"    \n",
-					"    sql_query = f\"\"\"\n",
-					"    SELECT * FROM (\n",
-					"        SELECT *, ROW_NUMBER() OVER (PARTITION BY {partition_cols_str} {order_by_clause}) as row_num\n",
-					"        FROM records_to_deduplicate\n",
-					"    ) ranked\n",
-					"    WHERE row_num = 1\n",
-					"    \"\"\"\n",
-					"    \n",
+					"    # As a simpler alternative, fall back to the DataFrame API approach\n",
 					"    try:\n",
-					"        return spark.sql(sql_query).drop(\"row_num\")\n",
+					"        # Build window spec using only columns we've verified exist\n",
+					"        from pyspark.sql.window import Window\n",
+					"        from pyspark.sql.functions import desc, row_number\n",
+					"        \n",
+					"        # Remove backticks for Window function\n",
+					"        clean_id_columns = [col.replace(\"`\", \"\") for col in id_columns]\n",
+					"        \n",
+					"        if date_column:\n",
+					"            window_spec = Window.partitionBy(*clean_id_columns).orderBy(desc(date_column))\n",
+					"        else:\n",
+					"            # If no date column, just use the ID columns\n",
+					"            window_spec = Window.partitionBy(*clean_id_columns)\n",
+					"            \n",
+					"        deduplicated = df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
+					"                         .filter(df[\"row_num\"] == 1) \\\n",
+					"                         .drop(\"row_num\")\n",
+					"                         \n",
+					"        return deduplicated\n",
 					"    except Exception as e:\n",
 					"        print(f\"ERROR IN DEDUPLICATION: {str(e)}\")\n",
+					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 316
+				"execution_count": 339
 			},
 			{
 				"cell_type": "markdown",
@@ -654,7 +661,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 317
+				"execution_count": 340
 			},
 			{
 				"cell_type": "code",
@@ -687,7 +694,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 318
+				"execution_count": 341
 			},
 			{
 				"cell_type": "markdown",
@@ -825,7 +832,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 319
+				"execution_count": 342
 			},
 			{
 				"cell_type": "markdown",
@@ -916,7 +923,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 320
+				"execution_count": 343
 			},
 			{
 				"cell_type": "markdown",
@@ -955,7 +962,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 321
+				"execution_count": 344
 			},
 			{
 				"cell_type": "code",
@@ -993,7 +1000,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 322
+				"execution_count": 345
 			},
 			{
 				"cell_type": "code",
@@ -1043,7 +1050,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 323
+				"execution_count": 346
 			},
 			{
 				"cell_type": "markdown",
@@ -1110,7 +1117,7 @@
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
 					"        \n",
 					"        # 5. Deduplicate new data\n",
-					"        deduplicated_data = safe_deduplicate_data(merged_new_data)\n",
+					"        deduplicated_data = optimize_deduplicate_data(merged_new_data)\n",
 					"        if deduplicated_data is None:\n",
 					"            logger.error(\"Deduplicated DataFrame is None\")\n",
 					"            return\n",
@@ -1185,7 +1192,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 324
+				"execution_count": 347
 			}
 		]
 	}

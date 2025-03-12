@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "761a3967-0879-4d06-9880-d91e0f273fa9"
+				"spark.autotune.trackingId": "114fbcbe-9119-4c72-af5c-f02d96e4ae8c"
 			}
 		},
 		"metadata": {
@@ -371,18 +371,22 @@
 				"source": [
 					"def write_transformed_data(df, output_path, la_code, date_folder):\n",
 					"    \"\"\"\n",
-					"    Write transformed data as a Parquet file with metadata\n",
+					"    Write transformed data as a Parquet file with proper metadata\n",
 					"    \"\"\"\n",
 					"    # Create a unique table identifier\n",
 					"    table_name = f\"{date_folder}_{la_code}\"\n",
 					"    full_path = f\"{output_path}/{table_name}.parquet\"\n",
 					"    \n",
 					"    try:\n",
-					"        # Add CreationDate based on the file date_folder, which should be YYYYMMDD format\n",
+					"        # Add CreationDate based on the file date_folder if not present\n",
 					"        if \"CreationDate\" not in df.columns:\n",
 					"            df = df.withColumn(\"CreationDate\", lit(date_folder))\n",
 					"        \n",
-					"        # Write to parquet (not delta)\n",
+					"        # Add LA_Code if not present\n",
+					"        if \"LA_Code\" not in df.columns:\n",
+					"            df = df.withColumn(\"LA_Code\", lit(la_code))\n",
+					"        \n",
+					"        # Write to parquet format (not delta)\n",
 					"        df.write.mode(\"overwrite\").parquet(full_path)\n",
 					"        logging.info(f\"Wrote parquet file to {full_path} with {df.count()} records\")\n",
 					"        return True, full_path\n",

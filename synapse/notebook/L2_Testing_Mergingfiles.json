@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b017b322-db86-43e9-b96c-4120314dfb79"
+				"spark.autotune.trackingId": "2552b6f9-26e6-4a4a-b0f2-b671092380f6"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 277
+				"execution_count": 303
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 278
+				"execution_count": 304
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 279
+				"execution_count": 305
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,44 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 306
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.types import StringType, IntegerType, TimestampType\n",
+					"\n",
+					"# Define global schema\n",
+					"TARGET_SCHEMA = [\n",
+					"    (\"loc_code\", StringType()),\n",
+					"    (\"part_no\", StringType()),\n",
+					"    (\"register_lett\", IntegerType()),\n",
+					"    (\"poll_number\", IntegerType()),\n",
+					"    (\"new_marker\", StringType()),\n",
+					"    (\"title\", StringType()),\n",
+					"    (\"lname\", StringType()),\n",
+					"    (\"fname\", StringType()),\n",
+					"    (\"dob\", StringType()),\n",
+					"    (\"flags\", StringType()),\n",
+					"    (\"address\", StringType()),\n",
+					"    (\"address2\", StringType()),\n",
+					"    (\"address3\", StringType()),\n",
+					"    (\"address4\", StringType()),\n",
+					"    (\"address5\", StringType()),\n",
+					"    (\"address6\", StringType()),\n",
+					"    (\"zip\", StringType()),\n",
+					"    (\"date_selected1\", TimestampType()),\n",
+					"    (\"date_selected2\", TimestampType()),\n",
+					"    (\"date_selected3\", TimestampType()),\n",
+					"    (\"rec_num\", IntegerType()),\n",
+					"    (\"perm_disqual\", StringType()),\n",
+					"    (\"source_id\", StringType()),\n",
+					"    (\"postcode_start\", StringType()),\n",
+					"    (\"hash_id\", StringType()),\n",
+					"    (\"creation_date\", StringType())\n",
+					"]"
+				],
+				"execution_count": 307
 			},
 			{
 				"cell_type": "code",
@@ -179,7 +216,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 280
+				"execution_count": 308
 			},
 			{
 				"cell_type": "markdown",
@@ -262,7 +299,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 281
+				"execution_count": 309
 			},
 			{
 				"cell_type": "code",
@@ -334,7 +371,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 282
+				"execution_count": 310
 			},
 			{
 				"cell_type": "code",
@@ -355,46 +392,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"# Option 1: Define at module level (outside of any function)\n",
-					"TARGET_SCHEMA = [\n",
-					"    (\"loc_code\", StringType()),\n",
-					"    (\"part_no\", StringType()),\n",
-					"    (\"register_lett\", IntegerType()),\n",
-					"    (\"poll_number\", IntegerType()),\n",
-					"    (\"new_marker\", StringType()),\n",
-					"    (\"title\", StringType()),\n",
-					"    (\"lname\", StringType()),\n",
-					"    (\"fname\", StringType()),\n",
-					"    (\"dob\", StringType()),\n",
-					"    (\"flags\", StringType()),\n",
-					"    (\"address\", StringType()),\n",
-					"    (\"address2\", StringType()),\n",
-					"    (\"address3\", StringType()),\n",
-					"    (\"address4\", StringType()),\n",
-					"    (\"address5\", StringType()),\n",
-					"    (\"address6\", StringType()),\n",
-					"    (\"zip\", StringType()),\n",
-					"    (\"date_selected1\", TimestampType()),\n",
-					"    (\"date_selected2\", TimestampType()),\n",
-					"    (\"date_selected3\", TimestampType()),\n",
-					"    (\"rec_num\", IntegerType()),\n",
-					"    (\"perm_disqual\", StringType()),\n",
-					"    (\"source_id\", StringType()),\n",
-					"    (\"postcode_start\", StringType()),\n",
-					"    (\"hash_id\", StringType()),\n",
-					"    (\"creation_date\", StringType())\n",
-					"]\n",
-					"\n",
-					"# Then in your main function, after transformation:\n",
-					"transformed_data = transform_to_target_schema(hashed_data, column_mapping)\n",
-					"transformed_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)"
-				],
-				"execution_count": null
+				"execution_count": 311
 			},
 			{
 				"cell_type": "code",
@@ -411,7 +409,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 312
 			},
 			{
 				"cell_type": "code",
@@ -438,7 +436,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 283
+				"execution_count": 313
 			},
 			{
 				"cell_type": "markdown",
@@ -479,7 +477,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 284
+				"execution_count": 314
 			},
 			{
 				"cell_type": "markdown",
@@ -546,7 +544,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 285
+				"execution_count": 315
 			},
 			{
 				"cell_type": "markdown",
@@ -616,7 +614,7 @@
 					"        print(f\"ERROR IN DEDUPLICATION: {str(e)}\")\n",
 					"        return df"
 				],
-				"execution_count": 286
+				"execution_count": 316
 			},
 			{
 				"cell_type": "markdown",
@@ -656,7 +654,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 287
+				"execution_count": 317
 			},
 			{
 				"cell_type": "code",
@@ -689,7 +687,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 288
+				"execution_count": 318
 			},
 			{
 				"cell_type": "markdown",
@@ -827,7 +825,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 289
+				"execution_count": 319
 			},
 			{
 				"cell_type": "markdown",
@@ -918,7 +916,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 290
+				"execution_count": 320
 			},
 			{
 				"cell_type": "markdown",
@@ -957,7 +955,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 321
 			},
 			{
 				"cell_type": "code",
@@ -995,7 +993,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 291
+				"execution_count": 322
 			},
 			{
 				"cell_type": "code",
@@ -1045,7 +1043,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 292
+				"execution_count": 323
 			},
 			{
 				"cell_type": "markdown",
@@ -1130,7 +1128,9 @@
 					"        if transformed_data is None:\n",
 					"            logger.error(\"Transformed DataFrame is None\")\n",
 					"            return\n",
-					"        \n",
+					"\n",
+					"        # Add this line to standardize the schema\n",
+					"        transformed_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)\n",
 					"        logger.info(f\"Transformed data contains {transformed_data.count()} rows\")\n",
 					"        \n",
 					"        # 8. Merge with existing data\n",
@@ -1163,11 +1163,11 @@
 					"        # Update the process log\n",
 					"        success1 = write_output_safely(final_data, config[\"output_path\"], \"transformed data\")\n",
 					"        \n",
-					"       if success1:\n",
+					"        if success1:\n",
 					"            success2 = write_output_safely(\n",
-					"            final_data, \n",
-					"            f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
-					"            \"deduplicated data\"\n",
+					"                final_data, \n",
+					"                f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
+					"                \"deduplicated data\"\n",
 					"            )\n",
 					"    \n",
 					"        if success1 and success2:\n",
@@ -1185,7 +1185,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 293
+				"execution_count": 324
 			}
 		]
 	}

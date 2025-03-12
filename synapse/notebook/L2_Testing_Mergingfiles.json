@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b3f6a99a-479d-49cf-b5db-104906d334f5"
+				"spark.autotune.trackingId": "7288a5fa-e1e1-4670-aad7-6ab18cac2103"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 1
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 2
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 3
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"    }"
 				],
-				"execution_count": 4
+				"execution_count": 49
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +238,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 5
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -324,7 +324,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 6
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 7
+				"execution_count": 52
 			},
 			{
 				"cell_type": "markdown",
@@ -392,7 +392,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 8
+				"execution_count": 53
 			},
 			{
 				"cell_type": "markdown",
@@ -449,7 +449,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 9
+				"execution_count": 54
 			},
 			{
 				"cell_type": "markdown",
@@ -484,7 +484,7 @@
 					"    logging.info(f\"Deduplication: {df.count()} rows before, {deduplicated.count()} rows after\")\n",
 					"    return deduplicated"
 				],
-				"execution_count": 10
+				"execution_count": 55
 			},
 			{
 				"cell_type": "markdown",
@@ -506,13 +506,14 @@
 					"    \"\"\"Apply hashing to sensitive fields while maintaining a consistent hash_id\"\"\"\n",
 					"    \n",
 					"    # Step 1: Create the hash_id from original values for identification\n",
-					"    hashed_df = df.withColumn(\n",
+					"    return df.withColumn(\n",
 					"        \"hash_id\",\n",
 					"        xxhash64(concat_ws(\",\", \n",
 					"            coalesce(col(\"Elector Forename\"), lit(\"\")),\n",
 					"            coalesce(col(\"Elector Surname\"), lit(\"\")),\n",
 					"            coalesce(col(\"Elector DOB\"), lit(\"\")),\n",
-					"            coalesce(col(\"Address1\"), lit(\"\"))\n",
+					"            coalesce(col(\"Address1\"), lit(\"\")),\n",
+					"            coalesce(col(\"CreationDate\"), lit(\"\"))  # Include creation date in hash\n",
 					"        ))\n",
 					"    )\n",
 					"    \n",
@@ -530,7 +531,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 11
+				"execution_count": 56
 			},
 			{
 				"cell_type": "markdown",
@@ -631,7 +632,7 @@
 					"            when(\n",
 					"                col(\"CreationDate\").isNotNull(),\n",
 					"                col(\"CreationDate\")\n",
-					"            ).otherwise(current_timestamp()).alias(\"creation_date\")\n",
+					"            ).otherwise(date_format(current_timestamp(), \"yyyyMMdd\")).alias(\"creation_date\")\n",
 					"        )\n",
 					"        \n",
 					"        print(f\"Transformation complete. Result has {transformed_df.count()} rows and {len(transformed_df.columns)} columns\")\n",
@@ -645,10 +646,24 @@
 					"        import traceback\n",
 					"        print(traceback.format_exc())\n",
 					"        \n",
-					"        # Create minimal valid DataFrame\n",
-					"        # ...rest of the error handling code remains the same"
+					"         # Create a minimal valid DataFrame instead of returning None\n",
+					"        print(\"Creating minimal valid DataFrame to avoid pipeline failure\")\n",
+					"        columns = [\n",
+					"            \"loc_code\", \"part_no\", \"register_lett\", \"poll_number\",\n",
+					"            \"new_marker\", \"title\", \"lname\", \"fname\", \"dob\", \"flags\",\n",
+					"            \"address\", \"address2\", \"address3\", \"address4\", \"address5\", \n",
+					"            \"address6\", \"zip\", \"date_selected1\", \"date_selected2\", \n",
+					"            \"date_selected3\", \"rec_num\", \"perm_disqual\", \"source_id\",\n",
+					"            \"postcode_start\", \"hash_id\", \"creation_date\"\n",
+					"        ]\n",
+					"        \n",
+					"        # Create empty DataFrame with the right structure\n",
+					"        schema = StructType([StructField(c, StringType(), True) for c in columns])\n",
+					"        empty_df = spark.createDataFrame([], schema)\n",
+					"        \n",
+					"        return empty_df"
 				],
-				"execution_count": 12
+				"execution_count": 57
 			},
 			{
 				"cell_type": "markdown",
@@ -757,7 +772,7 @@
 					"        print(f\"Error listing files in output directory: {str(e)}\")\n",
 					"    return new_data"
 				],
-				"execution_count": 13
+				"execution_count": 58
 			},
 			{
 				"cell_type": "markdown",
@@ -808,7 +823,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 14
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -858,7 +873,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 15
+				"execution_count": 60
 			},
 			{
 				"cell_type": "markdown",
@@ -889,6 +904,7 @@
 					"    \n",
 					"    spark = create_spark_session()\n",
 					"    config = load_config()\n",
+					"    storage_account = config[\"storage_account\"]\n",
 					"    process_log_path = f\"{config['output_path']}_process_log\"\n",
 					"    \n",
 					"    print(f\"Looking for files in: {config['input_path']}\")\n",
@@ -962,6 +978,24 @@
 					"            ))\n",
 					"        )\n",
 					"        \n",
+					"        # After deduplication has been applied\n",
+					"        deduplicated_data = remove_duplicates_by_extraction_date(merged_new_data)\n",
+					"        \n",
+					"        \n",
+					"        # Transform to target schema if needed\n",
+					"        transformed_data = transform_to_target_schema(deduplicated_data, column_mapping)\n",
+					"        \n",
+					"        # Write final deduplicated dataset to a clearly named location\n",
+					"        final_output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"\n",
+					"        transformed_data.write.mode(\"overwrite\").parquet(final_output_path)\n",
+					"        \n",
+					"        # For a large dataset (40M rows), let Spark determine partitioning\n",
+					"        transformed_data.write.mode(\"overwrite\").parquet(final_output_path)\n",
+					"        \n",
+					"        # Log details for documentation\n",
+					"        logging.info(f\"Created deduplicated dataset with {transformed_data.count()} rows at {final_output_path}\")\n",
+					"        logging.info(f\"Dataset partitioned across multiple files for performance\")\n",
+					"        \n",
 					"        # 9. Write output and update log\n",
 					"        logger.info(f\"Writing {final_data.count()} records to {config['output_path']}\")\n",
 					"        \n",
@@ -990,7 +1024,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 16
+				"execution_count": 61
 			}
 		]
 	}

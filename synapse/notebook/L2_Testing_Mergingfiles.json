@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5deb625b-576a-4637-93a2-30b924639b8f"
+				"spark.autotune.trackingId": "b3f6a99a-479d-49cf-b5db-104906d334f5"
 			}
 		},
 		"metadata": {
@@ -411,7 +411,7 @@
 				"cell_type": "code",
 				"source": [
 					"def merge_dataframes(dfs):\n",
-					"    \"\"\"Merge all dataframes with standardized schema\"\"\"\n",
+					"    \"\"\"Merge all dataframes with standardized schema, preserving original CreationDate\"\"\"\n",
 					"    if not dfs:\n",
 					"        raise ValueError(\"No dataframes to merge\")\n",
 					"        \n",
@@ -419,7 +419,34 @@
 					"    merged_df = dfs[0]\n",
 					"    for df in dfs[1:]:\n",
 					"        merged_df = merged_df.unionByName(df, allowMissingColumns=True)\n",
+					"    \n",
+					"    # Ensure CreationDate isn't being overwritten\n",
+					"    # Check if CreationDate exists but is all the same value\n",
+					"    distinct_dates = merged_df.select(\"CreationDate\").distinct().count()\n",
+					"    if distinct_dates == 1:\n",
+					"        # If only one date exists, it might have been overwritten\n",
+					"        logging.warning(\"Only one distinct CreationDate found in merged data - this may indicate a problem!\")\n",
 					"        \n",
+					"        # Check if original date information is available in other columns or file metadata\n",
+					"        if \"source_file\" in merged_df.columns:\n",
+					"            # Extract date from source_file path if possible\n",
+					"            merged_df = merged_df.withColumn(\n",
+					"                \"extracted_date\",\n",
+					"                regexp_extract(col(\"source_file\"), r\"(\\d{8})_\", 1)\n",
+					"            )\n",
+					"            \n",
+					"            # Use extracted date if available, otherwise keep existing\n",
+					"            merged_df = merged_df.withColumn(\n",
+					"                \"CreationDate\",\n",
+					"                when(col(\"extracted_date\").isNotNull(), col(\"extracted_date\"))\n",
+					"                .otherwise(col(\"CreationDate\"))\n",
+					"            )\n",
+					"            \n",
+					"            # Clean up temporary column\n",
+					"            merged_df = merged_df.drop(\"extracted_date\")\n",
+					"            \n",
+					"            logging.info(f\"After date correction: {merged_df.select('CreationDate').distinct().count()} distinct dates\")\n",
+					"    \n",
 					"    return merged_df"
 				],
 				"execution_count": 9

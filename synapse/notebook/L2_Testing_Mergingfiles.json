@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4ba0660f-e67a-4cb4-81d8-cdd2751ee0de"
+				"spark.autotune.trackingId": "d28c1db3-5ded-499c-bc53-7079615bd45e"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 62
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 63
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 64
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"    }"
 				],
-				"execution_count": 65
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +238,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 66
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -324,7 +324,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 67
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 68
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -392,7 +392,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 69
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -449,7 +449,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 70
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -484,7 +484,7 @@
 					"    logging.info(f\"Deduplication: {df.count()} rows before, {deduplicated.count()} rows after\")\n",
 					"    return deduplicated"
 				],
-				"execution_count": 71
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -530,7 +530,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 72
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -662,7 +662,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 73
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -726,7 +726,7 @@
 					"        # No existing data, just return the new data with deduplication\n",
 					"        return remove_duplicates_by_extraction_date(new_data)"
 				],
-				"execution_count": 74
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -777,7 +777,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 75
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -827,7 +827,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 76
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -978,7 +978,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 77
+				"execution_count": null
 			}
 		]
 	}

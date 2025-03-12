@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5d51ff5b-7776-4668-9438-f5363c4f28b9"
+				"spark.autotune.trackingId": "5deb625b-576a-4637-93a2-30b924639b8f"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 183
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"    }"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +238,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -324,7 +324,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -392,7 +392,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 126
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -422,7 +422,7 @@
 					"        \n",
 					"    return merged_df"
 				],
-				"execution_count": 127
+				"execution_count": 9
 			},
 			{
 				"cell_type": "markdown",
@@ -441,18 +441,23 @@
 				"cell_type": "code",
 				"source": [
 					"def remove_duplicates_by_extraction_date(df):\n",
-					"    \"\"\"Keep only the latest record for each Elector Number + LA_Code combination\"\"\"\n",
-					"    # Use your window partitioning approach\n",
-					"    window_spec = Window.partitionBy(\"Elector Number\", \"LA_Code\") \\\n",
-					"                        .orderBy(desc(\"CreationDate\"))\n",
+					"    \"\"\"Keep only the latest record for each unique individual\"\"\"\n",
+					"    # Use your window partitioning approach with enhanced identity matching\n",
+					"    window_spec = Window.partitionBy(\n",
+					"        \"Elector Number\", \n",
+					"        \"LA_Code\",\n",
+					"        \"Elector Forename\",\n",
+					"        \"Elector Surname\"\n",
+					"    ).orderBy(desc(\"CreationDate\"))\n",
 					"    \n",
 					"    deduplicated = df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
 					"                     .filter(col(\"row_num\") == 1) \\\n",
 					"                     .drop(\"row_num\")\n",
 					"                     \n",
+					"    logging.info(f\"Deduplication: {df.count()} rows before, {deduplicated.count()} rows after\")\n",
 					"    return deduplicated"
 				],
-				"execution_count": 128
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -498,7 +503,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 129
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -616,7 +621,7 @@
 					"        # Create minimal valid DataFrame\n",
 					"        # ...rest of the error handling code remains the same"
 				],
-				"execution_count": 130
+				"execution_count": 12
 			},
 			{
 				"cell_type": "markdown",
@@ -725,7 +730,7 @@
 					"        print(f\"Error listing files in output directory: {str(e)}\")\n",
 					"    return new_data"
 				],
-				"execution_count": 131
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -776,7 +781,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 132
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -826,7 +831,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 133
+				"execution_count": 15
 			},
 			{
 				"cell_type": "markdown",
@@ -958,7 +963,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 134
+				"execution_count": 16
 			}
 		]
 	}

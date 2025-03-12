@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e936a9c3-2960-4118-be51-7c2bf85b72bd"
+				"spark.autotune.trackingId": "7006f907-c09c-4afb-8255-242dadba5aff"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 194
+				"execution_count": 226
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 195
+				"execution_count": 227
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 196
+				"execution_count": 228
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"    }"
 				],
-				"execution_count": 197
+				"execution_count": 229
 			},
 			{
 				"cell_type": "markdown",
@@ -238,7 +238,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 198
+				"execution_count": 230
 			},
 			{
 				"cell_type": "code",
@@ -324,7 +324,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 199
+				"execution_count": 231
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +351,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 200
+				"execution_count": 232
 			},
 			{
 				"cell_type": "markdown",
@@ -392,7 +392,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 201
+				"execution_count": 233
 			},
 			{
 				"cell_type": "markdown",
@@ -459,7 +459,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 202
+				"execution_count": 234
 			},
 			{
 				"cell_type": "markdown",
@@ -533,7 +533,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 235
 			},
 			{
 				"cell_type": "markdown",
@@ -573,7 +573,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 236
 			},
 			{
 				"cell_type": "code",
@@ -606,7 +606,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 203
+				"execution_count": 237
 			},
 			{
 				"cell_type": "markdown",
@@ -627,18 +627,24 @@
 					"def transform_to_target_schema(df, column_mapping):\n",
 					"    \"\"\"\n",
 					"    Transform the dataframe to match the target PostgreSQL schema\n",
-					"    \n",
-					"    Args:\n",
-					"        df: Input DataFrame with standardized column names\n",
-					"        column_mapping: Dictionary mapping standard names to variations\n",
-					"        \n",
-					"    Returns:\n",
-					"        DataFrame with target schema for PostgreSQL\n",
 					"    \"\"\"\n",
 					"    print(f\"Starting transformation with DataFrame containing {df.count()} rows\")\n",
 					"    print(f\"Available columns: {df.columns}\")\n",
 					"    \n",
 					"    try:\n",
+					"        # Check if hash_id column exists, create it if missing\n",
+					"        if \"hash_id\" not in df.columns:\n",
+					"            print(\"Creating hash_id column since it doesn't exist\")\n",
+					"            df = df.withColumn(\n",
+					"                \"hash_id\",\n",
+					"                xxhash64(concat_ws(\",\",\n",
+					"                    coalesce(col(\"Elector Forename\"), lit(\"\")),\n",
+					"                    coalesce(col(\"Elector Surname\"), lit(\"\")),\n",
+					"                    coalesce(col(\"Elector DOB\"), lit(\"\")),\n",
+					"                    coalesce(col(\"Address1\"), lit(\"\"))\n",
+					"                ))\n",
+					"            )\n",
+					"        \n",
 					"        # Helper function to safely access columns\n",
 					"        def safe_col(column_name):\n",
 					"            if column_name in df.columns:\n",
@@ -714,12 +720,12 @@
 					"        print(f\"Result columns: {transformed_df.columns}\")\n",
 					"        \n",
 					"        return transformed_df\n",
-					"        \n",
 					"    except Exception as e:\n",
-					"        # Error handling as before\n",
+					"        # Error handling code\n",
 					"        print(f\"Error in transform_to_target_schema: {str(e)}\")\n",
 					"        import traceback\n",
 					"        print(traceback.format_exc())\n",
+					"        \n",
 					"        \n",
 					"         # Create a minimal valid DataFrame instead of returning None\n",
 					"        print(\"Creating minimal valid DataFrame to avoid pipeline failure\")\n",
@@ -738,7 +744,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 204
+				"execution_count": 238
 			},
 			{
 				"cell_type": "markdown",
@@ -768,7 +774,7 @@
 					"        # No existing data, just return the new data with deduplication\n",
 					"        return safe_deduplicate_data(new_data)  # Use safe_deduplicate_data instead"
 				],
-				"execution_count": 205
+				"execution_count": 239
 			},
 			{
 				"cell_type": "markdown",
@@ -819,7 +825,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 206
+				"execution_count": 240
 			},
 			{
 				"cell_type": "code",
@@ -869,7 +875,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 207
+				"execution_count": 241
 			},
 			{
 				"cell_type": "markdown",
@@ -964,7 +970,7 @@
 					"            return\n",
 					"        \n",
 					"        # After deduplication has been applied\n",
-					"        deduplicated_data = remove_duplicates_by_extraction_date(merged_new_data)\n",
+					"        deduplicated_data = safe_deduplicate_data(merged_new_data)\n",
 					"        \n",
 					"        \n",
 					"        # Transform to target schema if needed\n",
@@ -1015,7 +1021,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 208
+				"execution_count": 242
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "94c59be4-d660-425c-a657-b9aa302002a1"
+				"spark.autotune.trackingId": "264d3628-de83-4c4f-a201-c9246f08f91f"
 			}
 		},
 		"metadata": {
@@ -124,7 +124,7 @@
 					"from pyspark.sql import Window\n",
 					"from pyspark.sql.types import StructType, StructField, StringType"
 				],
-				"execution_count": 133
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -141,7 +141,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 134
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -175,7 +175,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 135
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -201,7 +201,7 @@
 					"            reverse_map[alias.lower()] = standard_name\n",
 					"    return reverse_map"
 				],
-				"execution_count": 136
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -228,7 +228,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 137
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -254,7 +254,7 @@
 					"        return 'csv'\n",
 					"    return None"
 				],
-				"execution_count": 138
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -269,7 +269,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file format: {file_path}\")"
 				],
-				"execution_count": 139
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -298,7 +298,7 @@
 					"            logging.error(f\"Error reading Excel with Sheet1: {str(e2)}\")\n",
 					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetIndex\", 0).load(file_path)"
 				],
-				"execution_count": 140
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -311,7 +311,7 @@
 					"            logging.info(f\"Renamed column: {col} -> {std_name}\")\n",
 					"    return df"
 				],
-				"execution_count": 141
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -347,7 +347,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 142
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -403,7 +403,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 143
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -460,7 +460,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 144
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -473,7 +473,7 @@
 					"            df = df.withColumn(col_name, when(col(col_name).isNotNull(), upper(trim(col(col_name)))).otherwise(None))\n",
 					"    return df"
 				],
-				"execution_count": 145
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -504,7 +504,7 @@
 					"        logging.error(f\"Error writing file: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 146
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -564,7 +564,7 @@
 					"            \"error\": str(e)\n",
 					"        }"
 				],
-				"execution_count": 147
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -583,7 +583,7 @@
 					"        logging.error(f\"Error reading mapping files: {str(e)}\")\n",
 					"        return set()"
 				],
-				"execution_count": 148
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -601,7 +601,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 149
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -699,10 +699,16 @@
 					"        if len(failed_files) > 10:\n",
 					"            logging.info(f\" ... and {len(failed_files) - 10} more files\")\n",
 					"    \n",
+					"    # Create a list of row tuples with explicit string conversion\n",
+					"    file_rows = [(str(file),) for file in new_files]\n",
+					"\n",
 					"    # Update the log of processed files\n",
-					"    new_processed_files_log = spark.createDataFrame([(file,) for file in new_files], [\"file\"])\n",
+					"    file_rows_list = list(file_rows) \n",
+					"    new_processed_files_log = spark.createDataFrame(file_rows_list, [\"file\"])\n",
 					"    if processed_files_log:\n",
-					"        existing_log_df = spark.createDataFrame([(file,) for file in processed_files_log], [\"file\"])\n",
+					"        existing_rows = [(str(file),) for file in processed_files_log]\n",
+					"        existing_rows_list = list(existing_rows)\n",
+					"        existing_log_df = spark.createDataFrame(existing_rows_list, [\"file\"])\n",
 					"        updated_log_df = existing_log_df.union(new_processed_files_log).distinct()\n",
 					"    else:\n",
 					"        updated_log_df = new_processed_files_log\n",
@@ -716,7 +722,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 150
+				"execution_count": null
 			}
 		]
 	}

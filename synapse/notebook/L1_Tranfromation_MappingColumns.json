@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f78830c9-08ac-4690-a3b6-0558d984dd73"
+				"spark.autotune.trackingId": "0f05bb27-aaaa-4d2a-9085-85d8f4f3e680"
 			}
 		},
 		"metadata": {
@@ -122,10 +122,9 @@
 					"import os\n",
 					"from notebookutils import mssparkutils\n",
 					"from pyspark.sql import Window\n",
-					"from pyspark.sql.types import StructType, StructField, StringType\n",
-					"from pyspark.sql.functions import try_cast"
+					"from pyspark.sql.types import StructType, StructField, StringType"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -142,7 +141,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -176,7 +175,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -202,7 +201,7 @@
 					"            reverse_map[alias.lower()] = standard_name\n",
 					"    return reverse_map"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "markdown",
@@ -229,7 +228,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -255,7 +254,7 @@
 					"        return 'csv'\n",
 					"    return None"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -270,7 +269,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file format: {file_path}\")"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -299,7 +298,7 @@
 					"            logging.error(f\"Error reading Excel with Sheet1: {str(e2)}\")\n",
 					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetIndex\", 0).load(file_path)"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -312,7 +311,7 @@
 					"            logging.info(f\"Renamed column: {col} -> {std_name}\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -346,7 +345,19 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def try_cast_to_int(column_name):\n",
+					"    \"\"\"Custom function to safely attempt to cast a column to integer type\"\"\"\n",
+					"    return when(\n",
+					"        col(column_name).cast(\"int\").isNotNull(),\n",
+					"        col(column_name).cast(\"int\")\n",
+					"    ).otherwise(col(column_name))"
+				],
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -392,8 +403,8 @@
 					"                            col(col_name).rlike(\"^[0-9]+$\"),\n",
 					"                            col(col_name).cast(\"int\")\n",
 					"                        ).otherwise(\n",
-					"                            # For any other format, keep as is but try to cast to int if possible\n",
-					"                            try_cast(col(col_name), \"int\")\n",
+					"                            # For any other format, use our custom try_cast function\n",
+					"                            try_cast_to_int(col_name)\n",
 					"                        )\n",
 					"                    )\n",
 					"                    \n",
@@ -402,15 +413,15 @@
 					"                    logging.info(f\"Converted {col_name} to integer format\")\n",
 					"                else:\n",
 					"                    logging.info(f\"No date-like values found in {col_name}, ensuring integer type\")\n",
-					"                    df = df.withColumn(col_name, try_cast(col(col_name), \"int\"))\n",
+					"                    df = df.withColumn(col_name, try_cast_to_int(col_name))\n",
 					"            except Exception as e:\n",
 					"                logging.warning(f\"Error checking {col_name} format: {str(e)}. Attempting basic conversion.\")\n",
 					"                # Fallback to basic conversion\n",
-					"                df = df.withColumn(col_name, try_cast(col(col_name), \"int\"))\n",
+					"                df = df.withColumn(col_name, try_cast_to_int(col_name))\n",
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -423,7 +434,7 @@
 					"            df = df.withColumn(col_name, when(col(col_name).isNotNull(), upper(trim(col(col_name)))).otherwise(None))\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -463,7 +474,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -494,7 +505,7 @@
 					"        logging.error(f\"Error writing file: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -554,7 +565,7 @@
 					"            \"error\": str(e)\n",
 					"        }"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -572,6 +583,49 @@
 					"    except Exception as e:\n",
 					"        logging.error(f\"Error reading mapping files: {str(e)}\")\n",
 					"        return set()"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def update_processed_files_log(spark, log_file_path, processed_files_log, new_files):\n",
+					"    \"\"\"Update the log of processed files\"\"\"\n",
+					"    try:\n",
+					"        # Create destination folder if it doesn't exist\n",
+					"        log_folder = os.path.dirname(log_file_path)\n",
+					"        if not mssparkutils.fs.exists(log_folder):\n",
+					"            mssparkutils.fs.mkdirs(log_folder)\n",
+					"            logging.info(f\"Created log folder: {log_folder}\")\n",
+					"        \n",
+					"        # Convert new_files to a list and ensure all elements are strings\n",
+					"        new_files_list = [str(file) for file in list(new_files)]\n",
+					"        \n",
+					"        # Create rows for DataFrame\n",
+					"        new_file_rows = [(file,) for file in new_files_list]\n",
+					"        \n",
+					"        # Create DataFrame for new files\n",
+					"        new_processed_files_log = spark.createDataFrame(new_file_rows, [\"file\"]\n",
+					"        \n",
+					"        # Merge with existing log if it exists\n",
+					"        if processed_files_log:\n",
+					"            # Convert processed_files_log to a list and ensure all elements are strings\n",
+					"            existing_files_list = [str(file) for file in list(processed_files_log)]\n",
+					"            existing_file_rows = [(file,) for file in existing_files_list]\n",
+					"            existing_log_df = spark.createDataFrame(existing_file_rows, [\"file\"])\n",
+					"            updated_log_df = existing_log_df.union(new_processed_files_log).distinct()\n",
+					"        else:\n",
+					"            updated_log_df = new_processed_files_log\n",
+					"        \n",
+					"        # Write updated log\n",
+					"        updated_log_df.write.mode(\"overwrite\").json(log_file_path)\n",
+					"        logging.info(f\"Updated processed files log with {len(new_files_list)} new entries\")\n",
+					"        return True\n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Error updating processed files log: {str(e)}\")\n",
+					"        import traceback\n",
+					"        traceback.print_exc()\n",
+					"        return False"
 				],
 				"execution_count": null
 			},
@@ -591,7 +645,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -634,7 +688,6 @@
 					"        file_name = os.path.basename(file_path)\n",
 					"        \n",
 					"        # Try to extract date and LA name from the file name\n",
-					"        # Example format: 20231204_256-Calderdale.csv\n",
 					"        parts = file_name.split('_')\n",
 					"        if len(parts) >= 2:\n",
 					"            date_folder = parts[0]\n",
@@ -712,7 +765,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 20
 			}
 		]
 	}

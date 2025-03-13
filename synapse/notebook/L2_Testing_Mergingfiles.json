@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b2debc59-5249-4561-858e-d983058091cc"
+				"spark.autotune.trackingId": "35d23b4a-fae7-49f6-83ab-9c8fbfd6ca00"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": null
+				"execution_count": 455
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 456
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 457
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 458
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": null
+				"execution_count": 459
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 460
 			},
 			{
 				"cell_type": "markdown",
@@ -299,7 +299,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 461
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +371,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 462
 			},
 			{
 				"cell_type": "code",
@@ -392,7 +392,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 463
 			},
 			{
 				"cell_type": "code",
@@ -409,7 +409,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 464
 			},
 			{
 				"cell_type": "code",
@@ -436,7 +436,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 465
 			},
 			{
 				"cell_type": "markdown",
@@ -477,7 +477,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": null
+				"execution_count": 466
 			},
 			{
 				"cell_type": "markdown",
@@ -544,7 +544,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": null
+				"execution_count": 467
 			},
 			{
 				"cell_type": "markdown",
@@ -562,12 +562,57 @@
 			{
 				"cell_type": "code",
 				"source": [
-					" File \"/tmp/ipykernel_7506/4249426639.py\", line 14, in write_output_safely\n",
-					"    logger.info(f\"Successfully wrote {df.count()} rows of {description} to {output_path}\")\n",
-					"NameError: name 'logger' is not defined\n",
-					""
+					"def optimize_deduplicate_data(df):\n",
+					"    \"\"\"Extremely conservative deduplication to preserve row count\"\"\"\n",
+					"    # Get current columns\n",
+					"    actual_columns = df.columns\n",
+					"    \n",
+					"    print(f\"PRE-DEDUPLICATION COUNT: {df.count()} rows\")\n",
+					"    \n",
+					"    # We need to use a much more specific combination of columns to identify duplicates\n",
+					"    # Only remove exact duplicates (rows that are identical across all columns)\n",
+					"    try:\n",
+					"        # Either use a more comprehensive set of ID columns\n",
+					"        id_columns = []\n",
+					"        \n",
+					"        # Use a different approach - focus on all the key identifying fields together\n",
+					"        key_fields = [\n",
+					"            \"Elector Number\", \"LA_Code\", \"poll_number\", \"register_lett\", \"rec_num\",\n",
+					"            \"Elector Surname\", \"Elector Forename\", \"Address1\", \"PostCode\"\n",
+					"        ]\n",
+					"        \n",
+					"        # Only use columns that actually exist\n",
+					"        id_columns = [col for col in key_fields if col in actual_columns]\n",
+					"        \n",
+					"        # If we have less than 3 identifying columns, use all non-metadata columns\n",
+					"        if len(id_columns) < 3:\n",
+					"            # Exclude metadata columns like timestamps, source_file, etc.\n",
+					"            metadata_cols = [\"source_file\", \"process_timestamp\", \"CreationDate\", \"creation_date\"]\n",
+					"            id_columns = [col for col in actual_columns if col not in metadata_cols]\n",
+					"        \n",
+					"        print(f\"Using these columns for deduplication: {id_columns}\")\n",
+					"        \n",
+					"        if len(id_columns) == 0:\n",
+					"            print(\"No suitable columns for deduplication found - returning all data\")\n",
+					"            return df\n",
+					"            \n",
+					"        # Use dropDuplicates instead of window functions for exact matching\n",
+					"        deduplicated = df.dropDuplicates(id_columns)\n",
+					"        \n",
+					"        final_count = deduplicated.count()\n",
+					"        print(f\"POST-DEDUPLICATION COUNT: {final_count} rows\")\n",
+					"        print(f\"ROWS REMOVED: {df.count() - final_count}\")\n",
+					"        \n",
+					"        return deduplicated\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        print(f\"ERROR IN DEDUPLICATION: {str(e)}\")\n",
+					"        import traceback\n",
+					"        traceback.print_exc()\n",
+					"        print(\"Returning original DataFrame\")\n",
+					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 468
 			},
 			{
 				"cell_type": "markdown",
@@ -607,7 +652,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 469
 			},
 			{
 				"cell_type": "code",
@@ -640,7 +685,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 470
 			},
 			{
 				"cell_type": "markdown",
@@ -778,7 +823,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": null
+				"execution_count": 471
 			},
 			{
 				"cell_type": "markdown",
@@ -869,7 +914,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": null
+				"execution_count": 472
 			},
 			{
 				"cell_type": "markdown",
@@ -911,7 +956,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 473
 			},
 			{
 				"cell_type": "code",
@@ -949,7 +994,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 474
 			},
 			{
 				"cell_type": "code",
@@ -999,7 +1044,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 475
 			},
 			{
 				"cell_type": "markdown",
@@ -1066,7 +1111,7 @@
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
 					"        \n",
 					"        # 5. Deduplicate new data\n",
-					"        deduplicated_data = safe_deduplicate_data(merged_new_data)\n",
+					"        deduplicated_data = optimize_deduplicate_data(merged_new_data)\n",
 					"        if deduplicated_data is None:\n",
 					"            logger.error(\"Deduplicated DataFrame is None\")\n",
 					"            return\n",
@@ -1141,7 +1186,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 476
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0f05bb27-aaaa-4d2a-9085-85d8f4f3e680"
+				"spark.autotune.trackingId": "2911fd67-0d54-414c-8d94-2a0dfede8a11"
 			}
 		},
 		"metadata": {
@@ -605,13 +605,14 @@
 					"        new_file_rows = [(file,) for file in new_files_list]\n",
 					"        \n",
 					"        # Create DataFrame for new files\n",
-					"        new_processed_files_log = spark.createDataFrame(new_file_rows, [\"file\"]\n",
+					"        new_processed_files_log = spark.createDataFrame(new_file_rows, [\"file\"])\n",
 					"        \n",
 					"        # Merge with existing log if it exists\n",
 					"        if processed_files_log:\n",
 					"            # Convert processed_files_log to a list and ensure all elements are strings\n",
 					"            existing_files_list = [str(file) for file in list(processed_files_log)]\n",
 					"            existing_file_rows = [(file,) for file in existing_files_list]\n",
+					"            \n",
 					"            existing_log_df = spark.createDataFrame(existing_file_rows, [\"file\"])\n",
 					"            updated_log_df = existing_log_df.union(new_processed_files_log).distinct()\n",
 					"        else:\n",

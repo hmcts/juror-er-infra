@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "119af730-6028-4ba8-b062-5596e46cff1a"
+				"spark.autotune.trackingId": "37838fb6-e1bd-4f98-b11e-ce1814240d2f"
 			}
 		},
 		"metadata": {
@@ -558,6 +558,46 @@
 				"source": [
 					"## Deduplicate Based on Latest Data"
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def deduplicate_by_la_code_and_date(df):\n",
+					"    \"\"\"Keep only the most recent record for each LA_Code\"\"\"\n",
+					"    # Check if we have multiple dates for same LA_Code\n",
+					"    if \"LA_Code\" in df.columns and \"CreationDate\" in df.columns:\n",
+					"        # Get unique LA_Codes\n",
+					"        la_codes = df.select(\"LA_Code\").distinct()\n",
+					"        la_count = la_codes.count()\n",
+					"        \n",
+					"        # Check how many CreationDates per LA_Code\n",
+					"        date_counts = df.groupBy(\"LA_Code\").agg(\n",
+					"            countDistinct(\"CreationDate\").alias(\"date_count\"),\n",
+					"            max(\"CreationDate\").alias(\"latest_date\")\n",
+					"        )\n",
+					"        \n",
+					"        # Log the findings\n",
+					"        multi_date_las = date_counts.filter(col(\"date_count\") > 1).count()\n",
+					"        logging.info(f\"Found {la_count} unique LA_Codes\")\n",
+					"        logging.info(f\"{multi_date_las} LA_Codes have multiple CreationDates\")\n",
+					"        \n",
+					"        if multi_date_las > 0:\n",
+					"            # Keep only the most recent record for each LA_Code\n",
+					"            window_spec = Window.partitionBy(\"LA_Code\").orderBy(desc(\"CreationDate\"))\n",
+					"            deduplicated = df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
+					"                             .filter(col(\"row_num\") == 1) \\\n",
+					"                             .drop(\"row_num\")\n",
+					"            \n",
+					"            logging.info(f\"Kept {deduplicated.count()} records after LA_Code deduplication\")\n",
+					"            return deduplicated\n",
+					"        else:\n",
+					"            logging.info(\"No LA_Code has multiple dates, skipping deduplication\")\n",
+					"            return df\n",
+					"    else:\n",
+					"        logging.warning(\"Missing LA_Code or CreationDate columns, skipping deduplication\")\n",
+					"        return df"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

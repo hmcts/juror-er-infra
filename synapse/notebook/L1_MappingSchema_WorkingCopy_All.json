@@ -1,5 +1,5 @@
 {
-	"name": "L1_MappingSchema_WorkingCopy",
+	"name": "L1_MappingSchema_WorkingCopy_All",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0bdae949-33ec-49ec-bf15-a5f06b01bf52"
+				"spark.autotune.trackingId": "78871215-0a8f-40e2-9058-a6567653cbd0"
 			}
 		},
 		"metadata": {

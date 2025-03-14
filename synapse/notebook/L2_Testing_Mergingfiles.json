@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "35d23b4a-fae7-49f6-83ab-9c8fbfd6ca00"
+				"spark.autotune.trackingId": "594aec15-5c7b-4a80-9e2f-dc2df19fc8f6"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 455
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 456
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 457
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 458
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 459
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 460
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -299,7 +299,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 461
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +371,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 462
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -392,7 +392,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 463
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -409,7 +409,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 464
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -436,7 +436,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 465
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -477,7 +477,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 466
+				"execution_count": 12
 			},
 			{
 				"cell_type": "markdown",
@@ -544,7 +544,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 467
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -612,7 +612,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 468
+				"execution_count": 14
 			},
 			{
 				"cell_type": "markdown",
@@ -652,7 +652,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 469
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -685,7 +685,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 470
+				"execution_count": 16
 			},
 			{
 				"cell_type": "markdown",
@@ -823,7 +823,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 471
+				"execution_count": 17
 			},
 			{
 				"cell_type": "markdown",
@@ -914,7 +914,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 472
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -956,7 +956,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 473
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -994,7 +994,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 474
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -1044,7 +1044,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 475
+				"execution_count": 21
 			},
 			{
 				"cell_type": "markdown",
@@ -1124,11 +1124,15 @@
 					"            logger.error(\"Hashed DataFrame is None\")\n",
 					"            return\n",
 					"        \n",
-					"        # 7. Transform to target schema\n",
+					"         #7. Transform to target schema\n",
 					"        transformed_data = transform_to_target_schema(hashed_data, column_mapping)\n",
 					"        if transformed_data is None:\n",
 					"            logger.error(\"Transformed DataFrame is None\")\n",
 					"            return\n",
+					"\n",
+					"        # Ensure schema consistency\n",
+					"        transformed_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)\n",
+					"        logger.info(f\"Schema standardized with {len(TARGET_SCHEMA)} columns\")\n",
 					"\n",
 					"        # Add this line to standardize the schema\n",
 					"        transformed_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)\n",
@@ -1151,29 +1155,33 @@
 					"                logger.info(f\"Creating directory: {dir_path}\")\n",
 					"                mssparkutils.fs.mkdirs(dir_path)\n",
 					"        \n",
-					"        # Write to voters_temp\n",
-					"        final_data.write.mode(\"overwrite\").parquet(config[\"output_path\"])\n",
-					"        \n",
-					"        # Also write to deduplicated dataset\n",
-					"        final_output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"\n",
-					"        final_data.write.mode(\"overwrite\").parquet(final_output_path)\n",
-					"        \n",
-					"        logger.info(f\"Created deduplicated dataset with {final_data.count()} rows at {final_output_path}\")\n",
-					"        logger.info(f\"Dataset partitioned across multiple files for performance\")\n",
-					"        \n",
+					"        if final_data.count() == 0:\n",
+					"            logger.warning(\"Final data is empty, nothing to write\")\n",
+					"            return\n",
+					"\n",
 					"        # Update the process log\n",
 					"        success1 = write_output_safely(final_data, config[\"output_path\"], \"transformed data\")\n",
 					"        \n",
+					"        success1 = write_output_safely(final_data, config[\"output_path\"], \"transformed data\")\n",
+					"        success2 = False  # Initialize the variable\n",
+					"\n",
 					"        if success1:\n",
 					"            success2 = write_output_safely(\n",
-					"                final_data, \n",
-					"                f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
-					"                \"deduplicated data\"\n",
+					"            final_data, \n",
+					"            f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
+					"            \"deduplicated data\"\n",
 					"            )\n",
 					"    \n",
 					"        if success1 and success2:\n",
 					"            logger.info(f\"Successfully processed {len(new_file_paths)} files\")\n",
 					"            logger.info(f\"Total records in output: {final_data.count()}\")\n",
+					"\n",
+					"            # Update the process log\n",
+					"            log_success = update_process_log(spark, new_file_paths, process_log_path)\n",
+					"            if log_success:\n",
+					"                logger.info(f\"Updated process log with {len(new_file_paths)} files\")\n",
+					"            else: \n",
+					"                logger.warning(\"Failed to update process log, but data was written successfully\")\n",
 					"        else:\n",
 					"            logger.error(\"Failed to write output to one or more destinations\")\n",
 					"            \n",
@@ -1186,7 +1194,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 476
+				"execution_count": 23
 			}
 		]
 	}

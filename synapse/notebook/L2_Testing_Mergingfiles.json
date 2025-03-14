@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "37838fb6-e1bd-4f98-b11e-ce1814240d2f"
+				"spark.autotune.trackingId": "147329d6-e19f-489c-88e8-d069c4808a67"
 			}
 		},
 		"metadata": {
@@ -1184,6 +1184,16 @@
 					"            logger.error(\"Final DataFrame is None\")\n",
 					"            return\n",
 					"        \n",
+					"        merged_new_data = merge_dataframes(processed_dfs)\n",
+					"        if merged_new_data is None:\n",
+					"           logger.error(\"Merged DataFrame is None. Check merge_dataframes function\")\n",
+					"            return\n",
+					"\n",
+					"        # Deduplicate by LA_Code and date\n",
+					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
+					"        deduplicated_by_la = deduplicate_by_la_code_and_date(merged_new_data)\n",
+					"        logger.info(f\"After LA_Code deduplication: {deduplicated_by_la.count()} rows\")\n",
+					"\n",
 					"        # 9. Write output to both locations\n",
 					"        logger.info(f\"Writing {final_data.count()} records to {config['output_path']}\")\n",
 					"        \n",

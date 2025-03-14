@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a3a177d3-bb98-47b4-9b6b-ca1ab97bec50"
+				"spark.autotune.trackingId": "b3b8b801-2a09-4e26-b474-31598ed92927"
 			}
 		},
 		"metadata": {
@@ -857,8 +857,6 @@
 					"            result[\"message\"] = f\"Error transforming data: {str(e)}\"\n",
 					"            return result\n",
 					"\n",
-					"        # Filter to required columns\n",
-					"        df = filter_to_required_columns(df)\n",
 					"        logging.info(\n",
 					"            f\"Filtered to {len(df.columns)} required columns: {', '.join(df.columns)}\"\n",
 					"        )\n",

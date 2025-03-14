@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L0_er_juror_ingestion",
+						"referenceName": "L0_Er_juror_IngestionFromBAIS_ZipFiles",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

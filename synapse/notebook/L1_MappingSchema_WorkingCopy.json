@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d80f9296-4bef-4b46-9c8d-76f7a2976907"
+				"spark.autotune.trackingId": "a3a177d3-bb98-47b4-9b6b-ca1ab97bec50"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 15
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -80,7 +80,7 @@
 					"    return SparkSession.builder.appName(\"Electoral Data ETL\").getOrCreate()\n",
 					""
 				],
-				"execution_count": 16
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -98,7 +98,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 17
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -132,7 +132,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 18
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 19
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +181,7 @@
 					"        return []\n",
 					""
 				],
-				"execution_count": 20
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -210,7 +210,7 @@
 					"        raise type(e)(error_msg) from e\n",
 					""
 				],
-				"execution_count": 21
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -262,7 +262,7 @@
 					"        f\"Failed to read Excel file {file_path}. Errors: {'; '.join(errors)}\"\n",
 					"    )"
 				],
-				"execution_count": 22
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -295,7 +295,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 23
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -327,7 +327,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 24
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -413,7 +413,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 25
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -475,7 +475,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 26
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -497,7 +497,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 27
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -559,7 +559,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 28
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -616,7 +616,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -643,7 +643,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -679,7 +679,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -708,7 +708,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -753,7 +753,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -779,7 +779,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -916,7 +916,7 @@
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
 					"        return result"
 				],
-				"execution_count": null
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -942,7 +942,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -979,7 +979,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -1010,7 +1010,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": null
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -1100,8 +1100,8 @@
 					"                StructField(\"timestamp\", StringType(), True),\n",
 					"            ]\n",
 					"        )\n",
-					"    empty_df = spark.createDataFrame([], empty_schema)\n",
-					"    empty_df.write.mode(\"overwrite\").json(f\"{transform_folder}/processing_summary.json\")\n",
+					"        empty_df = spark.createDataFrame([], empty_schema)\n",
+					"        empty_df.write.mode(\"overwrite\").json(f\"{transform_folder}/processing_summary.json\")\n",
 					"\n",
 					"    # Print a summary of results\n",
 					"    print_summary(results)\n",
@@ -1118,7 +1118,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 29
+				"execution_count": 54
 			}
 		]
 	}

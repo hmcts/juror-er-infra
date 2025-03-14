@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cd1ad928-f37b-4955-ae35-dc2911d2d5b1"
+				"spark.autotune.trackingId": "62d60f70-2a65-485e-8231-e3ce2a031d57"
 			}
 		},
 		"metadata": {
@@ -56,11 +56,15 @@
 					"import json\n",
 					"from datetime import datetime\n",
 					"from pyspark.sql import SparkSession\n",
-					"from notebookutils import mssparkutils\n",
-					"from pyspark.sql.functions import col, lit, when, upper, trim, split, element_at, size, concat_ws, regexp_replace, regexp_extract, length\n",
-					"from pyspark.sql.types import StringType"
+					"from pyspark.sql.functions import (\n",
+					"    col, lit, when, upper, trim, split, element_at, size, \n",
+					"    concat_ws, regexp_replace, regexp_extract, length, \n",
+					"    collect_list, greatest\n",
+					")\n",
+					"from pyspark.sql.types import StringType, StructType, StructField\n",
+					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 8
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -702,12 +706,8 @@
 					"        if validation_errors:\n",
 					"            logging.warning(f\"Data validation warnings: {'; '.join(validation_errors)}\")\n",
 					"\n",
-					"# Write transformed data to parquet - continue even with warnings\n",
-					"try:\n",
-					"    df.write.mode(\"overwrite\").parquet(output_path)\n",
-					"    # Rest of the code...\n",
+					"        # Write transformed data to parquet - continue even with warnings\n",
 					"        \n",
-					"        # Write transformed data to parquet\n",
 					"        try:\n",
 					"            df.write.mode(\"overwrite\").parquet(output_path)\n",
 					"            logging.info(f\"Successfully wrote parquet file to {output_path}\")\n",
@@ -873,7 +873,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 14
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "594aec15-5c7b-4a80-9e2f-dc2df19fc8f6"
+				"spark.autotune.trackingId": "89b070fc-e1ca-4435-9c29-bf26924c4d53"
 			}
 		},
 		"metadata": {
@@ -545,6 +545,35 @@
 					"    return merged_df"
 				],
 				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def filter_incomplete_records(df):\n",
+					"    \"\"\"Filter out records with missing critical data\"\"\"\n",
+					"    # Define critical fields that should not be empty\n",
+					"    critical_fields = [\"Elector Number\", \"Elector Surname\", \"Elector Forename\"]\n",
+					"    \n",
+					"    # Start with the complete dataset\n",
+					"    filtered_df = df\n",
+					"    \n",
+					"    # Filter out rows where critical fields are null\n",
+					"    for field in critical_fields:\n",
+					"        if field in df.columns:\n",
+					"            filtered_df = filtered_df.filter(col(field).isNotNull())\n",
+					"            \n",
+					"    # Log how many records were filtered out\n",
+					"    original_count = df.count()\n",
+					"    filtered_count = filtered_df.count()\n",
+					"    removed_count = original_count - filtered_count\n",
+					"    removed_percentage = (removed_count / original_count) * 100 if original_count > 0 else 0\n",
+					"    \n",
+					"    print(f\"Filtered out {removed_count} incomplete records ({removed_percentage:.2f}% of total)\")\n",
+					"    print(f\"Remaining records: {filtered_count}\")\n",
+					"    \n",
+					"    return filtered_df"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1109,8 +1138,14 @@
 					"            return\n",
 					"        \n",
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
+					"\n",
+					"        # 5. Filter incomplete records\n",
+					"        filtered_data = filter_incomplete_records(merged_new_data)\n",
+					"        if filtered_data is None or filtered_data.count() == 0:\n",
+					"            logger.error(\"No data remains after filtering incomplete records\")\n",
+					"            return\n",
 					"        \n",
-					"        # 5. Deduplicate new data\n",
+					"        # 6. Deduplicate new data\n",
 					"        deduplicated_data = optimize_deduplicate_data(merged_new_data)\n",
 					"        if deduplicated_data is None:\n",
 					"            logger.error(\"Deduplicated DataFrame is None\")\n",

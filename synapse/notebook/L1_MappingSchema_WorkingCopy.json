@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d1e21c9c-6981-4f25-b803-ba28924dcb59"
+				"spark.autotune.trackingId": "92397334-9079-4865-a1df-1a1dd11b3e39"
 			}
 		},
 		"metadata": {
@@ -118,10 +118,6 @@
 					"    \"\"\"Create a reverse mapping for easy lookup\"\"\"\n",
 					"    reverse_map = {}\n",
 					"    \n",
-					"    # Handle empty mapping\n",
-					"    if not column_mapping:\n",
-					"        return reverse_map\n",
-					"        \n",
 					"    # For the JSON format with aliases key\n",
 					"    for standard_name, details in column_mapping.items():\n",
 					"        # Add the standard name itself (case-insensitive mapping)\n",
@@ -217,12 +213,18 @@
 					"            df = df.withColumnRenamed(col, std_name)\n",
 					"            renamed_columns.append(f\"{col} -> {std_name}\")\n",
 					"    \n",
+					"    # Check if Flags/Markers exists after standardization, add if missing\n",
+					"    if \"Flags/Markers\" not in df.columns:\n",
+					"        logging.info(\"Adding missing 'Flags/Markers' column after standardization\")\n",
+					"        df = df.withColumn(\"Flags/Markers\", lit(None).cast(StringType()))\n",
+					"\n",
 					"    if renamed_columns:\n",
 					"        logging.info(f\"Renamed {len(renamed_columns)} columns: {', '.join(renamed_columns[:5])}...\")\n",
 					"    else:\n",
 					"        logging.warning(\"No columns were renamed - check your mapping configuration\")\n",
 					"        \n",
 					"    return df\n",
+					"\n",
 					"def ensure_required_fields(df):\n",
 					"    \"\"\"Ensure all required fields exist with proper data types\"\"\"\n",
 					"    # Add Elector Title if it doesn't exist\n",

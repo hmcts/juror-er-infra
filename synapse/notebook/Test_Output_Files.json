@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "49ed8373-83e7-46a1-b8a0-c6ebbf2123d1"
+				"spark.autotune.trackingId": "ccbe559d-4932-4c03-9743-d40189e87624"
 			}
 		},
 		"metadata": {
@@ -54,7 +54,7 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 23
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -98,14 +98,23 @@
 					"    return df\n",
 					"\n",
 					"# Example usage for specific file\n",
-					"file_path = f\"{base_path}/20231204_256-Calderdale.parquet\"\n",
+					"file_path = f\"{base_path}/20231212_307-Solihull.parquet\"\n",
 					"df = analyze_parquet(file_path)\n",
 					"\n",
 					"# Optional: Save sample to CSV for easier viewing\n",
 					"\n",
 					"display(df)"
 				],
-				"execution_count": 24
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import *\n",
+					"\n",
+					"df.filter(coalesce('Elector Surname').isNotNull())"
+				],
+				"execution_count": 18
 			}
 		]
 	}

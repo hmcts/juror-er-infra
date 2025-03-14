@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0031c3ce-e9fe-4b5d-b435-8d2399528019"
+				"spark.autotune.trackingId": "0e998bd2-5ebb-45a5-ad0e-e97c5c33aaf0"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 105
+				"execution_count": 130
 			},
 			{
 				"cell_type": "code",
@@ -80,7 +80,7 @@
 					"    return SparkSession.builder.appName(\"Electoral Data ETL\").getOrCreate()\n",
 					""
 				],
-				"execution_count": 106
+				"execution_count": 131
 			},
 			{
 				"cell_type": "code",
@@ -98,7 +98,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 107
+				"execution_count": 132
 			},
 			{
 				"cell_type": "code",
@@ -132,7 +132,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 108
+				"execution_count": 133
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 109
+				"execution_count": 134
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +181,7 @@
 					"        return []\n",
 					""
 				],
-				"execution_count": 110
+				"execution_count": 135
 			},
 			{
 				"cell_type": "code",
@@ -210,7 +210,7 @@
 					"        raise type(e)(error_msg) from e\n",
 					""
 				],
-				"execution_count": 111
+				"execution_count": 136
 			},
 			{
 				"cell_type": "code",
@@ -262,7 +262,7 @@
 					"        f\"Failed to read Excel file {file_path}. Errors: {'; '.join(errors)}\"\n",
 					"    )"
 				],
-				"execution_count": 112
+				"execution_count": 137
 			},
 			{
 				"cell_type": "code",
@@ -295,7 +295,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 113
+				"execution_count": 138
 			},
 			{
 				"cell_type": "code",
@@ -327,7 +327,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 114
+				"execution_count": 139
 			},
 			{
 				"cell_type": "code",
@@ -413,7 +413,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 115
+				"execution_count": 140
 			},
 			{
 				"cell_type": "code",
@@ -475,7 +475,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 116
+				"execution_count": 141
 			},
 			{
 				"cell_type": "code",
@@ -497,7 +497,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 117
+				"execution_count": 142
 			},
 			{
 				"cell_type": "code",
@@ -559,7 +559,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 118
+				"execution_count": 143
 			},
 			{
 				"cell_type": "code",
@@ -616,7 +616,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 119
+				"execution_count": 144
 			},
 			{
 				"cell_type": "code",
@@ -643,7 +643,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 120
+				"execution_count": 145
 			},
 			{
 				"cell_type": "code",
@@ -679,7 +679,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 121
+				"execution_count": 146
 			},
 			{
 				"cell_type": "code",
@@ -708,7 +708,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 122
+				"execution_count": 147
 			},
 			{
 				"cell_type": "code",
@@ -753,7 +753,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 123
+				"execution_count": 148
 			},
 			{
 				"cell_type": "code",
@@ -783,12 +783,12 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 124
+				"execution_count": 149
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder):\n",
+					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None):\n",
 					"    \"\"\"Process a source file and transform it to parquet format\"\"\"\n",
 					"    # Print more detailed debugging info\n",
 					"    print(f\"Debug - Starting to process file: {source_path}\")\n",
@@ -922,7 +922,7 @@
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
 					"        return result"
 				],
-				"execution_count": 125
+				"execution_count": 150
 			},
 			{
 				"cell_type": "code",
@@ -948,7 +948,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 126
+				"execution_count": 151
 			},
 			{
 				"cell_type": "code",
@@ -985,7 +985,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 127
+				"execution_count": 152
 			},
 			{
 				"cell_type": "code",
@@ -1016,7 +1016,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 128
+				"execution_count": 153
 			},
 			{
 				"cell_type": "code",
@@ -1147,7 +1147,8 @@
 					"        logging.info(f\"Processing file {file_num}/{total_files} ({progress_pct:.1f}%): {file_path}\")\n",
 					"        print(f\"Processing file {file_num}/{total_files} ({progress_pct:.1f}%): {os.path.basename(file_path)}\")\n",
 					"        \n",
-					"        result = process_file(spark, file_path, reverse_mapping, transform_folder, error_folder)\n",
+					"        # In the main function, where you call process_file\n",
+					"        result = process_file(spark, file_path, reverse_mapping, transform_folder, error_folder, column_mapping)\n",
 					"        results.append(result)\n",
 					"        \n",
 					"        status_emoji = \"✅\" if result[\"status\"] == \"success\" else \"❌\"\n",
@@ -1211,7 +1212,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 129
+				"execution_count": 154
 			}
 		]
 	}

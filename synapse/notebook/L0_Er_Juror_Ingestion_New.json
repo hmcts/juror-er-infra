@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "378534ca-8fc0-444c-a85b-ca3ea77e7f41"
+				"spark.autotune.trackingId": "663c8a75-c625-49cf-b970-313b6c8c476f"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"import re\n",
 					"from collections import defaultdict"
 				],
-				"execution_count": 16
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -82,7 +82,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 17
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -95,7 +95,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 18
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -117,7 +117,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 19
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -135,7 +135,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 20
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -213,7 +213,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 21
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -250,7 +250,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 22
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -287,7 +287,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 23
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -319,7 +319,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 24
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -381,7 +381,7 @@
 					"        print(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 25
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -426,7 +426,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 26
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -482,7 +482,7 @@
 					"    \n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 27
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -564,7 +564,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 28
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -585,7 +585,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 29
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -774,7 +774,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 30
+				"execution_count": 45
 			}
 		]
 	}

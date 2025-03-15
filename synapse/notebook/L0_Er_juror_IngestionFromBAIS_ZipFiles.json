@@ -1,6 +1,9 @@
 {
 	"name": "L0_Er_juror_IngestionFromBAIS_ZipFiles",
 	"properties": {
+		"folder": {
+			"name": "Archive"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "88c35165-b5dd-47a6-82c4-bf12a883ec67"
+				"spark.autotune.trackingId": "759772e3-74d2-4d96-b405-c887ed7836e8"
 			}
 		},
 		"metadata": {
@@ -42,7 +45,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},

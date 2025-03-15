@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "35f1fdc2-36af-4f51-84fc-ce2057560f3b"
+				"spark.autotune.trackingId": "378534ca-8fc0-444c-a85b-ca3ea77e7f41"
 			}
 		},
 		"metadata": {
@@ -327,10 +327,14 @@
 					"def process_file(source_path, date_folder, third_folder, file_name, storage_account):\n",
 					"    \"\"\"Process CSV or Excel file with improved naming to handle multiple files per LA/date\"\"\"\n",
 					"    try:\n",
+					"        # If the third_folder contains the filename, extract just the LA code part\n",
+					"        if '_' in third_folder and file_name in third_folder:\n",
+					"            third_folder = third_folder.split('_')[0]\n",
+					"            print(f\"Extracted LA code from folder name: {third_folder}\")\n",
+					"        \n",
 					"        # Create the folder name in the format YYYYMMDD_LA-Name\n",
 					"        folder_key = f\"{date_folder}_{third_folder}\"\n",
 					"        file_type = get_file_type(source_path)\n",
-					"        \n",
 					"        if not file_type:\n",
 					"            return False, None\n",
 					"        \n",

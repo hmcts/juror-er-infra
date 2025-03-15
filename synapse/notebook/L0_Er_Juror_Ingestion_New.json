@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "211108bb-fc96-42e4-a820-9638945d5c3b"
+				"spark.autotune.trackingId": "cee184c3-6fad-40ca-ba78-f25704f456e1"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"import re\n",
 					"from collections import defaultdict"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -82,7 +82,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -95,7 +95,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -117,7 +117,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -195,7 +195,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -234,7 +234,7 @@
 					"        print(f\"Error moving file to quarantine: {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -318,7 +318,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -363,7 +363,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -405,7 +405,7 @@
 					"    \n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -429,7 +429,7 @@
 					"        logging.error(f\"Error moving metadata file {file_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -487,7 +487,7 @@
 					"        print(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -508,7 +508,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -533,6 +533,18 @@
 					"    else:\n",
 					"        logging.info(f\"Source path exists: {source_path}\")\n",
 					"        print(f\"Source path exists: {source_path}\")\n",
+					"    \n",
+					"    # Ensure destination directories exist\n",
+					"    dest_dirs = [\n",
+					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\",\n",
+					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/metadata\",\n",
+					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/quarantine\"\n",
+					"    ]\n",
+					"    \n",
+					"    for dir_path in dest_dirs:\n",
+					"        if not mssparkutils.fs.exists(dir_path):\n",
+					"            print(f\"Creating destination directory: {dir_path}\")\n",
+					"            mssparkutils.fs.mkdirs(dir_path)\n",
 					"    \n",
 					"    # List root directory contents\n",
 					"    try:\n",
@@ -578,6 +590,11 @@
 					"            file_name = file_path.split('/')[-1]\n",
 					"            print(f\"\\nProcessing file: {file_path}\")\n",
 					"            \n",
+					"            # Check if file still exists (might have been moved by a previous operation)\n",
+					"            if not mssparkutils.fs.exists(file_path):\n",
+					"                print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
+					"                continue\n",
+					"            \n",
 					"            if is_metadata_file(file_path):\n",
 					"                print(f\"  Identified as metadata file\")\n",
 					"                success, new_path = process_metadata_file(file_path, file_name, storage_account)\n",
@@ -590,7 +607,7 @@
 					"                continue\n",
 					"            \n",
 					"            if not should_process_file(file_path):\n",
-					"                print(f\"  Skipping unsupported file format\")\n",
+					"                print(f\"  Skipping unsupported file format: {file_path}\")\n",
 					"                continue\n",
 					"            else:\n",
 					"                print(f\"  Supported file format: {get_file_type(file_path)}\")\n",
@@ -606,12 +623,9 @@
 					"            if not date_folder or not third_folder:\n",
 					"                should_quarantine = True\n",
 					"                quarantine_reason = \"missing_folder_parts\"\n",
-					"            elif confidence == \"low\":\n",
+					"            elif confidence == \"low\" and not re.match(r'^\\d{8}$', date_folder):\n",
 					"                should_quarantine = True\n",
 					"                quarantine_reason = f\"low_confidence_structure_{date_folder}_{third_folder}\"\n",
-					"            elif not re.match(r'^\\d{8}$', date_folder):\n",
-					"                should_quarantine = True\n",
-					"                quarantine_reason = f\"invalid_date_format_{date_folder}\"\n",
 					"            \n",
 					"            if should_quarantine:\n",
 					"                print(f\"  Moving file to quarantine due to: {quarantine_reason}\")\n",
@@ -625,11 +639,17 @@
 					"            \n",
 					"            # Process the file if it passed validation\n",
 					"            print(f\"  Valid folder structure, processing file...\")\n",
-					"            success, new_path = process_file(file_path, date_folder, third_folder, \n",
-					"                                         file_name, storage_account)\n",
+					"            success, new_path = process_file(file_path, date_folder, third_folder, file_name, storage_account)\n",
 					"            if success:\n",
 					"                moved_files['data_success'].append(new_path)\n",
 					"                print(f\"  Successfully processed to: {new_path}\")\n",
+					"                \n",
+					"                # Delete original file after successful processing if needed\n",
+					"                try:\n",
+					"                    mssparkutils.fs.rm(file_path)\n",
+					"                    print(f\"  Original file deleted after successful processing\")\n",
+					"                except Exception as del_e:\n",
+					"                    print(f\"  Warning: Could not delete original file: {str(del_e)}\")\n",
 					"            else:\n",
 					"                moved_files['failed'].append(f\"{file_path} (processing failed)\")\n",
 					"                print(f\"  Failed to process file\")\n",
@@ -637,6 +657,8 @@
 					"        except Exception as e:\n",
 					"            logging.error(f\"Error processing {file_path}: {str(e)}\")\n",
 					"            print(f\"  Error processing {file_path}: {str(e)}\")\n",
+					"            import traceback\n",
+					"            print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"            moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"            continue\n",
 					"    \n",
@@ -651,12 +673,19 @@
 					"        updated_log_df = new_processed_files_log\n",
 					"    updated_log_df.write.mode(\"overwrite\").json(log_file_path)\n",
 					"    logging.info(\"Updated processed files log\")\n",
+					"    \n",
+					"    print(\"\\nSummary totals:\")\n",
+					"    print(f\"Files processed: {len(new_files)}\")\n",
+					"    print(f\"Data files successfully moved: {len(moved_files['data_success'])}\")\n",
+					"    print(f\"Metadata files successfully moved: {len(moved_files['metadata_success'])}\")\n",
+					"    print(f\"Files quarantined: {len(moved_files['quarantine'])}\")\n",
+					"    print(f\"Files failed: {len(moved_files['failed'])}\")\n",
 					"\n",
 					"# This is the correct way to call main() when the script is run directly\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 25
 			}
 		]
 	}

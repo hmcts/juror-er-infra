@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a077a924-208e-465d-a29d-a502107ee7e9"
+				"spark.autotune.trackingId": "c359cac3-6c34-47e6-9686-fe2b0e18dad5"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"import re\n",
 					"from collections import defaultdict"
 				],
-				"execution_count": 39
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -473,6 +473,12 @@
 					"            la_folder = \"unknown_LA\"\n",
 					"        \n",
 					"        confidence = \"low\"\n",
+					"    \n",
+					"    # Check if the LA code has the expected format (typically a short alphanumeric code)\n",
+					"    # Modify this regex to match your expected LA code format\n",
+					"    la_code_pattern = re.compile(r'^[A-Za-z0-9]{1,5}$')\n",
+					"    if not la_code_pattern.match(la_folder):\n",
+					"        confidence = \"very_low\"\n",
 					"    \n",
 					"    return date_folder, la_folder, confidence"
 				],

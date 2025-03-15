@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a7e7477e-f977-42fc-b576-8e90f0d66949"
+				"spark.autotune.trackingId": "6232b02b-b938-489d-b814-96a325a2a4c5"
 			}
 		},
 		"metadata": {
@@ -600,7 +600,7 @@
 					"        logging.warning(\"Missing LA_Code or CreationDate columns, skipping deduplication\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -655,7 +655,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 14
+				"execution_count": 15
 			},
 			{
 				"cell_type": "markdown",
@@ -695,7 +695,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 15
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -728,7 +728,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 16
+				"execution_count": 17
 			},
 			{
 				"cell_type": "markdown",
@@ -866,7 +866,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 17
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -957,7 +957,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 18
+				"execution_count": 19
 			},
 			{
 				"cell_type": "markdown",
@@ -999,7 +999,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 19
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -1037,7 +1037,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 20
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -1087,7 +1087,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 21
+				"execution_count": 22
 			},
 			{
 				"cell_type": "markdown",
@@ -1110,64 +1110,64 @@
 					"    # Initialize\n",
 					"    print(\"Starting electoral data ETL process\")\n",
 					"    print(f\"Current time: {datetime.now()}\")\n",
-					"    \n",
+					"\n",
 					"    # Configure logging and capture the logger\n",
 					"    logger = configure_logging()\n",
 					"    print(\"Logging configured successfully\")\n",
 					"    logger.info(\"Logging configured successfully\")\n",
-					"    \n",
+					"\n",
 					"    spark = create_spark_session()\n",
 					"    config = load_config()\n",
 					"    storage_account = config[\"storage_account\"]\n",
 					"    process_log_path = f\"{config['output_path']}_process_log\"\n",
-					"    \n",
+					"\n",
 					"    print(f\"Looking for files in: {config['input_path']}\")\n",
-					"    \n",
+					"\n",
 					"    try:\n",
 					"        # 1. Get configuration and mapping\n",
 					"        column_mapping = read_column_mapping(spark, f\"{config['config_path']}/col_mapping_schema.json\")\n",
-					"        \n",
+					"\n",
 					"        # 2. Identify new files\n",
 					"        new_file_paths, all_file_paths = get_new_files(spark, config[\"input_path\"], process_log_path)\n",
-					"        \n",
+					"\n",
 					"        if not new_file_paths:\n",
 					"            logger.info(\"No new files to process\")\n",
 					"            return\n",
-					"        \n",
+					"\n",
 					"        logger.info(f\"Found {len(new_file_paths)} new files to process\")\n",
-					"        \n",
+					"\n",
 					"        # 3. Process new files\n",
 					"        processed_dfs = process_input_files(spark, new_file_paths, column_mapping)\n",
-					"        \n",
+					"\n",
 					"        if not processed_dfs or len(processed_dfs) == 0:\n",
 					"            logger.error(\"No data to process after reading files\")\n",
 					"            return\n",
-					"        \n",
+					"\n",
 					"        logger.info(f\"Successfully processed {len(processed_dfs)} DataFrames\")\n",
-					"        \n",
+					"\n",
 					"        # 4. Merge new data\n",
 					"        merged_new_data = merge_dataframes(processed_dfs)\n",
 					"        if merged_new_data is None:\n",
 					"            logger.error(\"Merged DataFrame is None. Check merge_dataframes function\")\n",
 					"            return\n",
-					"        \n",
+					"\n",
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
-					"        \n",
+					"\n",
 					"        # 5. Deduplicate new data\n",
 					"        deduplicated_data = optimize_deduplicate_data(merged_new_data)\n",
 					"        if deduplicated_data is None:\n",
 					"            logger.error(\"Deduplicated DataFrame is None\")\n",
 					"            return\n",
-					"        \n",
+					"\n",
 					"        logger.info(f\"After deduplication: {deduplicated_data.count()} rows\")\n",
-					"        \n",
+					"\n",
 					"        # 6. Apply hashing\n",
 					"        hashed_data = apply_hashing(deduplicated_data)\n",
 					"        if hashed_data is None:\n",
 					"            logger.error(\"Hashed DataFrame is None\")\n",
 					"            return\n",
-					"        \n",
-					"         #7. Transform to target schema\n",
+					"\n",
+					"        # 7. Transform to target schema\n",
 					"        transformed_data = transform_to_target_schema(hashed_data, column_mapping)\n",
 					"        if transformed_data is None:\n",
 					"            logger.error(\"Transformed DataFrame is None\")\n",
@@ -1177,29 +1177,27 @@
 					"        transformed_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)\n",
 					"        logger.info(f\"Schema standardized with {len(TARGET_SCHEMA)} columns\")\n",
 					"\n",
-					"        # Add this line to standardize the schema\n",
 					"        transformed_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)\n",
 					"        logger.info(f\"Transformed data contains {transformed_data.count()} rows\")\n",
-					"        \n",
+					"\n",
 					"        # 8. Merge with existing data\n",
 					"        final_data = merge_with_existing_data(spark, transformed_data, config[\"output_path\"])\n",
 					"        if final_data is None:\n",
 					"            logger.error(\"Final DataFrame is None\")\n",
 					"            return\n",
-					"        \n",
+					"\n",
 					"        merged_new_data = merge_dataframes(processed_dfs)\n",
 					"        if merged_new_data is None:\n",
-					"           logger.error(\"Merged DataFrame is None. Check merge_dataframes function\")\n",
+					"            logger.error(\"Merged DataFrame is None. Check merge_dataframes function\")\n",
 					"            return\n",
 					"\n",
-					"        # Deduplicate by LA_Code and date\n",
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
 					"        deduplicated_by_la = deduplicate_by_la_code_and_date(merged_new_data)\n",
 					"        logger.info(f\"After LA_Code deduplication: {deduplicated_by_la.count()} rows\")\n",
 					"\n",
 					"        # 9. Write output to both locations\n",
 					"        logger.info(f\"Writing {final_data.count()} records to {config['output_path']}\")\n",
-					"        \n",
+					"\n",
 					"        # Make sure directories exist\n",
 					"        for path in [config[\"output_path\"], f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"]:\n",
 					"            dir_path = path\n",
@@ -1207,24 +1205,24 @@
 					"            if not mssparkutils.fs.exists(dir_path):\n",
 					"                logger.info(f\"Creating directory: {dir_path}\")\n",
 					"                mssparkutils.fs.mkdirs(dir_path)\n",
-					"        \n",
+					"\n",
 					"        if final_data.count() == 0:\n",
 					"            logger.warning(\"Final data is empty, nothing to write\")\n",
 					"            return\n",
 					"\n",
 					"        # Update the process log\n",
 					"        success1 = write_output_safely(final_data, config[\"output_path\"], \"transformed data\")\n",
-					"        \n",
+					"\n",
 					"        success1 = write_output_safely(final_data, config[\"output_path\"], \"transformed data\")\n",
 					"        success2 = False  # Initialize the variable\n",
 					"\n",
 					"        if success1:\n",
 					"            success2 = write_output_safely(\n",
-					"            final_data, \n",
-					"            f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
-					"            \"deduplicated data\"\n",
+					"                final_data,\n",
+					"                f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
+					"                \"deduplicated data\"\n",
 					"            )\n",
-					"    \n",
+					"\n",
 					"        if success1 and success2:\n",
 					"            logger.info(f\"Successfully processed {len(new_file_paths)} files\")\n",
 					"            logger.info(f\"Total records in output: {final_data.count()}\")\n",
@@ -1233,11 +1231,11 @@
 					"            log_success = update_process_log(spark, new_file_paths, process_log_path)\n",
 					"            if log_success:\n",
 					"                logger.info(f\"Updated process log with {len(new_file_paths)} files\")\n",
-					"            else: \n",
+					"            else:\n",
 					"                logger.warning(\"Failed to update process log, but data was written successfully\")\n",
 					"        else:\n",
 					"            logger.error(\"Failed to write output to one or more destinations\")\n",
-					"            \n",
+					"\n",
 					"    except Exception as e:\n",
 					"        logger.error(f\"Error in incremental load process: {str(e)}\")\n",
 					"        import traceback\n",
@@ -1247,7 +1245,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 23
+				"execution_count": 24
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6e2365e0-093d-4e8d-bf34-41f7a150cc39"
+				"spark.autotune.trackingId": "13dd5dfa-d729-40aa-8dc7-af750e9d4cad"
 			}
 		},
 		"metadata": {
@@ -457,10 +457,7 @@
 					"                    trim(\n",
 					"                        concat_ws(\n",
 					"                            \" \",\n",
-					"                            slice(\n",
-					"                                col(\"name_parts\"),\n",
-					"                                lit(3),\n",
-					"                                lit(greatest(lit(1), size(col(\"name_parts\")) - lit(2))),\n",
+					"                            expr(f\"slice(name_parts, 3, greatest(1, size(name_parts) - 2))\")\n",
 					"                            ),\n",
 					"                        )\n",
 					"                    )\n",

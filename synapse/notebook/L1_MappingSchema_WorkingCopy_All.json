@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "78871215-0a8f-40e2-9058-a6567653cbd0"
+				"spark.autotune.trackingId": "27a0cef4-8c08-40bf-9773-a80f15d675f5"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import (\n",
 					"    col, lit, when, upper, trim, split, element_at, size, \n",
-					"    concat_ws, regexp_replace, regexp_extract, length, \n",
+					"    concat, concat_ws, regexp_replace, regexp_extract, length, \n",
 					"    collect_list, greatest\n",
 					")\n",
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
@@ -434,7 +434,7 @@
 					"            \"Elector Surname\",\n",
 					"            when(\n",
 					"                size(col(\"name_parts\")) > 0,\n",
-					"                upper(trim(element_at(col(\"name_parts\"), 1))),\n",
+					"                upper(trim(element_at(col(\"name_parts\"), lit(1)))),\n",
 					"            ).otherwise(lit(None)),\n",
 					"        )\n",
 					"\n",
@@ -443,7 +443,7 @@
 					"            \"Elector Forename\",\n",
 					"            when(\n",
 					"                size(col(\"name_parts\")) > 1,\n",
-					"                upper(trim(element_at(col(\"name_parts\"), 2))),\n",
+					"                upper(trim(element_at(col(\"name_parts\"), lit(2)))),\n",
 					"            ).otherwise(lit(None)),\n",
 					"        )\n",
 					"\n",
@@ -459,8 +459,8 @@
 					"                            \" \",\n",
 					"                            slice(\n",
 					"                                col(\"name_parts\"),\n",
-					"                                3,\n",
-					"                                greatest(1, size(col(\"name_parts\")) - 2),\n",
+					"                                lit(3),\n",
+					"                                lit(greatest(lit(1), size(col(\"name_parts\")) - lit(2))),\n",
 					"                            ),\n",
 					"                        )\n",
 					"                    )\n",

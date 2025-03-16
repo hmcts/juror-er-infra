@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a69251f7-c821-4e76-abb0-d7ee9a2aca1a"
+				"spark.autotune.trackingId": "6a2efe94-f776-446d-81a4-384b3788db3a"
 			}
 		},
 		"metadata": {
@@ -630,8 +630,8 @@
 					"        \"files\": []\n",
 					"    }\n",
 					"    \n",
-					"    # Process the folder recursively\n",
-					"    def process_folder(path, storage_account, moved_files, depth=0):\n",
+					"    # Process the folder recursively - simplified version that doesn't process ZIP files\n",
+					"    def process_folder_for_index(path, depth=0):\n",
 					"        indent = \"  \" * depth\n",
 					"        try:\n",
 					"            print(f\"{indent}Scanning directory (depth {depth}): {path}\")\n",
@@ -665,6 +665,7 @@
 					"    # Start the recursive process\n",
 					"    process_folder_for_index(source_path)\n",
 					"    \n",
+					"    # Write the index to a JSON file\n",
 					"    # Write the index to a JSON file\n",
 					"    index_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/index/file_index.json\"\n",
 					"    \n",

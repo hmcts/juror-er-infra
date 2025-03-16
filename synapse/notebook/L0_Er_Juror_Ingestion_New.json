@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "48d5322d-4469-46ca-bc1d-9b782896c94a"
+				"spark.autotune.trackingId": "043dd3c3-00b3-4c4b-89a0-8f598289556f"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"import json  # Add this line\n",
 					"from collections import defaultdict"
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -83,7 +83,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -96,7 +96,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 21
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -118,7 +118,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 22
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -214,7 +214,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 24
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -251,7 +251,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 25
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -283,7 +283,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 26
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -320,7 +320,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 27
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -376,7 +376,7 @@
 					"        print(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 28
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -421,7 +421,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 29
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -477,7 +477,7 @@
 					"    \n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 30
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -559,7 +559,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 31
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -617,14 +617,26 @@
 					"        print(f\"Creating index directory: {index_dir}\")\n",
 					"        mssparkutils.fs.mkdirs(index_dir)\n",
 					"    \n",
-					"    # Convert to DataFrame and write as JSON\n",
-					"    index_df = spark.createDataFrame([json.dumps(file_index)], [\"index\"])\n",
-					"    index_df.write.mode(\"overwrite\").text(index_path)\n",
+					"    # Convert to a proper DataFrame using a list of Row objects\n",
+					"    from pyspark.sql import Row\n",
+					"    index_rows = []\n",
 					"    \n",
-					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
-					"    return file_index"
+					"    # Add each file as a separate row in the DataFrame\n",
+					"    for file_data in file_index[\"files\"]:\n",
+					"        # Convert the individual file data to a Row\n",
+					"        file_row = Row(\n",
+					"            path=file_data[\"path\"],\n",
+					"            file_name=file_data[\"file_name\"],\n",
+					"            date_folder=file_data[\"date_folder\"],\n",
+					"            la_folder=file_data[\"la_folder\"],\n",
+					"            confidence=file_data[\"confidence\"],\n",
+					"            file_type=file_data[\"file_type\"],\n",
+					"            is_empty=file_data[\"is_empty\"],\n",
+					"            is_metadata=file_data[\"is_metadata\"],\n",
+					"            should_process=file_data[\"should_process\"],\n",
+					"            pr"
 				],
-				"execution_count": 32
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -713,7 +725,7 @@
 					"        print(f\"  Failed to process file\")\n",
 					"        return False"
 				],
-				"execution_count": 33
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -808,7 +820,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 34
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -829,7 +841,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 35
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -872,9 +884,28 @@
 					"            mssparkutils.fs.mkdirs(dir_path)\n",
 					"    \n",
 					"    # Create/update the file index\n",
-					"    file_index = create_file_index(source_path, storage_account)\n",
-					"    print(f\"Created index with {len(file_index['files'])} files\")\n",
+					"    try: \n",
+					"        if mssparkutils.fs.exists(index_path):\n",
+					"        # Read existing index from parquet file\n",
+					"        index_df = spark.read.parquet(index_path)\n",
+					"\n",
+					"        # Convert back to Python dictionary format\n",
+					"        file_index = {\n",
+					"            \"created_at\": time.strftime(\"%Y%m%d%H%M%S\"),\n",
+					"            \"files\": []\n",
+					"        }\n",
+					"        \n",
+					"    for row in index_df.collect():\n",
+					"            file_dict = row.asDict()\n",
+					"            file_index[\"files\"].append(file_dict)\n",
+					"        print(f\"Read existing index with {len(file_index['files'])} files\")\n",
+					"        else:\n",
+					"            file_index = create_file_index(source_path, storage_account)\n",
+					"    except Exception as e:\n",
+					"        print(f\"Error reading index, creating new one: {str(e)}\")\n",
+					"        file_index = create_file_index(source_path, storage_account)\n",
 					"    \n",
+					"print(f\"Working with index containing {len(file_index['files'])} files\")\n",
 					"    # Read the log of processed files\n",
 					"    try:\n",
 					"        processed_files_log = spark.read.json(log_file_path).select(\"file\").rdd.flatMap(lambda x: x).collect()\n",
@@ -1053,11 +1084,10 @@
 					"    print(f\"Files quarantined: {len(moved_files['quarantine'])}\")\n",
 					"    print(f\"Files failed: {len(moved_files['failed'])}\")\n",
 					"\n",
-					"# Eighth cell - main call\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 36
+				"execution_count": null
 			}
 		]
 	}

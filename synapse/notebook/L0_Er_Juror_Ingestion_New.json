@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9011c859-2ee4-4194-b5fb-70b30354eedd"
+				"spark.autotune.trackingId": "b4135c47-d144-430a-aefd-79cfee55c563"
 			}
 		},
 		"metadata": {
@@ -721,11 +721,6 @@
 					"            print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
 					"            return False\n",
 					"        \n",
-					"        # Check if file still exists\n",
-					"        if not mssparkutils.fs.exists(file_path):\n",
-					"            print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
-					"            return False\n",
-					"        \n",
 					"        # Check if file is empty\n",
 					"        if file_info[\"is_empty\"]:\n",
 					"            print(f\"  File is empty, moving to empty files folder\")\n",
@@ -762,9 +757,14 @@
 					"        should_quarantine = False\n",
 					"        quarantine_reason = \"\"\n",
 					"        \n",
+					"        # Improved quarantine conditions:\n",
 					"        if not date_folder or not la_folder:\n",
 					"            should_quarantine = True\n",
 					"            quarantine_reason = \"missing_folder_parts\"\n",
+					"        elif la_folder and \"la_data\" in la_folder.lower():\n",
+					"            # Quarantine if LA folder is just \"LA_Data\"\n",
+					"            should_quarantine = True\n",
+					"            quarantine_reason = \"invalid_la_code_la_data\"\n",
 					"        elif confidence == \"very_low\":\n",
 					"            should_quarantine = True\n",
 					"            quarantine_reason = f\"invalid_la_code_format_{la_folder}\"\n",

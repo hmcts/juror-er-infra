@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c7c77ff0-8061-4a92-9d6f-adf6b6e07647"
+				"spark.autotune.trackingId": "014c392e-45f2-455a-82fd-895af32413ee"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"import json  # Add this line\n",
 					"from collections import defaultdict"
 				],
-				"execution_count": null
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -83,7 +83,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 94
 			},
 			{
 				"cell_type": "code",
@@ -96,7 +96,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": null
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -118,7 +118,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
@@ -149,7 +149,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 97
 			},
 			{
 				"cell_type": "code",
@@ -227,7 +227,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 98
 			},
 			{
 				"cell_type": "code",
@@ -264,7 +264,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 99
 			},
 			{
 				"cell_type": "code",
@@ -272,6 +272,8 @@
 					"def process_metadata_file(file_path, file_name, storage_account):\n",
 					"    \"\"\"Process metadata file\"\"\"\n",
 					"    try:\n",
+					"        # Debug info\n",
+					"        print(f\"  process_metadata_file received: path={file_path}, name={file_name}\")\n",
 					"        # Make sure metadata directory exists\n",
 					"        metadata_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/metadata\"\n",
 					"        if not mssparkutils.fs.exists(metadata_dir):\n",
@@ -296,7 +298,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 100
 			},
 			{
 				"cell_type": "code",
@@ -333,7 +335,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 101
 			},
 			{
 				"cell_type": "code",
@@ -389,7 +391,7 @@
 					"        print(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -434,7 +436,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -490,7 +492,7 @@
 					"    \n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -572,7 +574,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -660,21 +662,23 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 106
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def process_individual_file(file_info, storage_account, moved_files):\n",
 					"    \"\"\"Process a single file based on its index information\"\"\"\n",
-					"    # Extract info from the file_info dictionary\n",
-					"    file_path = file_info[\"path\"]\n",
-					"    file_name = file_info[\"file_name\"]  # Already extracted in file_info\n",
-					"    date_folder = file_info[\"date_folder\"]\n",
-					"    la_folder = file_info[\"la_folder\"]\n",
-					"    confidence = file_info[\"confidence\"]\n",
-					"    \n",
-					"    print(f\"\\nProcessing file: {file_path}\")\n",
+					"    try:\n",
+					"        # Extract info from the file_info dictionary\n",
+					"        file_path = file_info[\"path\"]\n",
+					"        file_name = file_info[\"file_name\"]  \n",
+					"        date_folder = file_info[\"date_folder\"]\n",
+					"        la_folder = file_info[\"la_folder\"]\n",
+					"        confidence = file_info[\"confidence\"]\n",
+					"        \n",
+					"        print(f\"\\nProcessing file: {file_path}\")\n",
+					"        \n",
 					"    \n",
 					"    # Check if file still exists\n",
 					"    if not mssparkutils.fs.exists(file_path):\n",
@@ -750,7 +754,7 @@
 					"        print(f\"  Failed to process file\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -845,7 +849,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -866,7 +870,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -1113,7 +1117,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 110
 			}
 		]
 	}

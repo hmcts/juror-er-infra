@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b35e15f4-f72d-4c9a-b0c4-50035515b14a"
+				"spark.autotune.trackingId": "8c7f3e58-1647-40fc-898e-da2a70601dd2"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"import json  # Add this line\n",
 					"from collections import defaultdict"
 				],
-				"execution_count": 93
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -83,7 +83,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 94
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -96,7 +96,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 95
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -118,7 +118,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 96
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -149,7 +149,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 97
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -227,7 +227,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 98
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -264,7 +264,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 99
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -298,7 +298,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 100
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -335,7 +335,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 101
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -391,7 +391,7 @@
 					"        print(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 102
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -436,7 +436,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 103
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -492,7 +492,7 @@
 					"    \n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 104
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -574,7 +574,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 105
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -662,7 +662,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 106
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -679,82 +679,88 @@
 					"        \n",
 					"        print(f\"\\nProcessing file: {file_path}\")\n",
 					"        \n",
-					"    \n",
-					"    # Check if file still exists\n",
-					"    if not mssparkutils.fs.exists(file_path):\n",
-					"        print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
-					"        return False\n",
-					"    \n",
-					"    # Check if file is empty\n",
-					"    if file_info[\"is_empty\"]:\n",
-					"        print(f\"  File is empty, moving to empty files folder\")\n",
-					"        success, empty_path = process_empty_file(file_path, storage_account, moved_files)\n",
+					"        # Check if file still exists\n",
+					"        if not mssparkutils.fs.exists(file_path):\n",
+					"            print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
+					"            return False\n",
+					"        \n",
+					"        # Check if file is empty\n",
+					"        if file_info[\"is_empty\"]:\n",
+					"            print(f\"  File is empty, moving to empty files folder\")\n",
+					"            success, empty_path = process_empty_file(file_path, storage_account, moved_files)\n",
+					"            if success:\n",
+					"                print(f\"  Successfully processed empty file to: {empty_path}\")\n",
+					"                return True\n",
+					"            else:\n",
+					"                moved_files['failed'].append(f\"{file_path} (empty file move failed)\")\n",
+					"                print(f\"  Failed to process empty file\")\n",
+					"                return False\n",
+					"        \n",
+					"        # Check if it's a metadata file\n",
+					"        if file_info[\"is_metadata\"]:\n",
+					"            print(f\"  Identified as metadata file\")\n",
+					"            success, new_path = process_metadata_file(file_path, file_name, storage_account)\n",
+					"            if success:\n",
+					"                moved_files['metadata_success'].append(new_path)\n",
+					"                print(f\"  Successfully processed metadata file to: {new_path}\")\n",
+					"                return True\n",
+					"            else:\n",
+					"                moved_files['failed'].append(f\"{file_path} (metadata move failed)\")\n",
+					"                print(f\"  Failed to process metadata file\")\n",
+					"                return False\n",
+					"        \n",
+					"        # Check if it's a supported file type\n",
+					"        if not file_info[\"should_process\"]:\n",
+					"            print(f\"  Skipping unsupported file format: {file_path}\")\n",
+					"            return False\n",
+					"        else:\n",
+					"            print(f\"  Supported file format: {file_info['file_type']}\")\n",
+					"        \n",
+					"        # Check if we should move to quarantine for manual inspection\n",
+					"        should_quarantine = False\n",
+					"        quarantine_reason = \"\"\n",
+					"        \n",
+					"        if not date_folder or not la_folder:\n",
+					"            should_quarantine = True\n",
+					"            quarantine_reason = \"missing_folder_parts\"\n",
+					"        elif confidence == \"very_low\":\n",
+					"            should_quarantine = True\n",
+					"            quarantine_reason = f\"invalid_la_code_format_{la_folder}\"\n",
+					"        elif confidence == \"low\" and not re.match(r'^\\d{8}$', date_folder):\n",
+					"            should_quarantine = True\n",
+					"            quarantine_reason = f\"low_confidence_structure_{date_folder}_{la_folder}\"\n",
+					"        \n",
+					"        if should_quarantine:\n",
+					"            print(f\"  Moving file to quarantine due to: {quarantine_reason}\")\n",
+					"            success, quarantine_path = move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
+					"            if success:\n",
+					"                print(f\"  Successfully moved to quarantine: {quarantine_path}\")\n",
+					"                return True\n",
+					"            else:\n",
+					"                print(f\"  Failed to move to quarantine\")\n",
+					"                moved_files['failed'].append(f\"{file_path} (quarantine failed - {quarantine_reason})\")\n",
+					"                return False\n",
+					"        \n",
+					"        # Process the file if it passed validation\n",
+					"        print(f\"  Valid folder structure, processing file...\")\n",
+					"        success, new_path = process_file(file_path, date_folder, la_folder, file_name, storage_account)\n",
 					"        if success:\n",
-					"            print(f\"  Successfully processed empty file to: {empty_path}\")\n",
+					"            moved_files['data_success'].append(new_path)\n",
+					"            print(f\"  Successfully processed to: {new_path}\")\n",
 					"            return True\n",
 					"        else:\n",
-					"            moved_files['failed'].append(f\"{file_path} (empty file move failed)\")\n",
-					"            print(f\"  Failed to process empty file\")\n",
+					"            moved_files['failed'].append(f\"{file_path} (processing failed)\")\n",
+					"            print(f\"  Failed to process file\")\n",
 					"            return False\n",
-					"    \n",
-					"    # Check if it's a metadata file\n",
-					"    if file_info[\"is_metadata\"]:\n",
-					"        print(f\"  Identified as metadata file\")\n",
-					"        success, new_path = process_metadata_file(file_path, file_name, storage_account)\n",
-					"        if success:\n",
-					"            moved_files['metadata_success'].append(new_path)\n",
-					"            print(f\"  Successfully processed metadata file to: {new_path}\")\n",
-					"            return True\n",
-					"        else:\n",
-					"            moved_files['failed'].append(f\"{file_path} (metadata move failed)\")\n",
-					"            print(f\"  Failed to process metadata file\")\n",
-					"            return False\n",
-					"    \n",
-					"    # Check if it's a supported file type\n",
-					"    if not file_info[\"should_process\"]:\n",
-					"        print(f\"  Skipping unsupported file format: {file_path}\")\n",
-					"        return False\n",
-					"    else:\n",
-					"        print(f\"  Supported file format: {file_info['file_type']}\")\n",
-					"    \n",
-					"    # Check if we should move to quarantine for manual inspection\n",
-					"    should_quarantine = False\n",
-					"    quarantine_reason = \"\"\n",
-					"    \n",
-					"    if not date_folder or not la_folder:\n",
-					"        should_quarantine = True\n",
-					"        quarantine_reason = \"missing_folder_parts\"\n",
-					"    elif confidence == \"very_low\":\n",
-					"        should_quarantine = True\n",
-					"        quarantine_reason = f\"invalid_la_code_format_{la_folder}\"\n",
-					"    elif confidence == \"low\" and not re.match(r'^\\d{8}$', date_folder):\n",
-					"        should_quarantine = True\n",
-					"        quarantine_reason = f\"low_confidence_structure_{date_folder}_{la_folder}\"\n",
-					"    \n",
-					"    if should_quarantine:\n",
-					"        print(f\"  Moving file to quarantine due to: {quarantine_reason}\")\n",
-					"        success, quarantine_path = move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
-					"        if success:\n",
-					"            print(f\"  Successfully moved to quarantine: {quarantine_path}\")\n",
-					"            return True\n",
-					"        else:\n",
-					"            print(f\"  Failed to move to quarantine\")\n",
-					"            moved_files['failed'].append(f\"{file_path} (quarantine failed - {quarantine_reason})\")\n",
-					"            return False\n",
-					"    \n",
-					"    # Process the file if it passed validation\n",
-					"    print(f\"  Valid folder structure, processing file...\")\n",
-					"    success, new_path = process_file(file_path, date_folder, la_folder, file_name, storage_account)\n",
-					"    if success:\n",
-					"        moved_files['data_success'].append(new_path)\n",
-					"        print(f\"  Successfully processed to: {new_path}\")\n",
-					"        return True\n",
-					"    else:\n",
-					"        moved_files['failed'].append(f\"{file_path} (processing failed)\")\n",
-					"        print(f\"  Failed to process file\")\n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Error processing {file_path}: {str(e)}\")\n",
+					"        print(f\"  Error processing {file_path}: {str(e)}\")\n",
+					"        import traceback\n",
+					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
+					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 107
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -849,7 +855,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 108
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -870,7 +876,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 109
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -973,26 +979,26 @@
 					"    print(f\"Grouped into {len(file_groups)} file groups and {len(individual_files)} individual files\")\n",
 					"    \n",
 					"    # Process individual files first\n",
-					"   for file_info in individual_files:\n",
+					"    for file_info in individual_files:\n",
 					"        try:\n",
 					"            if not isinstance(file_info, dict):\n",
 					"                print(f\"ERROR: file_info is not a dictionary: {type(file_info)}\")\n",
-					"            continue\n",
+					"                continue\n",
 					"            \n",
-					"        if \"path\" not in file_info:\n",
-					"            print(f\"ERROR: file_info does not have a 'path' key: {file_info}\")\n",
-					"            continue\n",
+					"            if \"path\" not in file_info:\n",
+					"                print(f\"ERROR: file_info does not have a 'path' key: {file_info}\")\n",
+					"                continue\n",
 					"            \n",
-					"        process_individual_file(file_info, storage_account, moved_files)\n",
-					"    except Exception as e:\n",
-					"        print(f\"Error processing individual file: {str(e)}\")\n",
-					"        print(f\"File info: {file_info}\")\n",
-					"        import traceback\n",
-					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
-					"        if isinstance(file_info, dict) and \"path\" in file_info:\n",
-					"            moved_files['failed'].append(f\"{file_info['path']} (processing error: {str(e)})\")\n",
-					"        else:\n",
-					"            moved_files['failed'].append(f\"Unknown file (processing error)\")\n",
+					"            process_individual_file(file_info, storage_account, moved_files)\n",
+					"        except Exception as e:\n",
+					"            print(f\"Error processing individual file: {str(e)}\")\n",
+					"            print(f\"File info: {file_info}\")\n",
+					"            import traceback\n",
+					"            print(f\"Traceback: {traceback.format_exc()}\")\n",
+					"            if isinstance(file_info, dict) and \"path\" in file_info:\n",
+					"                moved_files['failed'].append(f\"{file_info['path']} (processing error: {str(e)})\")\n",
+					"            else:\n",
+					"                moved_files['failed'].append(f\"Unknown file (processing error)\")\n",
 					"    \n",
 					"    # Process file groups\n",
 					"    for (date_folder, la_folder), file_group in file_groups.items():\n",
@@ -1129,7 +1135,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 110
+				"execution_count": null
 			}
 		]
 	}

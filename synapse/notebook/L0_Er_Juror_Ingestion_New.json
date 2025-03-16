@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2a0e4aa0-c3c3-4652-bfeb-bf7cd8165c52"
+				"spark.autotune.trackingId": "a69251f7-c821-4e76-abb0-d7ee9a2aca1a"
 			}
 		},
 		"metadata": {
@@ -1108,13 +1108,8 @@
 					"            print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"            for file_info in file_group:\n",
 					"                moved_files['failed'].append(f\"{file_info['path']} (group processing error)\")\n",
-					"    \n",
-					"    # Inside the main() function, in the loop that processes each file\n",
-					"    for file_path in new_files:\n",
-					"        try:\n",
-					"            file_name = file_path.split('/')[-1]\n",
-					"            print(f\"\\nProcessing file: {file_path}\")\n",
-					"            \n",
+					"\n",
+					" \n",
 					"            # Check if file still exists (might have been moved by a previous operation)\n",
 					"            if not mssparkutils.fs.exists(file_path):\n",
 					"                print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
@@ -1131,7 +1126,6 @@
 					"                    print(f\"  Failed to move empty file\")\n",
 					"                continue\n",
 					"            \n",
-					"            # The rest of your existing code follows...\n",
 					"            if is_metadata_file(file_path):\n",
 					"                print(f\"  Identified as metadata file\")\n",
 					"                success, new_path = process_metadata_file(file_path, file_name, storage_account)\n",

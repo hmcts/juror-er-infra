@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6232b02b-b938-489d-b814-96a325a2a4c5"
+				"spark.autotune.trackingId": "83b177bf-2606-4c2e-a628-d20f9cfa65fc"
 			}
 		},
 		"metadata": {
@@ -1172,7 +1172,8 @@
 					"        if transformed_data is None:\n",
 					"            logger.error(\"Transformed DataFrame is None\")\n",
 					"            return\n",
-					"\n",
+					"        transformed_data = apply_hashing_to_voters(transformed_data)\n",
+					"        logger.info(\"Applied hashing to sensitive columns\")\n",
 					"        # Ensure schema consistency\n",
 					"        transformed_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)\n",
 					"        logger.info(f\"Schema standardized with {len(TARGET_SCHEMA)} columns\")\n",

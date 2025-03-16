@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "043dd3c3-00b3-4c4b-89a0-8f598289556f"
+				"spark.autotune.trackingId": "abfc1992-28f9-48b7-8313-9dc5650fd717"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"import json  # Add this line\n",
 					"from collections import defaultdict"
 				],
-				"execution_count": null
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -83,7 +83,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -96,7 +96,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": null
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -118,7 +118,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -126,17 +126,30 @@
 					"def is_empty_file(file_path):\n",
 					"    \"\"\"Check if a file is empty or very small\"\"\"\n",
 					"    try:\n",
-					"        # Get file properties\n",
-					"        file_info = mssparkutils.fs.info(file_path)\n",
+					"        # Alternative approach to check file size\n",
+					"        # Use a small PySpark dataframe to read the file\n",
+					"        test_df = spark.read.text(file_path)\n",
 					"        \n",
-					"        # Check if size is very small (less than 10 bytes)\n",
-					"        return file_info.size < 10\n",
+					"        # Check if the dataframe is empty or very small\n",
+					"        row_count = test_df.count()\n",
+					"        \n",
+					"        if row_count == 0:\n",
+					"            return True\n",
+					"        \n",
+					"        # Check if the file has content but it's very small\n",
+					"        # Take first row and check its length\n",
+					"        if row_count > 0:\n",
+					"            first_row = test_df.first()\n",
+					"            if first_row and len(str(first_row[0])) < 10:\n",
+					"                return True\n",
+					"                \n",
+					"        return False\n",
 					"    except Exception as e:\n",
 					"        print(f\"Error checking if file is empty: {str(e)}\")\n",
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -214,7 +227,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -251,7 +264,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -283,7 +296,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -320,7 +333,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -376,7 +389,7 @@
 					"        print(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -421,7 +434,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -477,7 +490,7 @@
 					"    \n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -559,7 +572,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -634,17 +647,29 @@
 					"            is_empty=file_data[\"is_empty\"],\n",
 					"            is_metadata=file_data[\"is_metadata\"],\n",
 					"            should_process=file_data[\"should_process\"],\n",
-					"            pr"
+					"            processed=file_data[\"processed\"]\n",
+					"        )\n",
+					"        index_rows.append(file_row)\n",
+					"    \n",
+					"    # Create DataFrame from the rows\n",
+					"    index_df = spark.createDataFrame(index_rows)\n",
+					"    \n",
+					"    # Write the DataFrame as a Parquet file (more robust than text)\n",
+					"    index_df.write.mode(\"overwrite\").parquet(index_path)\n",
+					"    \n",
+					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
+					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def process_individual_file(file_info, storage_account, moved_files):\n",
 					"    \"\"\"Process a single file based on its index information\"\"\"\n",
+					"    # Extract info from the file_info dictionary\n",
 					"    file_path = file_info[\"path\"]\n",
-					"    file_name = file_info[\"file_name\"]\n",
+					"    file_name = file_info[\"file_name\"]  # Already extracted in file_info\n",
 					"    date_folder = file_info[\"date_folder\"]\n",
 					"    la_folder = file_info[\"la_folder\"]\n",
 					"    confidence = file_info[\"confidence\"]\n",
@@ -725,7 +750,7 @@
 					"        print(f\"  Failed to process file\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -820,7 +845,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -841,7 +866,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -886,26 +911,27 @@
 					"    # Create/update the file index\n",
 					"    try: \n",
 					"        if mssparkutils.fs.exists(index_path):\n",
-					"        # Read existing index from parquet file\n",
-					"        index_df = spark.read.parquet(index_path)\n",
+					"            # Read existing index from parquet file\n",
+					"            index_df = spark.read.parquet(index_path)\n",
 					"\n",
-					"        # Convert back to Python dictionary format\n",
-					"        file_index = {\n",
-					"            \"created_at\": time.strftime(\"%Y%m%d%H%M%S\"),\n",
-					"            \"files\": []\n",
-					"        }\n",
-					"        \n",
-					"    for row in index_df.collect():\n",
-					"            file_dict = row.asDict()\n",
-					"            file_index[\"files\"].append(file_dict)\n",
-					"        print(f\"Read existing index with {len(file_index['files'])} files\")\n",
+					"            # Convert back to Python dictionary format\n",
+					"            file_index = {\n",
+					"                \"created_at\": time.strftime(\"%Y%m%d%H%M%S\"),\n",
+					"                \"files\": []\n",
+					"            }\n",
+					"            \n",
+					"            for row in index_df.collect():\n",
+					"                file_dict = row.asDict()\n",
+					"                file_index[\"files\"].append(file_dict)\n",
+					"            print(f\"Read existing index with {len(file_index['files'])} files\")\n",
 					"        else:\n",
 					"            file_index = create_file_index(source_path, storage_account)\n",
 					"    except Exception as e:\n",
 					"        print(f\"Error reading index, creating new one: {str(e)}\")\n",
 					"        file_index = create_file_index(source_path, storage_account)\n",
 					"    \n",
-					"print(f\"Working with index containing {len(file_index['files'])} files\")\n",
+					"    print(f\"Working with index containing {len(file_index['files'])} files\")\n",
+					"    \n",
 					"    # Read the log of processed files\n",
 					"    try:\n",
 					"        processed_files_log = spark.read.json(log_file_path).select(\"file\").rdd.flatMap(lambda x: x).collect()\n",
@@ -1087,7 +1113,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 74
 			}
 		]
 	}

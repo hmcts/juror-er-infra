@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8c7f3e58-1647-40fc-898e-da2a70601dd2"
+				"spark.autotune.trackingId": "63be76e7-2ae2-4b40-a81f-af4d94894992"
 			}
 		},
 		"metadata": {
@@ -589,7 +589,7 @@
 					"    }\n",
 					"    \n",
 					"    # Process the folder recursively\n",
-					"    def process_folder_for_index(path, depth=0):\n",
+					"    def process_folder(path, storage_account, moved_files, depth=0):\n",
 					"        indent = \"  \" * depth\n",
 					"        try:\n",
 					"            print(f\"{indent}Scanning directory (depth {depth}): {path}\")\n",
@@ -678,6 +678,11 @@
 					"        confidence = file_info[\"confidence\"]\n",
 					"        \n",
 					"        print(f\"\\nProcessing file: {file_path}\")\n",
+					"        \n",
+					"        # Check if file still exists\n",
+					"        if not mssparkutils.fs.exists(file_path):\n",
+					"            print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
+					"            return False\n",
 					"        \n",
 					"        # Check if file still exists\n",
 					"        if not mssparkutils.fs.exists(file_path):\n",

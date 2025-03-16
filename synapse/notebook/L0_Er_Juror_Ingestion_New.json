@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "68de2a91-b3df-4202-8380-45466e75a081"
+				"spark.autotune.trackingId": "2a0e4aa0-c3c3-4652-bfeb-bf7cd8165c52"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,9 @@
 					"import tempfile\n",
 					"import re\n",
 					"import json  # Add this line\n",
-					"from collections import defaultdict"
+					"from collections import defaultdict\n",
+					"import logging\n",
+					"import traceback"
 				],
 				"execution_count": null
 			},

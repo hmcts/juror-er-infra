@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "88fa2ab7-74e1-4403-8b57-a05a96f9db53"
+				"spark.autotune.trackingId": "12f472d6-2ae4-44f5-9510-82acd35e1807"
 			}
 		},
 		"metadata": {
@@ -387,6 +387,53 @@
 					"        import traceback\n",
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def explicit_file_copy(source_path, dest_path, storage_account):\n",
+					"    \"\"\"Explicitly copy a file with better error handling and verification\"\"\"\n",
+					"    try:\n",
+					"        # Debug info\n",
+					"        print(f\"  Copying {source_path} to {dest_path}\")\n",
+					"        \n",
+					"        # Ensure destination directory exists\n",
+					"        dest_dir = os.path.dirname(dest_path)\n",
+					"        if not mssparkutils.fs.exists(dest_dir):\n",
+					"            print(f\"  Creating destination directory: {dest_dir}\")\n",
+					"            mssparkutils.fs.mkdirs(dest_dir)\n",
+					"        \n",
+					"        # Check if source exists\n",
+					"        if not mssparkutils.fs.exists(source_path):\n",
+					"            print(f\"  Source file does not exist: {source_path}\")\n",
+					"            return False\n",
+					"        \n",
+					"        # Execute the copy\n",
+					"        mssparkutils.fs.cp(source_path, dest_path, True)\n",
+					"        \n",
+					"        # Verify the file was copied\n",
+					"        if mssparkutils.fs.exists(dest_path):\n",
+					"            print(f\"  Verified file copied successfully\")\n",
+					"            \n",
+					"            # Try to delete the original file\n",
+					"            try:\n",
+					"                mssparkutils.fs.rm(source_path)\n",
+					"                print(f\"  Successfully deleted original file\")\n",
+					"            except Exception as e:\n",
+					"                print(f\"  Warning: Could not delete original file: {str(e)}\")\n",
+					"                # Still consider this a success since copy worked\n",
+					"            \n",
+					"            return True\n",
+					"        else:\n",
+					"            print(f\"  ERROR: Copy failed, destination file not found: {dest_path}\")\n",
+					"            return False\n",
+					"    except Exception as e:\n",
+					"        print(f\"  Error during file copy: {str(e)}\")\n",
+					"        import traceback\n",
+					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
+					"        return False"
 				],
 				"execution_count": null
 			},

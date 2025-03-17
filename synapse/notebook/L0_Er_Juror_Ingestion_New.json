@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "15526bf0-3a6c-4ab4-990a-6ddfe844eeac"
+				"spark.autotune.trackingId": "5807a744-6032-4b2c-bcec-4bf932081431"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 299
 			},
 			{
 				"cell_type": "code",
@@ -85,7 +85,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 300
 			},
 			{
 				"cell_type": "code",
@@ -98,7 +98,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": null
+				"execution_count": 301
 			},
 			{
 				"cell_type": "code",
@@ -120,7 +120,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 302
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +181,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 303
 			},
 			{
 				"cell_type": "code",
@@ -259,7 +259,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 304
 			},
 			{
 				"cell_type": "code",
@@ -309,7 +309,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 305
 			},
 			{
 				"cell_type": "code",
@@ -343,7 +343,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 306
 			},
 			{
 				"cell_type": "code",
@@ -380,7 +380,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 307
 			},
 			{
 				"cell_type": "code",
@@ -421,13 +421,13 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 308
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def process_file(source_path, date_folder, la_folder, file_name, storage_account):\n",
-					"    \"\"\"Process CSV or Excel file handling non-standard formats\"\"\"\n",
+					"    \"\"\"Process CSV or Excel file without sequence suffix since files are merged\"\"\"\n",
 					"    try:\n",
 					"        # Create the folder name in the format YYYYMMDD_LA-Name\n",
 					"        folder_key = f\"{date_folder}_{la_folder}\"\n",
@@ -437,43 +437,26 @@
 					"            print(f\"  Cannot determine file type for {source_path}\")\n",
 					"            return False, None\n",
 					"        \n",
-					"        # For non-standard files (those with very_low confidence)\n",
-					"        # we'll keep more of the original filename to aid identification\n",
-					"        is_non_standard = (la_folder and la_folder.startswith(\"unknown_\"))\n",
+					"        # Handle Excel files\n",
+					"        if file_type == 'excel':\n",
+					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_key}.xlsx\"\n",
+					"            logging.info(f\"Moving Excel file to: {dest_path}\")\n",
+					"            mssparkutils.fs.cp(source_path, dest_path, True)\n",
+					"            return True, f\"excel/{folder_key}.xlsx\"\n",
 					"        \n",
-					"        # Determine destination path\n",
-					"        dest_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
+					"        # Handle CSV files\n",
+					"        if file_type == 'csv':\n",
+					"            dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_key}.csv\"\n",
+					"            logging.info(f\"Moving CSV file to: {dest_path}\")\n",
+					"            mssparkutils.fs.cp(source_path, dest_path, True)\n",
+					"            return True, f\"csv/{folder_key}.csv\"\n",
 					"        \n",
-					"        if is_non_standard:\n",
-					"            # Keep original filename but add date prefix for non-standard files\n",
-					"            original_name = os.path.basename(source_path)\n",
-					"            dest_path = f\"{dest_dir}/{date_folder}_{original_name}\"\n",
-					"        else:\n",
-					"            # Use standard naming for normal files\n",
-					"            if file_type == 'excel':\n",
-					"                dest_path = f\"{dest_dir}/{folder_key}.xlsx\"\n",
-					"            else:  # csv\n",
-					"                dest_path = f\"{dest_dir}/{folder_key}.csv\"\n",
-					"        \n",
-					"        # Copy the file without deleting the source\n",
-					"        print(f\"  Copying file: {source_path} -> {dest_path}\")\n",
-					"        mssparkutils.fs.cp(source_path, dest_path, True)\n",
-					"        \n",
-					"        # Verify copy worked\n",
-					"        if mssparkutils.fs.exists(dest_path):\n",
-					"            print(f\"  Successfully copied file (source preserved)\")\n",
-					"            return True, dest_path\n",
-					"        else:\n",
-					"            print(f\"  ERROR: Copy failed, destination does not exist\")\n",
-					"            return False, None\n",
-					"            \n",
+					"        return False, None\n",
 					"    except Exception as e:\n",
-					"        print(f\"  ERROR in process_file: {str(e)}\")\n",
-					"        import traceback\n",
-					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
+					"        logging.error(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 309
 			},
 			{
 				"cell_type": "code",
@@ -518,13 +501,13 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 310
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def get_folder_parts(file_path):\n",
-					"    \"\"\"Extract folder information with fallback for non-standard file names\"\"\"\n",
+					"    \"\"\"Extract folder information for naming with better fallbacks for non-standard names\"\"\"\n",
 					"    parts = file_path.split('/')\n",
 					"    print(f\"Path parts: {parts}\")\n",
 					"    \n",
@@ -533,62 +516,80 @@
 					"    la_folder = None\n",
 					"    confidence = \"low\"\n",
 					"    \n",
-					"    # First look for date pattern (YYYYMMDD) in path parts\n",
-					"    date_pattern = re.compile(r'^\\d{8}$')\n",
-					"    date_indices = [i for i, part in enumerate(parts) if date_pattern.match(part)]\n",
+					"    # First try the standard approach - find LA_Data in the path\n",
+					"    la_index = -1\n",
+					"    for i, part in enumerate(parts):\n",
+					"        if part.lower() == 'la_data':\n",
+					"            la_index = i\n",
+					"            break\n",
 					"    \n",
-					"    if date_indices:\n",
-					"        # Use the first date pattern found\n",
-					"        date_idx = date_indices[0]\n",
-					"        date_folder = parts[date_idx]\n",
+					"    if la_index != -1:\n",
+					"        # Get date folder (before LA_Data)\n",
+					"        if la_index > 0:\n",
+					"            date_folder = parts[la_index - 1]\n",
 					"        \n",
-					"        # Try to find LA folder after the date folder\n",
-					"        if date_idx + 1 < len(parts):\n",
-					"            potential_la = parts[date_idx + 1]\n",
-					"            # Check if this is not just \"LA_Data\" or a similar placeholder\n",
-					"            if \"la_data\" not in potential_la.lower() and not potential_la.endswith(('.csv', '.xlsx', '.xls')):\n",
-					"                la_folder = potential_la\n",
-					"                confidence = \"medium\"\n",
+					"        # Get LA folder (after LA_Data)\n",
+					"        if len(parts) > la_index + 1:\n",
+					"            la_folder = parts[la_index + 1]\n",
+					"        \n",
+					"        confidence = \"high\" if date_folder and la_folder else \"low\"\n",
 					"    \n",
-					"    # If we still don't have valid parts, try extracting from the filename\n",
+					"    # If standard approach failed, look for date pattern\n",
+					"    if not date_folder or not la_folder:\n",
+					"        date_pattern = re.compile(r'^\\d{8}$')\n",
+					"        date_indices = [i for i, part in enumerate(parts) if date_pattern.match(part)]\n",
+					"        \n",
+					"        if date_indices:\n",
+					"            date_idx = date_indices[0]\n",
+					"            date_folder = parts[date_idx]\n",
+					"            \n",
+					"            if date_idx + 1 < len(parts):\n",
+					"                potential_la = parts[date_idx + 1]\n",
+					"                if \"la_data\" not in potential_la.lower() and not potential_la.endswith(('.csv', '.xlsx', '.xls')):\n",
+					"                    la_folder = potential_la\n",
+					"                    confidence = \"medium\"\n",
+					"    \n",
+					"    # Handle non-standard filenames (like \"AA - Ashton-Under-Hill.XLSX\")\n",
 					"    if not date_folder or not la_folder:\n",
 					"        filename = os.path.basename(file_path)\n",
 					"        \n",
-					"        # Check for patterns like \"AA - Ashton-Under-Hill.XLSX\"\n",
+					"        # Handle patterns like \"AA - Ashton-Under-Hill.XLSX\"\n",
 					"        name_match = re.match(r'^([A-Z]{1,3})\\s*-\\s*(.+?)\\.[A-Za-z]+$', filename)\n",
 					"        if name_match:\n",
-					"            # If we found a pattern like \"AA - Location\"\n",
 					"            code = name_match.group(1).strip()\n",
 					"            location = name_match.group(2).strip()\n",
 					"            \n",
-					"            # Use today's date as a fallback\n",
+					"            # Use today's date \n",
 					"            current_date = time.strftime(\"%Y%m%d\")\n",
 					"            date_folder = current_date\n",
 					"            \n",
-					"            # Use the code-location format\n",
-					"            la_folder = f\"{code}-{location.replace(' ', '')}\"\n",
+					"            # Use the code-location format with cleaned name\n",
+					"            clean_location = re.sub(r'[^\\w\\-]', '', location)\n",
+					"            la_folder = f\"{code}-{clean_location}\"\n",
 					"            confidence = \"low\"\n",
 					"    \n",
-					"    # Final fallback - if nothing else works\n",
+					"    # Final fallback\n",
 					"    if not date_folder:\n",
-					"        date_folder = time.strftime(\"%Y%m%d\")  # Today's date\n",
+					"        date_folder = time.strftime(\"%Y%m%d\")\n",
 					"        confidence = \"very_low\"\n",
 					"    \n",
 					"    if not la_folder:\n",
-					"        # Extract something usable from the filename\n",
+					"        # Create a unique identifier from the filename\n",
 					"        filename = os.path.basename(file_path)\n",
-					"        base_name = os.path.splitext(filename)[0]\n",
+					"        name_part = os.path.splitext(filename)[0]\n",
+					"        clean_name = re.sub(r'[^\\w\\-]', '_', name_part)\n",
 					"        \n",
-					"        # Clean up the filename to be usable as a folder name\n",
-					"        # Replace special characters with underscores\n",
-					"        clean_name = re.sub(r'[^\\w\\-]', '_', base_name)\n",
+					"        # Limit the length to avoid excessively long names\n",
+					"        if len(clean_name) > 30:\n",
+					"            clean_name = clean_name[:30]\n",
+					"        \n",
 					"        la_folder = f\"unknown_{clean_name}\"\n",
 					"        confidence = \"very_low\"\n",
 					"    \n",
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 311
 			},
 			{
 				"cell_type": "code",
@@ -641,7 +642,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 312
 			},
 			{
 				"cell_type": "code",
@@ -730,7 +731,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 313
 			},
 			{
 				"cell_type": "code",
@@ -833,7 +834,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 314
 			},
 			{
 				"cell_type": "code",
@@ -956,7 +957,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 315
 			},
 			{
 				"cell_type": "code",
@@ -977,7 +978,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 316
 			},
 			{
 				"cell_type": "code",
@@ -1236,7 +1237,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 317
 			}
 		]
 	}

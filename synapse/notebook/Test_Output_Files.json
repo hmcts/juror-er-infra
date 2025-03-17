@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4f4849fb-9247-41a5-9c27-7654a2853787"
+				"spark.autotune.trackingId": "04156d97-a974-4518-ac8e-5b128ed5aad0"
 			}
 		},
 		"metadata": {
@@ -101,14 +101,14 @@
 					"    return df\n",
 					"\n",
 					"# Example usage for specific file\n",
-					"file_path = f\"{base_path}/20240110_305-Tewkesbury.parquet\"\n",
+					"file_path = f\"{base_path}/20231207_249-Blackpool.parquet\"\n",
 					"df = analyze_parquet(file_path)\n",
 					"\n",
 					"# Optional: Save sample to CSV for easier viewing\n",
 					"\n",
-					"display(df)"
+					"df.count()"
 				],
-				"execution_count": 3
+				"execution_count": 2
 			}
 		]
 	}

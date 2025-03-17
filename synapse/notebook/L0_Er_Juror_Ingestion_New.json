@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "552d0087-60c0-480e-a78b-3f16e5537ad5"
+				"spark.autotune.trackingId": "a0fb47be-c41e-4112-aeeb-8bce2a763cc1"
 			}
 		},
 		"metadata": {
@@ -1088,12 +1088,6 @@
 					"            print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"            for file_info in file_group:\n",
 					"                moved_files['failed'].append(f\"{file_info['path']} (group processing error)\")\n",
-					"\n",
-					" \n",
-					"            # Check if file still exists (might have been moved by a previous operation)\n",
-					"            if not mssparkutils.fs.exists(file_path):\n",
-					"                print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
-					"                continue\n",
 					"            \n",
 					"            # Add the empty file check right here\n",
 					"            if is_empty_file(file_path):\n",

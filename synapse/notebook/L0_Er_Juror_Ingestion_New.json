@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "eacf258b-eb5b-4884-8713-141242d13408"
+				"spark.autotune.trackingId": "5d26e4a6-ad84-4f7c-b7bd-561d3640908d"
 			}
 		},
 		"metadata": {
@@ -729,6 +729,20 @@
 					"        if not mssparkutils.fs.exists(file_path):\n",
 					"            print(f\"  File no longer exists, might have been processed already: {file_path}\")\n",
 					"            return False\n",
+					"        \n",
+					"        # Check for problematic \"NT - Location\" pattern - move directly to quarantine\n",
+					"        if \"-\" in file_name and not (file_name.startswith(\"unknown_\") or \"la_data\" in file_path.lower()):\n",
+					"            # This might be one of the problematic patterns\n",
+					"            quarantine_reason = \"non_standard_la_code\"\n",
+					"            print(f\"  Moving file to quarantine due to: {quarantine_reason}\")\n",
+					"            success, quarantine_path = move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
+					"            if success:\n",
+					"                print(f\"  Successfully moved to quarantine: {quarantine_path}\")\n",
+					"                return True\n",
+					"            else:\n",
+					"                print(f\"  Failed to move to quarantine\")\n",
+					"                moved_files['failed'].append(f\"{file_path} (quarantine failed - {quarantine_reason})\")\n",
+					"                return False\n",
 					"        \n",
 					"        # Check if file is empty\n",
 					"        if file_info[\"is_empty\"]:\n",

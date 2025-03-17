@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "725011ec-9619-4b48-9c32-c4ae1aa5f6ab"
+				"spark.autotune.trackingId": "8c4e8dd2-d012-45a0-a9cf-cd019907f822"
 			}
 		},
 		"metadata": {
@@ -807,7 +807,7 @@
 					"            print(f\"  Successfully processed to: {new_path}\")\n",
 					"            return True\n",
 					"        else:\n",
-					"            moved_files['failed'].append(f\"{file_path} (processing failed)\")\n",
+					"            moved_files['failed'].append(f\"{file_info['path']} (processing failed)\")\n",
 					"            print(f\"  Failed to process file\")\n",
 					"            return False\n",
 					"    except Exception as e:\n",

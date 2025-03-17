@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "31294acf-6e3b-46d5-995f-d9aded3a64a4"
+				"spark.autotune.trackingId": "e5ad104e-acb7-4699-8a2b-c87c97f8de84"
 			}
 		},
 		"metadata": {
@@ -45,7 +45,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -56,7 +57,7 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 20
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -71,14 +72,24 @@
 					"df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 21
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(df_single)"
+				],
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"df_single.count()"
 				],
-				"execution_count": 22
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -88,13 +99,13 @@
 				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
-					"final_count = df.groupBy('creation_date') \\\n",
+					"final_count = df.groupBy('creation_date','rec_num') \\\n",
 					"    .agg(count('rec_num')) \\\n",
 					"    .orderBy('creation_date')\n",
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 23
+				"execution_count": 5
 			}
 		]
 	}

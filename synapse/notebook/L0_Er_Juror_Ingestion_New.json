@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6bcfcca7-d2da-49d2-a69e-f4601326a2b1"
+				"spark.autotune.trackingId": "eacf258b-eb5b-4884-8713-141242d13408"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 318
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -85,7 +85,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 319
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -98,7 +98,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 320
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -120,7 +120,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 321
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +181,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 322
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -259,7 +259,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 323
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -309,7 +309,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 324
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -343,7 +343,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 325
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -380,7 +380,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 326
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -421,7 +421,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 327
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -456,7 +456,7 @@
 					"        logging.error(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 328
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -501,13 +501,13 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 329
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def get_folder_parts(file_path):\n",
-					"    \"\"\"Extract folder information for naming with better fallbacks for non-standard names\"\"\"\n",
+					"    \"\"\"Extract folder information with quarantine flagging for problematic patterns\"\"\"\n",
 					"    parts = file_path.split('/')\n",
 					"    print(f\"Path parts: {parts}\")\n",
 					"    \n",
@@ -516,7 +516,7 @@
 					"    la_folder = None\n",
 					"    confidence = \"low\"\n",
 					"    \n",
-					"    # First try the standard approach - find LA_Data in the path\n",
+					"    # Check for standard pattern with LA_Data\n",
 					"    la_index = -1\n",
 					"    for i, part in enumerate(parts):\n",
 					"        if part.lower() == 'la_data':\n",
@@ -534,62 +534,39 @@
 					"        \n",
 					"        confidence = \"high\" if date_folder and la_folder else \"low\"\n",
 					"    \n",
-					"    # If standard approach failed, look for date pattern\n",
-					"    if not date_folder or not la_folder:\n",
-					"        date_pattern = re.compile(r'^\\d{8}$')\n",
-					"        date_indices = [i for i, part in enumerate(parts) if date_pattern.match(part)]\n",
+					"    # Check for problematic pattern like \"20231205/NT - White Ladies Aston.XLSX\"\n",
+					"    filename = os.path.basename(file_path)\n",
+					"    if not la_folder and \"-\" in filename:\n",
+					"        # This is a non-standard pattern - flag for quarantine\n",
+					"        confidence = \"very_low\"\n",
 					"        \n",
-					"        if date_indices:\n",
-					"            date_idx = date_indices[0]\n",
-					"            date_folder = parts[date_idx]\n",
-					"            \n",
-					"            if date_idx + 1 < len(parts):\n",
-					"                potential_la = parts[date_idx + 1]\n",
-					"                if \"la_data\" not in potential_la.lower() and not potential_la.endswith(('.csv', '.xlsx', '.xls')):\n",
-					"                    la_folder = potential_la\n",
-					"                    confidence = \"medium\"\n",
-					"    \n",
-					"    # Handle non-standard filenames (like \"AA - Ashton-Under-Hill.XLSX\")\n",
-					"    if not date_folder or not la_folder:\n",
-					"        filename = os.path.basename(file_path)\n",
+					"        # Still extract something usable for the quarantine filename\n",
+					"        date_pattern = re.findall(r'\\d{8}', '/'.join(parts))\n",
+					"        if date_pattern:\n",
+					"            date_folder = date_pattern[0]\n",
+					"        else:\n",
+					"            date_folder = time.strftime(\"%Y%m%d\")\n",
 					"        \n",
-					"        # Handle patterns like \"AA - Ashton-Under-Hill.XLSX\"\n",
-					"        name_match = re.match(r'^([A-Z]{1,3})\\s*-\\s*(.+?)\\.[A-Za-z]+$', filename)\n",
-					"        if name_match:\n",
-					"            code = name_match.group(1).strip()\n",
-					"            location = name_match.group(2).strip()\n",
-					"            \n",
-					"            # Use today's date \n",
-					"            current_date = time.strftime(\"%Y%m%d\")\n",
-					"            date_folder = current_date\n",
-					"            \n",
-					"            # Use the code-location format with cleaned name\n",
-					"            clean_location = re.sub(r'[^\\w\\-]', '', location)\n",
-					"            la_folder = f\"{code}-{clean_location}\"\n",
-					"            confidence = \"low\"\n",
+					"        # Extract a clean identifier from the filename\n",
+					"        name_part = os.path.splitext(filename)[0]\n",
+					"        clean_name = re.sub(r'[^\\w\\-]', '_', name_part)\n",
+					"        la_folder = f\"unknown_{clean_name}\"\n",
 					"    \n",
-					"    # Final fallback\n",
+					"    # Final fallbacks\n",
 					"    if not date_folder:\n",
 					"        date_folder = time.strftime(\"%Y%m%d\")\n",
 					"        confidence = \"very_low\"\n",
 					"    \n",
 					"    if not la_folder:\n",
-					"        # Create a unique identifier from the filename\n",
-					"        filename = os.path.basename(file_path)\n",
 					"        name_part = os.path.splitext(filename)[0]\n",
 					"        clean_name = re.sub(r'[^\\w\\-]', '_', name_part)\n",
-					"        \n",
-					"        # Limit the length to avoid excessively long names\n",
-					"        if len(clean_name) > 30:\n",
-					"            clean_name = clean_name[:30]\n",
-					"        \n",
 					"        la_folder = f\"unknown_{clean_name}\"\n",
 					"        confidence = \"very_low\"\n",
 					"    \n",
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 330
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -642,7 +619,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 331
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -731,7 +708,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 332
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -834,7 +811,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 333
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -957,7 +934,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 334
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -978,7 +955,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 335
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1237,7 +1214,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 336
+				"execution_count": null
 			}
 		]
 	}

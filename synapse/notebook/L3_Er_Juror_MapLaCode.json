@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "955ed8f8-7146-4dee-98c3-7773477cb7bf"
+				"spark.autotune.trackingId": "a652bcdb-f659-4d3e-a0f6-0612bd7867af"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"import logging\n",
 					""
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -73,7 +73,7 @@
 					"    .config(\"spark.sql.autoBroadcastJoinThreshold\", \"100MB\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -88,7 +88,7 @@
 					"        storage_account = \"baubaisadfsastg\"\n",
 					"        voters_temp_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"\n",
 					"        mapping_csv_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/la_code_tbl/tbl_lacodeToRecNum.csv\"\n",
-					"        output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_mapped\"\n",
+					"        output_path = f\"abfss://eric-juror-schema@{storage_account}.dfs.core.windows.net/tbl_eric_voters\"\n",
 					"        \n",
 					"        # Read voters data\n",
 					"        logger.info(f\"Reading voters data from {voters_temp_path}\")\n",
@@ -188,7 +188,7 @@
 					"    else:\n",
 					"        print(\"Court location mapping failed\")"
 				],
-				"execution_count": null
+				"execution_count": 4
 			}
 		]
 	}

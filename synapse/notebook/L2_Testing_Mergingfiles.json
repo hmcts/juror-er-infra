@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "da864cc6-1d9e-4238-aaa7-bca4da0fba18"
+				"spark.autotune.trackingId": "75f3a9ae-cce0-402e-9af8-d31c560796bb"
 			}
 		},
 		"metadata": {
@@ -725,10 +725,10 @@
 					"    hashed_df = hashed_df.withColumn(\"lname\", xxhash64(col(\"lname\")))\n",
 					"    hashed_df = hashed_df.withColumn(\"dob\", xxhash64(col(\"dob\")))\n",
 					"    hashed_df = hashed_df.withColumn(\"address\", xxhash64(col(\"address\")))\n",
-					"    hashed_df = hashed_df.withColumn(\"address2\", xxhash64(col(\"address\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"address2\", xxhash64(col(\"address\")))\n",
 					"    return hashed_df"
 				],
-				"execution_count": 17
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -866,7 +866,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 18
+				"execution_count": 19
 			},
 			{
 				"cell_type": "markdown",
@@ -957,7 +957,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 19
+				"execution_count": 20
 			},
 			{
 				"cell_type": "markdown",
@@ -999,7 +999,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 20
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -1037,7 +1037,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 21
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1087,7 +1087,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 22
+				"execution_count": 23
 			},
 			{
 				"cell_type": "markdown",
@@ -1246,7 +1246,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 23
+				"execution_count": 24
 			}
 		]
 	}

@@ -1,0 +1,141 @@
+{
+	"name": "L2_Testing_VotersEric",
+	"properties": {
+		"folder": {
+			"name": "Testing/L2"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "7f15dabc-38f8-4954-875a-5c877d37a414"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import *"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Read the data\n",
+					"df = spark.read.parquet(\"abfss://eric-juror-schema@baubaisadfsastg.dfs.core.windows.net/tbl_eric_voters\")\n",
+					"\n",
+					"# Coalesce to a single partition\n",
+					"df_single = df.coalesce(1)\n",
+					""
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(df_single)"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col, count\n",
+					"\n",
+					"# Check for duplicates based on hard_id\n",
+					"duplicate_hashids = df_single.groupBy(\"hash_id\").count().filter(col(\"count\") > 1)\n",
+					"\n",
+					"# Get the count of distinct hard_id values that have duplicates\n",
+					"duplicate_count = duplicate_hashids.count()\n",
+					"print(f\"Found {duplicate_count} distinct hash_id values that appear more than once\")\n",
+					"\n",
+					"# Show some examples of duplicated hard_id values\n",
+					"if duplicate_count > 0:\n",
+					"    print(\"Examples of duplicated hard_id values:\")\n",
+					"    duplicate_hashids.orderBy(col(\"count\").desc()).show(5)\n",
+					"    \n",
+					"    # Get a sample hard_id that has duplicates\n",
+					"    sample_hashdid = duplicate_hashids.first()[\"hash_id\"]\n",
+					"    \n",
+					"    # Show all records with this hard_id\n",
+					"    print(f\"Records with hard_id = {sample_hardid}:\")\n",
+					"    df.filter(col(\"hash_id\") == sample_hashid).show()\n",
+					"else:\n",
+					"    print(\"No duplicates found based on hash_id\")"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_single.count()"
+				],
+				"execution_count": 19
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import count\n",
+					"\n",
+					"final_count = df.groupBy('creation_date','rec_num') \\\n",
+					"    .agg(count('rec_num')) \\\n",
+					"    .orderBy('creation_date')\n",
+					"\n",
+					"display(final_count)"
+				],
+				"execution_count": 12
+			}
+		]
+	}
+}

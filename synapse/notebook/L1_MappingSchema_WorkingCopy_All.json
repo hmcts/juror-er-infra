@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8bb28712-d4ed-4341-8a43-051fb9a81744"
+				"spark.autotune.trackingId": "bafec758-a4f2-4a22-be3e-eac789f8637f"
 			}
 		},
 		"metadata": {
@@ -162,24 +162,14 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def list_files(folder_path, extensions):\n",
+					"def list_files(folder_path, extensions=['.parquet']):\n",
 					"    \"\"\"List all files with specific extensions in a folder\"\"\"\n",
 					"    try:\n",
-					"        # Check if folder exists\n",
-					"        if not mssparkutils.fs.exists(folder_path):\n",
-					"            logging.warning(f\"Folder does not exist: {folder_path}\")\n",
-					"            return []\n",
-					"\n",
 					"        files = mssparkutils.fs.ls(folder_path)\n",
-					"        return [\n",
-					"            f.path\n",
-					"            for f in files\n",
-					"            if any(f.name.lower().endswith(ext) for ext in extensions)\n",
-					"        ]\n",
+					"        return [f.path for f in files if f.name.lower().endswith('.parquet')]\n",
 					"    except Exception as e:\n",
-					"        logging.error(f\"Error listing files in {folder_path}: {str(e)}\")\n",
-					"        return []\n",
-					""
+					"        logging.error(f\"Error listing files: {str(e)}\")\n",
+					"        return []"
 				],
 				"execution_count": null
 			},

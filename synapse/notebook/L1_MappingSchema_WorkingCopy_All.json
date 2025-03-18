@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a5532b3c-7681-4db6-a36a-efc656662b28"
+				"spark.autotune.trackingId": "478c8db4-a5a5-4c63-a9b2-eb4e185840f7"
 			}
 		},
 		"metadata": {
@@ -848,7 +848,7 @@
 					"\n",
 					"        # Create a output name using date and LA code\n",
 					"        output_name = f\"{date_folder}_{la_code}\"\n",
-					"        output_path = f\"{transform_folder}/{output_name}.parquet\"\n",
+					"        output_path =f\"{transform_folder}/{os.path.splitext(file_name)[0]}.parquet\"\n",
 					"        # Validate data before writing\n",
 					"        validation_errors = []\n",
 					"\n",
@@ -1078,7 +1078,7 @@
 					"\n",
 					"    # List all files in the source folder with better error handling\n",
 					"    try:\n",
-					"        all_files = list_files(files_folder, [\".csv\", \".xlsx\", \".xls\"])\n",
+					"        all_files = list_files(files_folder, ['.parquet'])\n",
 					"        logging.info(f\"Found {len(all_files)} files to process\")\n",
 					"        if len(all_files) == 0:\n",
 					"            logging.warning(\"No files found in source directory - nothing to process\")\n",

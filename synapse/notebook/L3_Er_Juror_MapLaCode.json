@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ff07b354-1f85-4f82-8d1c-64048ecef1e1"
+				"spark.autotune.trackingId": "848f5beb-1f22-4e39-b303-3d503ce7fdbd"
 			}
 		},
 		"metadata": {
@@ -87,15 +87,15 @@
 					"        mapping_df.printSchema()\n",
 					"        \n",
 					"        # Ensure consistent types for joining\n",
-					"        # Assuming 'region_id' in mapping corresponds to 'rec_num' in voters\n",
-					"        mapping_df = mapping_df.withColumn(\"region_id\", col(\"region_id\").cast(\"string\"))\n",
+					"        # 'LOCAL_AUTHORITY_CODE' in mapping corresponds to 'rec_num' in voters\n",
+					"        mapping_df = mapping_df.withColumn(\"LOCAL_AUTHORITY_CODE\", col(\"LOCAL_AUTHORITY_CODE\").cast(\"string\"))\n",
 					"        voters_df = voters_df.withColumn(\"rec_num\", col(\"rec_num\").cast(\"string\"))\n",
 					"        \n",
 					"        # Perform the join and update\n",
 					"        logger.info(\"Joining datasets to update mapping values\")\n",
 					"        joined_df = voters_df.join(\n",
-					"            mapping_df.select(\"loc_code\", \"region_id\"),\n",
-					"            voters_df[\"rec_num\"] == mapping_df[\"region_id\"],\n",
+					"            mapping_df.select(\"loc_code\", \"LOCAL_AUTHORITY_CODE\"),\n",
+					"            voters_df[\"rec_num\"] == mapping_df[\"LOCAL_AUTHORITY_CODE\"],\n",
 					"            \"left_outer\"\n",
 					"        )\n",
 					"        \n",

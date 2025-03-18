@@ -1,0 +1,133 @@
+{
+	"name": "L3_Er_Juror_MapLaCode",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "937aeb76-d80b-4a20-ae88-6e2e66c8fdd2"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import *\n",
+					"import logging\n",
+					"from notebookutils import mssparkutils"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"\n",
+					"# Configure logging\n",
+					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
+					"logger = logging.getLogger()\n",
+					"\n",
+					"# Initialize Spark session\n",
+					"spark = SparkSession.builder \\\n",
+					"    .appName(\"Voters Mapping\") \\\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def map_voters_with_location():\n",
+					"    try:\n",
+					"        # Initialize storage paths\n",
+					"        storage_account = \"baubaisadfsastg\"\n",
+					"        voters_temp_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
+					"        mapping_csv_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/court_location_202502271930.csv\"\n",
+					"        output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_mapped\"\n",
+					"        \n",
+					"        # Read voters data\n",
+					"        logger.info(f\"Reading voters data from {voters_temp_path}\")\n",
+					"        voters_df = spark.read.parquet(voters_temp_path)\n",
+					"        logger.info(f\"Loaded {voters_df.count()} voter records\")\n",
+					"        \n",
+					"        # Read mapping CSV with appropriate options\n",
+					"        logger.info(f\"Reading mapping CSV from {mapping_csv_path}\")\n",
+					"        mapping_df = spark.read.option(\"header\", \"true\") \\\n",
+					"                             .option(\"inferSchema\", \"true\") \\\n",
+					"                             .option(\"mode\", \"PERMISSIVE\") \\\n",
+					"                             .option(\"nullValue\", \"\") \\\n",
+					"                             .csv(mapping_csv_path)\n",
+					"        logger.info(f\"Loaded {mapping_df.count()} mapping records\")\n",
+					"        \n",
+					"        # Show sample data and schema for debugging\n",
+					"        logger.info(\"Voters DataFrame Schema:\")\n",
+					"        voters_df.printSchema()\n",
+					"        \n",
+					"        logger.info(\"Mapping DataFrame Schema:\")\n",
+					"        mapping_df.printSchema()\n",
+					"        \n",
+					"        # Ensure consistent types for joining\n",
+					"        # Assuming 'region_id' in mapping corresponds to 'rec_num' in voters\n",
+					"        mapping_df = mapping_df.withColumn(\"region_id\", col(\"region_id\").cast(\"string\"))\n",
+					"        voters_df = voters_df.withColumn(\"rec_num\", col(\"rec_num\").cast(\"string\"))\n",
+					"        \n",
+					"        # Perform the join and update\n",
+					"        logger.info(\"Joining datasets to update mapping values\")\n",
+					"        joined_df = voters_df.join(\n",
+					"            mapping_df.select(\"loc_code\", \"region_id\"),\n",
+					"            voters_df[\"rec_num\"] == mapping_df[\"region_id\"],\n",
+					"            \"left_outer\"\n",
+					"        )\n",
+					"        \n",
+					"        # Update loc_code where we have a match\n",
+					"        updated_df = joined_df.withColumn(\n",
+					"            \"loc_code\", \n",
+					"            when(col(\"mapping_df.loc_code\").isNotNull(), col(\"mapping_df.loc_code\"))\n",
+					"            .otherwise(col(\"voters_df.loc_code\"))\n",
+					"        )\n",
+					"        \n",
+					"        # Select only the original columns from voters_df\n",
+					"        final_df = updated_df.select([col(f\"voters_df.{c}\") for c in voters_df.columns])\n",
+					"        \n",
+					"        # Write the updated data\n",
+					"        logger.info(f\"Writing {final_df.count()} records to {output_path}\")\n",
+					"        final_df.write.mode(\"overwrite\").parquet(output_path)\n",
+					"        \n",
+					"        logger.info(\"Mapping process completed successfully\")\n",
+					"        return True\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        logger.error(f\"Error in mapping process: {str(e)}\")\n",
+					"        import traceback\n",
+					"        logger.error(traceback.format_exc())\n",
+					"        return False\n",
+					"\n",
+					"# Call the function\n",
+					"if __name__ == \"__main__\":\n",
+					"    map_voters_with_location()"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

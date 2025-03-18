@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b7a6cbed-e6ea-4106-acb8-ae3d41a801b8"
+				"spark.autotune.trackingId": "32744336-b7a6-481e-8323-86389e625cec"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"        storage_account = \"baubaisadfsastg\"\n",
 					"        voters_temp_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"\n",
 					"        mapping_csv_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/la_code_tbl/tbl_lacodeToRecNum.csv\"\n",
-					"        output_path = f\"abfss://eric-juror-schema@{storage_account}.dfs.core.windows.net/tbl_voters\"\n",
+					"        output_path = f\"abfss://eric-juror-schema@{storage_account}.dfs.core.windows.net/tbl_eric_voters\"\n",
 					"        \n",
 					"        # Read voters data\n",
 					"        logger.info(f\"Reading voters data from {voters_temp_path}\")\n",

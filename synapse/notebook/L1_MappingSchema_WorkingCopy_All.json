@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7fdbfae8-1c0b-444c-b6a0-9458d1cf1d44"
+				"spark.autotune.trackingId": "d96133cf-3807-465a-9120-b495c0724e43"
 			}
 		},
 		"metadata": {
@@ -186,7 +186,6 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"\n",
 					"def read_file(spark, file_path):\n",
 					"    \"\"\"Read file as DataFrame with resilient options\"\"\"\n",
 					"    try:\n",
@@ -194,10 +193,15 @@
 					"            logging.info(f\"Reading as CSV file: {file_path}\")\n",
 					"            return (\n",
 					"                spark.read.option(\"header\", \"true\")\n",
-					"                .option(\"inferSchema\", \"false\")\n",
-					"                .option(\"mode\", \"PERMISSIVE\")\n",
-					"                .option(\"encoding\", \"UTF-8\")\n",
-					"                .csv(file_path)\n",
+					"                   .option(\"header\", \"true\") \\\n",
+					"                   .option(\"inferSchema\", \"false\") \\\n",
+					"                   .option(\"mode\", \"PERMISSIVE\") \\\n",
+					"                   .option(\"nullValue\", \"\") \\\n",
+					"                   .option(\"emptyValue\", null) \\\n",
+					"                   .option(\"ignoreLeadingWhiteSpace\", \"true\") \\\n",
+					"                   .option(\"ignoreTrailingWhiteSpace\", \"true\") \\\n",
+					"                   .csv(file_path)\n",
+					"\n",
 					"            )\n",
 					"        elif file_path.lower().endswith((\".xlsx\", \".xls\")):\n",
 					"            logging.info(f\"Reading as Excel file: {file_path}\")\n",

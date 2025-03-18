@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "43d3ba36-eb25-4a78-b583-1723c5bfd459"
+				"spark.autotune.trackingId": "0ee8b56e-9147-4d6d-90aa-3e4f492c10a3"
 			}
 		},
 		"metadata": {
@@ -176,19 +176,9 @@
 				"cell_type": "code",
 				"source": [
 					"def read_file(spark, file_path):\n",
-					"    \"\"\"Read a file based on its type\"\"\"\n",
-					"    if file_path.lower().endswith('.parquet'):\n",
-					"        logging.info(f\"Reading Parquet file: {file_path}\")\n",
-					"        return spark.read.parquet(file_path)\n",
-					"    # Keep these as fallbacks\n",
-					"    elif file_path.lower().endswith('.csv'):\n",
-					"        logging.info(f\"Reading CSV file: {file_path}\")\n",
-					"        return spark.read.option(\"header\", \"true\").option(\"inferSchema\", \"true\").csv(file_path)\n",
-					"    elif file_path.lower().endswith(('.xlsx', '.xls')):\n",
-					"        logging.info(f\"Reading Excel file: {file_path}\")\n",
-					"        return read_excel_file(spark, file_path)\n",
-					"    else:\n",
-					"        raise ValueError(f\"Unsupported file format: {file_path}\")"
+					"    \"\"\"Read a Parquet file\"\"\"\n",
+					"    logging.info(f\"Reading Parquet file: {file_path}\")\n",
+					"    return spark.read.parquet(file_path)"
 				],
 				"execution_count": null
 			},
@@ -587,7 +577,6 @@
 					"        pass\n",
 					"\n",
 					"    # Alternative parsing method if LA_Data not found\n",
-					"    # Assuming format is something like storage/files/20240215_Birmingham.csv\n",
 					"    file_name = parts[-1]\n",
 					"    if \"_\" in file_name:\n",
 					"        parts = file_name.split(\"_\", 1)\n",

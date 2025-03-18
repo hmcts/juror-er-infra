@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bafec758-a4f2-4a22-be3e-eac789f8637f"
+				"spark.autotune.trackingId": "a5532b3c-7681-4db6-a36a-efc656662b28"
 			}
 		},
 		"metadata": {
@@ -103,7 +103,6 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"\n",
 					"def read_column_mapping(spark, config_path):\n",
 					"    \"\"\"Read and parse the column mapping configuration\"\"\"\n",
 					"    try:\n",
@@ -177,15 +176,16 @@
 				"cell_type": "code",
 				"source": [
 					"def read_file(spark, file_path):\n",
-					"    \"\"\"Read a file based on its extension\"\"\"\n",
+					"    \"\"\"Read a file based on its type\"\"\"\n",
 					"    if file_path.lower().endswith('.parquet'):\n",
-					"        logging.info(\"Reading as Parquet file\")\n",
+					"        logging.info(f\"Reading Parquet file: {file_path}\")\n",
 					"        return spark.read.parquet(file_path)\n",
+					"    # Keep these as fallbacks\n",
 					"    elif file_path.lower().endswith('.csv'):\n",
-					"        logging.info(\"Reading as CSV file (fallback)\")\n",
+					"        logging.info(f\"Reading CSV file: {file_path}\")\n",
 					"        return spark.read.option(\"header\", \"true\").option(\"inferSchema\", \"true\").csv(file_path)\n",
 					"    elif file_path.lower().endswith(('.xlsx', '.xls')):\n",
-					"        logging.info(\"Reading as Excel file (fallback)\")\n",
+					"        logging.info(f\"Reading Excel file: {file_path}\")\n",
 					"        return read_excel_file(spark, file_path)\n",
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file format: {file_path}\")"

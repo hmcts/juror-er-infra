@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "38f733b0-e4d2-4012-b97e-d6ce86fc4be3"
+				"spark.autotune.trackingId": "be81e827-9b7d-4128-bb17-4da6b549ff71"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 58
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -85,7 +85,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 59
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -98,7 +98,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 60
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -120,7 +120,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 61
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +181,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 62
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -259,7 +259,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 63
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -309,7 +309,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 64
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -343,7 +343,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 65
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -380,7 +380,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 66
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -421,7 +421,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 67
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -456,7 +456,7 @@
 					"        logging.error(f\"Error processing file {source_path}: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 68
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +501,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 69
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -566,7 +566,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 70
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -619,7 +619,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 71
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -708,7 +708,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 72
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
@@ -825,13 +825,13 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 73
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def process_file_group(file_group, date_folder, la_folder, storage_account, moved_files):\n",
-					"    \"\"\"Process a group of files with the same date and LA folder with proper Excel merging\"\"\"\n",
+					"    \"\"\"Process a group of files with the same date and LA folder without deleting originals\"\"\"\n",
 					"    try:\n",
 					"        print(f\"\\nProcessing file group: date={date_folder}, LA={la_folder}, files={len(file_group)}\")\n",
 					"        \n",
@@ -861,7 +861,7 @@
 					"        csv_files = [info for info in valid_files if info[\"file_type\"] == \"csv\"]\n",
 					"        excel_files = [info for info in valid_files if info[\"file_type\"] == \"excel\"]\n",
 					"        \n",
-					"        # Process CSV files if present (unchanged)\n",
+					"        # Process CSV files if present\n",
 					"        if csv_files:\n",
 					"            csv_dest_path = f\"{dest_dir}/{folder_key}.csv\"\n",
 					"            print(f\"  Processing {len(csv_files)} CSV files to: {csv_dest_path}\")\n",
@@ -910,117 +910,37 @@
 					"                for info in csv_files:\n",
 					"                    moved_files['failed'].append(f\"{info['path']} (CSV group processing failed)\")\n",
 					"        \n",
-					"        # Process Excel files - with actual merging\n",
+					"        # Process Excel files - simplified approach\n",
 					"        if excel_files:\n",
 					"            excel_dest_path = f\"{dest_dir}/{folder_key}.xlsx\"\n",
 					"            print(f\"  Processing {len(excel_files)} Excel files to: {excel_dest_path}\")\n",
 					"            \n",
 					"            try:\n",
-					"                # For single file, just copy directly\n",
-					"                if len(excel_files) == 1:\n",
-					"                    path = excel_files[0][\"path\"]\n",
-					"                    print(f\"  Copying single Excel file: {path} to {excel_dest_path}\")\n",
+					"                # Copy each Excel file in sequence to the same destination\n",
+					"                for i, info in enumerate(excel_files):\n",
+					"                    path = info[\"path\"]\n",
+					"                    print(f\"  Processing Excel file {i+1}/{len(excel_files)}: {path}\")\n",
+					"                    \n",
+					"                    # Simple direct copy\n",
+					"                    print(f\"  Copying Excel file to: {excel_dest_path}\")\n",
 					"                    mssparkutils.fs.cp(path, excel_dest_path, True)\n",
 					"                    \n",
-					"                    # Verify copy\n",
+					"                    # Verify the copy succeeded\n",
 					"                    if mssparkutils.fs.exists(excel_dest_path):\n",
-					"                        print(f\"  Successfully copied Excel file to {excel_dest_path}\")\n",
-					"                        moved_files['data_success'].append(excel_dest_path)\n",
+					"                        print(f\"  Successfully copied Excel file to: {excel_dest_path}\")\n",
 					"                    else:\n",
-					"                        print(f\"  Failed to copy Excel file to {excel_dest_path}\")\n",
+					"                        print(f\"  WARNING: Failed to copy Excel file to: {excel_dest_path}\")\n",
 					"                        moved_files['failed'].append(f\"{path} (Copy failed)\")\n",
-					"                else:\n",
-					"                    # For multiple files, we'll try to read as DataFrames and merge the data\n",
-					"                    \n",
-					"                    # Download all Excel files to a temp dir first\n",
-					"                    with tempfile.TemporaryDirectory() as tmpdirname:\n",
-					"                        # List to track temp file paths\n",
-					"                        temp_excel_paths = []\n",
-					"                        \n",
-					"                        # Download each Excel file locally\n",
-					"                        for i, info in enumerate(excel_files):\n",
-					"                            src_path = info[\"path\"]\n",
-					"                            temp_path = os.path.join(tmpdirname, f\"file_{i}.xlsx\")\n",
-					"                            \n",
-					"                            print(f\"  Downloading Excel file {i+1}/{len(excel_files)}: {src_path}\")\n",
-					"                            mssparkutils.fs.cp(src_path, f\"file://{temp_path}\", True)\n",
-					"                            temp_excel_paths.append(temp_path)\n",
-					"                        \n",
-					"                        # Create the merged output file\n",
-					"                        merged_excel_path = os.path.join(tmpdirname, \"merged.xlsx\")\n",
-					"                        \n",
-					"                        # Now process each Excel file and merge data\n",
-					"                        all_data = {}  # To store all data by sheet name\n",
-					"                        \n",
-					"                        # First, try using spark-excel to read the files\n",
-					"                        try:\n",
-					"                            print(\"  Attempting to merge Excel files using spark-excel method\")\n",
-					"                            \n",
-					"                            # Create a new Excel file at the merged path\n",
-					"                            import pandas as pd\n",
-					"                            with pd.ExcelWriter(merged_excel_path) as writer:\n",
-					"                                pass  # Just create an empty Excel file\n",
-					"                            \n",
-					"                            # Now we'll add all sheets from all files\n",
-					"                            for temp_path in temp_excel_paths:\n",
-					"                                # Try to read all sheets\n",
-					"                                print(f\"  Reading Excel file: {temp_path}\")\n",
-					"                                \n",
-					"                                # Get all sheets using pandas\n",
-					"                                xl = pd.ExcelFile(temp_path)\n",
-					"                                sheet_names = xl.sheet_names\n",
-					"                                \n",
-					"                                for sheet in sheet_names:\n",
-					"                                    df = pd.read_excel(temp_path, sheet_name=sheet)\n",
-					"                                    \n",
-					"                                    # Add data to our collection\n",
-					"                                    if sheet not in all_data:\n",
-					"                                        all_data[sheet] = df\n",
-					"                                    else:\n",
-					"                                        # Append the data to existing dataframe\n",
-					"                                        all_data[sheet] = pd.concat([all_data[sheet], df], ignore_index=True)\n",
-					"                            \n",
-					"                            # Write the merged data to the output file\n",
-					"                            with pd.ExcelWriter(merged_excel_path) as writer:\n",
-					"                                for sheet, df in all_data.items():\n",
-					"                                    df.to_excel(writer, sheet_name=sheet, index=False)\n",
-					"                            \n",
-					"                            print(f\"  Successfully merged {len(temp_excel_paths)} Excel files\")\n",
-					"                            \n",
-					"                            # Now copy the merged file to the destination\n",
-					"                            print(f\"  Copying merged Excel file to {excel_dest_path}\")\n",
-					"                            mssparkutils.fs.cp(f\"file://{merged_excel_path}\", excel_dest_path, True)\n",
-					"                            \n",
-					"                            # Verify copy\n",
-					"                            if mssparkutils.fs.exists(excel_dest_path):\n",
-					"                                print(f\"  Successfully copied merged Excel file to {excel_dest_path}\")\n",
-					"                                # Update success tracking for all files\n",
-					"                                for info in excel_files:\n",
-					"                                    moved_files['data_success'].append(excel_dest_path)\n",
-					"                            else:\n",
-					"                                print(f\"  Failed to copy merged Excel file to {excel_dest_path}\")\n",
-					"                                for info in excel_files:\n",
-					"                                    moved_files['failed'].append(f\"{info['path']} (Copy of merged file failed)\")\n",
-					"                                    \n",
-					"                        except Exception as e:\n",
-					"                            print(f\"  Error during Excel merge: {str(e)}\")\n",
-					"                            print(f\"  Traceback: {traceback.format_exc()}\")\n",
-					"                            \n",
-					"                            # Fallback: copy the first file only if merge fails\n",
-					"                            print(\"  Fallback: Copying the first Excel file only\")\n",
-					"                            path = excel_files[0][\"path\"]\n",
-					"                            mssparkutils.fs.cp(path, excel_dest_path, True)\n",
-					"                            \n",
-					"                            # Verify copy\n",
-					"                            if mssparkutils.fs.exists(excel_dest_path):\n",
-					"                                print(f\"  Successfully copied first Excel file to {excel_dest_path}\")\n",
-					"                                for info in excel_files:\n",
-					"                                    moved_files['data_success'].append(excel_dest_path)\n",
-					"                            else:\n",
-					"                                print(f\"  Failed to copy first Excel file to {excel_dest_path}\")\n",
-					"                                for info in excel_files:\n",
-					"                                    moved_files['failed'].append(f\"{info['path']} (Fallback copy failed)\")\n",
 					"                \n",
+					"                # After processing all files, check if we have a final destination file\n",
+					"                if mssparkutils.fs.exists(excel_dest_path):\n",
+					"                    print(f\"  Final Excel file exists at: {excel_dest_path}\")\n",
+					"                    # Add a single success entry for the Excel group\n",
+					"                    moved_files['data_success'].append(excel_dest_path)\n",
+					"                else:\n",
+					"                    print(f\"  ERROR: No final Excel file produced at: {excel_dest_path}\")\n",
+					"                    for info in excel_files:\n",
+					"                        moved_files['failed'].append(f\"{info['path']} (No final file produced)\")\n",
 					"            except Exception as e:\n",
 					"                print(f\"  Error processing Excel files: {str(e)}\")\n",
 					"                import traceback\n",
@@ -1036,7 +956,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 74
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -1057,7 +977,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 75
+				"execution_count": 94
 			},
 			{
 				"cell_type": "code",
@@ -1316,7 +1236,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 76
+				"execution_count": 95
 			}
 		]
 	}

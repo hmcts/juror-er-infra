@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6b2227be-7017-4e1a-9140-87cf6cca4c0a"
+				"spark.autotune.trackingId": "8bb28712-d4ed-4341-8a43-051fb9a81744"
 			}
 		},
 		"metadata": {
@@ -187,32 +187,18 @@
 				"cell_type": "code",
 				"source": [
 					"def read_file(spark, file_path):\n",
-					"    \"\"\"Read file as DataFrame with resilient options\"\"\"\n",
-					"    try:\n",
-					"        if file_path.lower().endswith(\".csv\"):\n",
-					"            logging.info(f\"Reading as CSV file: {file_path}\")\n",
-					"            return (\n",
-					"                spark.read.option(\"header\", \"true\")\n",
-					"                   .option(\"header\", \"true\") \\\n",
-					"                   .option(\"inferSchema\", \"false\") \\\n",
-					"                   .option(\"mode\", \"PERMISSIVE\") \\\n",
-					"                   .option(\"nullValue\", \"\") \\\n",
-					"                   .option(\"emptyValue\", null) \\\n",
-					"                   .option(\"ignoreLeadingWhiteSpace\", \"true\") \\\n",
-					"                   .option(\"ignoreTrailingWhiteSpace\", \"true\") \\\n",
-					"                   .csv(file_path)\n",
-					"\n",
-					"            )\n",
-					"        elif file_path.lower().endswith((\".xlsx\", \".xls\")):\n",
-					"            logging.info(f\"Reading as Excel file: {file_path}\")\n",
-					"            return read_excel_file(spark, file_path)\n",
-					"        else:\n",
-					"            raise ValueError(f\"Unsupported file format: {file_path}\")\n",
-					"    except Exception as e:\n",
-					"        error_msg = f\"Error reading file {file_path}: {str(e)}\"\n",
-					"        logging.error(error_msg)\n",
-					"        raise type(e)(error_msg) from e\n",
-					""
+					"    \"\"\"Read a file based on its extension\"\"\"\n",
+					"    if file_path.lower().endswith('.parquet'):\n",
+					"        logging.info(\"Reading as Parquet file\")\n",
+					"        return spark.read.parquet(file_path)\n",
+					"    elif file_path.lower().endswith('.csv'):\n",
+					"        logging.info(\"Reading as CSV file (fallback)\")\n",
+					"        return spark.read.option(\"header\", \"true\").option(\"inferSchema\", \"true\").csv(file_path)\n",
+					"    elif file_path.lower().endswith(('.xlsx', '.xls')):\n",
+					"        logging.info(\"Reading as Excel file (fallback)\")\n",
+					"        return read_excel_file(spark, file_path)\n",
+					"    else:\n",
+					"        raise ValueError(f\"Unsupported file format: {file_path}\")"
 				],
 				"execution_count": null
 			},

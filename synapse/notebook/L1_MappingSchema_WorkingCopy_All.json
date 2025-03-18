@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "784b43eb-1c0b-4850-bd17-ae04580d47e1"
+				"spark.autotune.trackingId": "43d3ba36-eb25-4a78-b583-1723c5bfd459"
 			}
 		},
 		"metadata": {
@@ -161,8 +161,8 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def list_files(folder_path, extensions=['.parquet']):\n",
-					"    \"\"\"List all files with specific extensions in a folder\"\"\"\n",
+					"def list_files(folder_path):\n",
+					"    \"\"\"List all Parquet files in a folder\"\"\"\n",
 					"    try:\n",
 					"        files = mssparkutils.fs.ls(folder_path)\n",
 					"        return [f.path for f in files if f.name.lower().endswith('.parquet')]\n",

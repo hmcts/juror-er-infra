@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "75f3a9ae-cce0-402e-9af8-d31c560796bb"
+				"spark.autotune.trackingId": "846d126b-48c7-45b8-b159-4d5733ce9708"
 			}
 		},
 		"metadata": {
@@ -719,13 +719,15 @@
 					"    hashed_df = hashed_df.withColumn(\"original_lname\", col(\"lname\"))\n",
 					"    hashed_df = hashed_df.withColumn(\"original_dob\", col(\"dob\"))\n",
 					"    hashed_df = hashed_df.withColumn(\"original_address\", col(\"address\"))\n",
-					"    hashed_df = hashed_df.withColumn(\"original_address2\", col(\"address\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_address2\", col(\"address2\"))\n",
+					"    hashed_df = hashed_df.withColumn(\"original_address3\", col(\"address3\"))\n",
 					"    # Hash the sensitive fields\n",
 					"    hashed_df = hashed_df.withColumn(\"fname\", xxhash64(col(\"fname\")))\n",
 					"    hashed_df = hashed_df.withColumn(\"lname\", xxhash64(col(\"lname\")))\n",
 					"    hashed_df = hashed_df.withColumn(\"dob\", xxhash64(col(\"dob\")))\n",
 					"    hashed_df = hashed_df.withColumn(\"address\", xxhash64(col(\"address\")))\n",
-					"    hashed_df = hashed_df.withColumn(\"address2\", xxhash64(col(\"address\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"address2\", xxhash64(col(\"address2\")))\n",
+					"    hashed_df = hashed_df.withColumn(\"address3\", xxhash64(col(\"address3\"))\n",
 					"    return hashed_df"
 				],
 				"execution_count": 18

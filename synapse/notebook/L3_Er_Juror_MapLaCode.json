@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "99db0b97-23ca-4d0d-9624-2f3d41063c47"
+				"spark.autotune.trackingId": "a1117af0-2ec4-4666-9796-8791525d5c6b"
 			}
 		},
 		"metadata": {
@@ -53,11 +53,12 @@
 				"source": [
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *\n",
+					"from pyspark.sql.window import Window\n",
 					"from notebookutils import mssparkutils\n",
 					"import logging\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -73,7 +74,7 @@
 					"    .config(\"spark.sql.autoBroadcastJoinThreshold\", \"100MB\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 3
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -89,7 +90,7 @@
 					"        storage_account = \"baubaisadfsastg\"\n",
 					"        voters_source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"\n",
 					"        mapping_csv_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/la_code_tbl/tbl_lacodeToRecNum.csv\"\n",
-					"        output_path = f\"abfss://eric-juror-schema@{storage_account}.dfs.core.windows.net/tbl_eric_voters\n",
+					"        output_path = f\"abfss://eric-juror-schema@{storage_account}.dfs.core.windows.net/tbl_eric_voters\"\n",
 					"        \n",
 					"        # Read voters data\n",
 					"        logger.info(f\"Reading voters data from {voters_source_path}\")\n",
@@ -103,9 +104,16 @@
 					"                             .option(\"inferSchema\", \"true\") \\\n",
 					"                             .csv(mapping_csv_path)\n",
 					"        \n",
+					"        # Print column names from both dataframes for debugging\n",
+					"        logger.info(f\"Voter dataframe columns: {voters_df.columns}\")\n",
+					"        logger.info(f\"Mapping dataframe columns: {mapping_df.columns}\")\n",
+					"        \n",
 					"        # Ensure data types match for join\n",
 					"        voters_df = voters_df.withColumn(\"rec_num\", col(\"rec_num\").cast(\"string\"))\n",
 					"        mapping_df = mapping_df.withColumn(\"LOCAL_AUTHORITY_CODE\", col(\"LOCAL_AUTHORITY_CODE\").cast(\"string\"))\n",
+					"        \n",
+					"        # Rename the LOC_CODE column in mapping_df to avoid ambiguity\n",
+					"        mapping_df = mapping_df.withColumnRenamed(\"LOC_CODE\", \"mapping_loc_code\")\n",
 					"        \n",
 					"        # Broadcast the mapping table since it's likely much smaller\n",
 					"        from pyspark.sql.functions import broadcast\n",
@@ -118,25 +126,15 @@
 					"            \"inner\"  # Only keep records with matches\n",
 					"        )\n",
 					"        \n",
-					"        # Update the loc_code with LOC_CODE from mapping\n",
-					"        updated_df = joined_df.withColumn(\n",
-					"            \"loc_code\", \n",
-					"            col(\"m.LOC_CODE\")\n",
-					"        )\n",
-					"        \n",
-					"        # Select only needed columns from voters table plus updated loc_code\n",
-					"        final_columns = []\n",
+					"        # Select columns, replacing loc_code with mapping_loc_code\n",
+					"        selected_columns = []\n",
 					"        for column in voters_df.columns:\n",
 					"            if column == \"loc_code\":\n",
-					"                # For loc_code, use the value from mapping\n",
-					"                continue\n",
+					"                selected_columns.append(col(\"m.mapping_loc_code\").alias(\"loc_code\"))\n",
 					"            else:\n",
-					"                final_columns.append(col(f\"v.{column}\"))\n",
+					"                selected_columns.append(col(f\"v.{column}\"))\n",
 					"        \n",
-					"        # Add the updated loc_code column\n",
-					"        final_columns.append(col(\"loc_code\"))\n",
-					"        \n",
-					"        final_df = updated_df.select(*final_columns)\n",
+					"        final_df = joined_df.select(*selected_columns)\n",
 					"        \n",
 					"        # Check for duplicates in the result\n",
 					"        hash_id_duplicate_check = final_df.groupBy(\"hash_id\").count().filter(col(\"count\") > 1)\n",
@@ -193,7 +191,7 @@
 					"    else:\n",
 					"        print(\"Court location mapping failed\")"
 				],
-				"execution_count": 4
+				"execution_count": 8
 			}
 		]
 	}

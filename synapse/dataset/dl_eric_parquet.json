@@ -1,0 +1,19 @@
+{
+	"name": "dl_eric_parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "baubais-synapse-stg-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "eric-juror-voters-temp"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

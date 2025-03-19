@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "71bd160f-841b-4f79-8c9c-2bac1733154e"
+				"spark.autotune.trackingId": "205faa06-387b-4269-b87f-b293f43e42e9"
 			}
 		},
 		"metadata": {
@@ -605,7 +605,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def optimize_deduplicate_data(df):\n",
+					"def optimise_deduplicate_data(df):\n",
 					"    \"\"\"Extremely conservative deduplication to preserve row count\"\"\"\n",
 					"    # Get current columns\n",
 					"    actual_columns = df.columns\n",
@@ -1208,7 +1208,7 @@
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
 					"\n",
 					"        # 5. Deduplicate new data\n",
-					"        deduplicated_data = optimize_deduplicate_data(merged_new_data)\n",
+					"        deduplicated_data = optimise_deduplicate_data(merged_new_data)\n",
 					"        if deduplicated_data is None:\n",
 					"            logger.error(\"Deduplicated DataFrame is None\")\n",
 					"            return\n",

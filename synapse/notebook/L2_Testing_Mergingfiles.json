@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "205faa06-387b-4269-b87f-b293f43e42e9"
+				"spark.autotune.trackingId": "536023c6-7e48-49a5-a12c-6a977bbc02f5"
 			}
 		},
 		"metadata": {
@@ -953,7 +953,7 @@
 					"            existing_data = spark.read.parquet(output_path)\n",
 					"            existing_data.createOrReplaceTempView(\"existing_data\")\n",
 					"            \n",
-					"            # Use SQL approach which has better optimization\n",
+					"            # Use SQL approach which has better optimisation\n",
 					"            merged_data = spark.sql(\"\"\"\n",
 					"                -- Keep all new records that don't exist in the existing data\n",
 					"                SELECT n.*\n",

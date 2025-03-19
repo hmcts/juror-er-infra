@@ -1,0 +1,158 @@
+{
+	"name": "L3_Er_Juror_DataLake_ErickSchema",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "d43afc32-5753-4b60-aecd-087aed3358bb"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import *\n",
+					"from notebookutils import mssparkutils\n",
+					"import logging\n",
+					"from datetime import datetime"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Configure logging\n",
+					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
+					"logger = logging.getLogger()\n",
+					"\n",
+					"# Initialize Spark session\n",
+					"spark = SparkSession.builder \\\n",
+					"    .appName(\"Voters Data Lake Export\") \\\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def export_voters_to_datalake():\n",
+					"    \"\"\"\n",
+					"    Exports voters_deduplicated data to a date-organized structure in the data lake\n",
+					"    without applying any mapping.\n",
+					"    \"\"\"\n",
+					"    try:\n",
+					"        # Initialize storage paths\n",
+					"        storage_account = \"baubaisadfsastg\"\n",
+					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"\n",
+					"        \n",
+					"        # Create date-based output path\n",
+					"        current_date = datetime.now().strftime(\"%Y-%m-%d\")\n",
+					"        base_output_path = f\"abfss://eric-juror-voters-temp@{storage_account}.dfs.core.windows.net\"\n",
+					"        date_output_path = f\"{base_output_path}/{current_date}\"\n",
+					"        \n",
+					"        # Read source data\n",
+					"        logger.info(f\"Reading voter data from {source_path}\")\n",
+					"        voters_df = spark.read.parquet(source_path)\n",
+					"        record_count = voters_df.count()\n",
+					"        logger.info(f\"Loaded {record_count} voter records\")\n",
+					"        \n",
+					"        # Create metadata\n",
+					"        metadata_df = spark.createDataFrame([\n",
+					"            (current_date, \"voters_deduplicated\", record_count)\n",
+					"        ], [\"date\", \"dataset\", \"record_count\"])\n",
+					"        \n",
+					"        # Ensure base directory exists\n",
+					"        if not mssparkutils.fs.exists(base_output_path):\n",
+					"            logger.info(f\"Creating base output directory: {base_output_path}\")\n",
+					"            mssparkutils.fs.mkdirs(base_output_path)\n",
+					"        \n",
+					"        # Write the data to date-specific directory\n",
+					"        logger.info(f\"Writing data to date-specific path: {date_output_path}\")\n",
+					"        voters_df.write.mode(\"overwrite\").parquet(date_output_path)\n",
+					"        \n",
+					"        # Write metadata\n",
+					"        metadata_path = f\"{base_output_path}/metadata\"\n",
+					"        if not mssparkutils.fs.exists(metadata_path):\n",
+					"            mssparkutils.fs.mkdirs(metadata_path)\n",
+					"        \n",
+					"        metadata_df.write.mode(\"append\").parquet(f\"{metadata_path}/export_summary\")\n",
+					"        \n",
+					"        # Create a latest.txt file with the current date for easy identification of latest data\n",
+					"        latest_path = f\"{base_output_path}/latest.txt\"\n",
+					"        mssparkutils.fs.put(latest_path, current_date, True)\n",
+					"        \n",
+					"        # Verify successful write\n",
+					"        if mssparkutils.fs.exists(date_output_path):\n",
+					"            logger.info(f\"Successfully wrote {record_count} records to {date_output_path}\")\n",
+					"            \n",
+					"            # Create a _SUCCESS flag file\n",
+					"            mssparkutils.fs.put(f\"{date_output_path}/_SUCCESS\", \"\", True)\n",
+					"            \n",
+					"            # Return success\n",
+					"            return True, date_output_path\n",
+					"        else:\n",
+					"            logger.error(f\"Failed to write data to {date_output_path}\")\n",
+					"            return False, None\n",
+					"            \n",
+					"    except Exception as e:\n",
+					"        logger.error(f\"Error in data lake export process: {str(e)}\")\n",
+					"        import traceback\n",
+					"        logger.error(traceback.format_exc())\n",
+					"        return False, None\n",
+					"\n",
+					"# Execute the export\n",
+					"if __name__ == \"__main__\":\n",
+					"    success, output_path = export_voters_to_datalake()\n",
+					"    if success:\n",
+					"        print(f\"Data lake export completed successfully\")\n",
+					"        print(f\"Output written to: {output_path}\")\n",
+					"        print(f\"Use this path for your downstream processes\")\n",
+					"    else:\n",
+					"        print(\"Data lake export failed\")"
+				],
+				"execution_count": 17
+			}
+		]
+	}
+}

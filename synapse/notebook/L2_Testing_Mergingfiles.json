@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8f72784f-f86e-461a-9e13-f0978ad8ae12"
+				"spark.autotune.trackingId": "71bd160f-841b-4f79-8c9c-2bac1733154e"
 			}
 		},
 		"metadata": {
@@ -656,6 +656,46 @@
 					"        return df"
 				],
 				"execution_count": 39
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def improved_deduplicate_data(df):\n",
+					"    \"\"\"\n",
+					"    Improved deduplication using window functions to keep most recent record\n",
+					"    per set of identifying columns\n",
+					"    \"\"\"\n",
+					"    # Define identifying columns\n",
+					"    id_columns = [\n",
+					"        \"fname\", \"lname\", \"address\", \"poll_number\", \"rec_num\", \"hash_id\"\n",
+					"    ]\n",
+					"    \n",
+					"    # Filter list to only include columns that exist in the dataframe\n",
+					"    existing_id_columns = [col for col in id_columns if col in df.columns]\n",
+					"    \n",
+					"    if len(existing_id_columns) == 0:\n",
+					"        print(\"No suitable columns for deduplication found - returning all data\")\n",
+					"        return df\n",
+					"    \n",
+					"    print(f\"Deduplicating using columns: {existing_id_columns}\")\n",
+					"    print(f\"Input record count: {df.count()}\")\n",
+					"    \n",
+					"    # Create window spec partitioned by identifying columns\n",
+					"    window_spec = Window.partitionBy([col(x) for x in existing_id_columns]) \\\n",
+					"                       .orderBy(col(\"creation_date\").desc())\n",
+					"    \n",
+					"    # Apply deduplication\n",
+					"    deduplicated_df = df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
+					"                        .filter(col(\"row_num\") == 1) \\\n",
+					"                        .drop(\"row_num\")\n",
+					"    \n",
+					"    output_count = deduplicated_df.count()\n",
+					"    print(f\"Output record count: {output_count}\")\n",
+					"    print(f\"Removed {df.count() - output_count} duplicate records\")\n",
+					"    \n",
+					"    return deduplicated_df"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",

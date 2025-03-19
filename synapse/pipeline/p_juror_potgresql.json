@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "L0_er_juror_ingestion",
+				"name": "L0_Er_Juror_Ingestion",
 				"type": "SynapseNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -16,24 +16,18 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L0_Er_juror_IngestionFromBAIS_ZipFiles",
+						"referenceName": "L0_Er_Juror_Ingestion",
 						"type": "NotebookReference"
 					},
-					"snapshot": true,
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"numExecutors": null
+					"snapshot": true
 				}
 			},
 			{
-				"name": "L1_Tranfromation_MappingColumns",
+				"name": "L1_MappingSchema",
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "L0_er_juror_ingestion",
+						"activity": "L0_Er_Juror_Ingestion",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -49,24 +43,18 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L1_Tranfromation_MappingColumns_v01",
+						"referenceName": "L1_MappingSchema",
 						"type": "NotebookReference"
 					},
-					"snapshot": true,
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
-					},
-					"numExecutors": null
+					"snapshot": true
 				}
 			},
 			{
-				"name": "L2_Testing_Mergingfiles",
+				"name": "L2_Er_Juror_Mergingfiles",
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "L1_Tranfromation_MappingColumns",
+						"activity": "L1_MappingSchema",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -82,16 +70,37 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L2_Testing_Mergingfiles",
+						"referenceName": "L2_Er_Juror_Mergingfiles",
 						"type": "NotebookReference"
 					},
-					"snapshot": true,
-					"conf": {
-						"spark.dynamicAllocation.enabled": null,
-						"spark.dynamicAllocation.minExecutors": null,
-						"spark.dynamicAllocation.maxExecutors": null
+					"snapshot": true
+				}
+			},
+			{
+				"name": "L3_Er_Juror_DataLake_ErickSchema",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L2_Er_Juror_Mergingfiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L3_Er_Juror_DataLake_ErickSchema",
+						"type": "NotebookReference"
 					},
-					"numExecutors": null
+					"snapshot": true
 				}
 			}
 		],

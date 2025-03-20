@@ -25,10 +25,18 @@ resource "azurerm_subnet" "function_subnet3" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.adf_juror_vnet.name
   address_prefixes     = var.subnet_function_space
+  delegation {
+    name = "function-delegation"
+    service_delegation {
+      name    = "Microsoft.Web/serverFarms"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
 }
 
 
 resource "azurerm_virtual_network_peering" "juror-to-hub" {
+  count                     = var.env == "stg" ? 1 : 0
   name                      = "${azurerm_virtual_network.adf_juror_vnet.name}-to-hmcts-hub-nonprodi"
   resource_group_name       = var.resource_group_name
   virtual_network_name      = azurerm_virtual_network.adf_juror_vnet.name
@@ -39,7 +47,7 @@ resource "azurerm_virtual_network_peering" "juror-to-hub" {
 }
 
 resource "azurerm_virtual_network_peering" "hub-to-juror" {
-
+  count                     = var.env == "stg" ? 1 : 0
   provider                  = azurerm.HMCTS-HUB-NONPROD-INTSVC
   name                      = "hmcts-hub-nonprodi-to-${azurerm_virtual_network.adf_juror_vnet.name}"
   resource_group_name       = "hmcts-hub-nonprodi"

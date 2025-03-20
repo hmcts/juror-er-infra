@@ -126,29 +126,6 @@
 					},
 					"numExecutors": null
 				}
-			},
-			{
-				"name": "Copy Data to juror_eric schema",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "L3_Er_Juror_DataLake_ErickSchema",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"enableStaging": false
-				}
 			}
 		],
 		"annotations": []

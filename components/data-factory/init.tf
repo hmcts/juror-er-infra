@@ -16,3 +16,9 @@ provider "azurerm" {
   features {}
   subscription_id = var.subscription_id
 }
+
+provider "azurerm" {
+  alias = "HMCTS-HUB-NONPROD-INTSVC"
+  features {}
+  subscription_id = "fb084706-583f-4c9a-bdab-949aac66ba5c"
+}

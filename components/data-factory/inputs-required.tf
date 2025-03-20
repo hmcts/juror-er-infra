@@ -70,3 +70,7 @@ variable "subnet2_name" {
 variable "subnet2_address_space" {
   description = "The IP for Subnet2"
 }
+
+variable "subnet_function_space" {
+  description = "The IP for Fuction Subnet"
+}

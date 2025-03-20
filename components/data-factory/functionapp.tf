@@ -17,7 +17,11 @@ resource "azurerm_linux_function_app" "funcapp" {
   service_plan_id            = azurerm_service_plan.asp.id
 
   virtual_network_subnet_id = azurerm_subnet.function_subnet3.id
-  site_config {}
+  site_config {
+    application_stack {
+      python_version = "~3.12"
+    }
+  }
   identity {
     type = "SystemAssigned"
   }

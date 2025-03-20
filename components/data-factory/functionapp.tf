@@ -12,7 +12,7 @@ resource "azurerm_linux_function_app" "funcapp" {
   resource_group_name = var.resource_group_name
   location            = var.location
 
-  storage_account_name       = module.storage.storageaccount_id
+  storage_account_name       = module.storage.storageaccount_name
   storage_account_access_key = module.storage.storageaccount_primary_access_key
   service_plan_id            = azurerm_service_plan.asp.id
 

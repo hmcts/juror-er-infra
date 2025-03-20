@@ -18,8 +18,9 @@ resource "azurerm_linux_function_app" "funcapp" {
 
   virtual_network_subnet_id = azurerm_subnet.function_subnet3.id
   site_config {
+    always_on = true
     application_stack {
-      python_version = "~3.12"
+      python_version = "3.12"
     }
   }
   identity {

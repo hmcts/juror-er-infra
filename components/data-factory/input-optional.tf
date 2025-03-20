@@ -63,3 +63,7 @@ variable "github_root_folder" {
   default     = "/synapse"
 
 }
+variable "subnet_fuction_name" {
+  description = "The Name for Function Subnet"
+  default     = "function-privateendpoints"
+}

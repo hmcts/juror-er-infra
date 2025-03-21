@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d43afc32-5753-4b60-aecd-087aed3358bb"
+				"spark.autotune.trackingId": "6503885a-448f-429e-bf24-91595b994940"
 			}
 		},
 		"metadata": {
@@ -88,7 +88,7 @@
 					"        \n",
 					"        # Create date-based output path\n",
 					"        current_date = datetime.now().strftime(\"%Y-%m-%d\")\n",
-					"        base_output_path = f\"abfss://eric-juror-voters-temp@{storage_account}.dfs.core.windows.net\"\n",
+					"        base_output_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net\"\n",
 					"        date_output_path = f\"{base_output_path}/{current_date}\"\n",
 					"        \n",
 					"        # Read source data\n",

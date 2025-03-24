@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "63cb385d-52f2-46e9-aba0-fcf2d7151930"
+				"spark.autotune.trackingId": "21f902c9-db18-4f44-891c-ea4da5edb6e6"
 			}
 		},
 		"metadata": {
@@ -57,19 +57,19 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 1
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"# Read the data\n",
-					"df = spark.read.parquet(\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/2025-03-21\")\n",
+					"df = spark.read.parquet(\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/2025-03-24\")\n",
 					"\n",
 					"# Coalesce to a single partition\n",
 					"df_single = df.coalesce(1)\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -79,7 +79,7 @@
 				"source": [
 					"display(df_single)"
 				],
-				"execution_count": 3
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",

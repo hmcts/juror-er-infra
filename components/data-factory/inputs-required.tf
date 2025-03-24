@@ -74,3 +74,8 @@ variable "subnet2_address_space" {
 variable "subnet_function_space" {
   description = "The IP for Fuction Subnet"
 }
+
+variable "routes" {
+  description = "The routes to add to the route table"
+  type        = map(object({ address_prefix = string, next_hop_type = string, next_hop_in_ip_address = string }))
+}

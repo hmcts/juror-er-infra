@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "eb4eb1e4-9b8e-48ca-bcb2-6c8317fd8ff2"
+				"spark.autotune.trackingId": "d2d11975-9f3d-4dd7-95ed-80d62f79f815"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 34
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 35
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 36
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 37
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 38
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 39
+				"execution_count": 63
 			},
 			{
 				"cell_type": "markdown",
@@ -299,7 +299,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 40
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +371,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 41
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -392,7 +392,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 42
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -409,7 +409,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 43
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -436,7 +436,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 44
+				"execution_count": 68
 			},
 			{
 				"cell_type": "markdown",
@@ -477,7 +477,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 45
+				"execution_count": 69
 			},
 			{
 				"cell_type": "markdown",
@@ -544,7 +544,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 46
+				"execution_count": 70
 			},
 			{
 				"cell_type": "markdown",
@@ -597,7 +597,7 @@
 					"        logging.warning(\"Missing LA_Code or CreationDate columns, skipping deduplication\")\n",
 					"        return df"
 				],
-				"execution_count": 47
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -652,7 +652,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 48
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -705,7 +705,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 49
+				"execution_count": 73
 			},
 			{
 				"cell_type": "markdown",
@@ -752,77 +752,93 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 50
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def apply_hashing_to_voters(df):\n",
 					"    \"\"\"Apply improved hashing specifically for voters_temp table column structure\"\"\"\n",
-					"    from pyspark.sql.functions import col, xxhash64, lit, concat_ws, coalesce, expr, substring, hex\n",
+					"    from pyspark.sql.functions import col, xxhash64, lit, concat_ws, coalesce, expr, substring, hex, when, isnan\n",
 					"\n",
 					"    # Create hash_id from original values with unique columns\n",
-					"    hashed_df = df.withColumn(\n",
-					"        \"hash_id\",\n",
-					"        xxhash64(concat_ws(\",\",\n",
-					"            coalesce(col(\"fname\"), lit(\"\")),\n",
-					"            coalesce(col(\"lname\"), lit(\"\")),\n",
-					"            coalesce(col(\"dob\"), lit(\"\")),\n",
-					"            coalesce(col(\"address\"), lit(\"\")),\n",
-					"            coalesce(col(\"address2\"), lit(\"\")),\n",
-					"            coalesce(col(\"address3\"), lit(\"\")),\n",
-					"            coalesce(col(\"zip\"), lit(\"\")),\n",
-					"            coalesce(col(\"poll_number\"), lit(\"\")), \n",
-					"            coalesce(col(\"rec_num\"), lit(\"\"))\n",
-					"        ))\n",
-					"    )\n",
+					"    # First check if required columns exist\n",
+					"    required_cols = [\"fname\", \"lname\", \"poll_number\", \"address\", \"zip\"]\n",
+					"    existing_cols = [c for c in required_cols if c in df.columns]\n",
 					"    \n",
-					"    # Store original values for reference\n",
-					"    hashed_df = hashed_df.withColumn(\"original_fname\", col(\"fname\"))\n",
-					"    hashed_df = hashed_df.withColumn(\"original_lname\", col(\"lname\"))\n",
-					"    hashed_df = hashed_df.withColumn(\"original_dob\", col(\"dob\"))\n",
-					"    hashed_df = hashed_df.withColumn(\"original_address\", col(\"address\"))\n",
+					"    if existing_cols:\n",
+					"        try:\n",
+					"            # Create hash ID with null-safe concatenation\n",
+					"            hashed_df = df.withColumn(\n",
+					"                \"hash_id\",\n",
+					"                xxhash64(concat_ws(\",\",\n",
+					"                    *[coalesce(col(c), lit(\"\")) for c in existing_cols]\n",
+					"                ))\n",
+					"            )\n",
+					"        except Exception as e:\n",
+					"            print(f\"Error creating hash_id: {str(e)}\")\n",
+					"            # Fallback to a simpler hash method\n",
+					"            hashed_df = df.withColumn(\"hash_id\", \n",
+					"                                     xxhash64(concat_ws(\",\", lit(\"fixed_seed\"), lit(current_timestamp()))))\n",
+					"    else:\n",
+					"        # If no columns exist, create a random hash\n",
+					"        print(\"No identifying columns found for hash_id, using random value\")\n",
+					"        hashed_df = df.withColumn(\"hash_id\", xxhash64(lit(current_timestamp())))\n",
 					"    \n",
-					"    # For DOB, use special date handling to maintain the date format\n",
+					"    # Store original values for reference (only if columns exist)\n",
+					"    for original_col in [\"fname\", \"lname\", \"dob\", \"address\"]:\n",
+					"        if original_col in df.columns:\n",
+					"            hashed_df = hashed_df.withColumn(f\"original_{original_col}\", col(original_col))\n",
+					"    \n",
+					"    # For DOB, handle nulls explicitly\n",
 					"    if \"dob\" in df.columns:\n",
-					"        # First hash the original dob value to generate a number\n",
-					"        hashed_df = hashed_df.withColumn(\"dob_hash\", xxhash64(col(\"dob\")))\n",
-					"        \n",
-					"        # Then construct a valid date that's a certain number of days after 1900-01-01\n",
-					"        # This will maintain date format while still obscuring the actual date\n",
-					"        # Modulo by 36500 to keep dates within 100 years of 1900-01-01\n",
-					"        hashed_df = hashed_df.withColumn(\n",
-					"            \"dob\", \n",
-					"            expr(\"date_add(to_date('1900-01-01', 'yyyy-MM-dd'), mod(dob_hash, 36500))\")\n",
-					"        )\n",
-					"        # Remove the temporary column\n",
-					"        hashed_df = hashed_df.drop(\"dob_hash\")\n",
+					"        try:\n",
+					"            # Keep null values as null, only hash non-null values\n",
+					"            # Use when() to handle the condition\n",
+					"            hashed_df = hashed_df.withColumn(\"dob\", \n",
+					"                when(\n",
+					"                    col(\"dob\").isNull() | (col(\"dob\") == \"\"),\n",
+					"                    None\n",
+					"                ).otherwise(\n",
+					"                    substring(hex(xxhash64(col(\"dob\"))), 1, 10)\n",
+					"                )\n",
+					"            )\n",
+					"        except Exception as e:\n",
+					"            print(f\"Error hashing DOB with special handling: {str(e)}\")\n",
+					"            # Try an even simpler approach if the above fails\n",
+					"            try:\n",
+					"                hashed_df = hashed_df.withColumn(\"dob\", \n",
+					"                    when(col(\"dob\").isNotNull() & (length(trim(col(\"dob\"))) > 0),\n",
+					"                         hex(xxhash64(col(\"dob\")))\n",
+					"                    ).otherwise(None)\n",
+					"                )\n",
+					"            except Exception as e2:\n",
+					"                print(f\"Fallback DOB hashing also failed: {str(e2)}\")\n",
+					"                # Keep original if all hashing attempts fail\n",
+					"                pass\n",
 					"    \n",
-					"    # For text columns, use a simplified approach with hex formatting\n",
-					"    # This will create strings of consistent length without needing a custom UDF\n",
-					"    if \"fname\" in df.columns:\n",
-					"        hashed_df = hashed_df.withColumn(\"fname\", \n",
-					"                                         substring(hex(xxhash64(col(\"fname\"))), 1, 20))\n",
-					"    \n",
-					"    if \"lname\" in df.columns:\n",
-					"        hashed_df = hashed_df.withColumn(\"lname\", \n",
-					"                                         substring(hex(xxhash64(col(\"lname\"))), 1, 20))\n",
-					"    \n",
-					"    if \"address\" in df.columns:\n",
-					"        hashed_df = hashed_df.withColumn(\"address\", \n",
-					"                                        substring(hex(xxhash64(col(\"address\"))), 1, 35))\n",
-					"    \n",
-					"    if \"address2\" in df.columns:\n",
-					"        hashed_df = hashed_df.withColumn(\"address2\", \n",
-					"                                        substring(hex(xxhash64(col(\"address2\"))), 1, 35))\n",
-					"    \n",
-					"    if \"address3\" in df.columns:\n",
-					"        hashed_df = hashed_df.withColumn(\"address3\", \n",
-					"                                        substring(hex(xxhash64(col(\"address3\"))), 1, 35))\n",
+					"    # For text columns, similar null-aware handling\n",
+					"    text_cols = [\"fname\", \"lname\", \"address\", \"address2\", \"address3\"]\n",
+					"    for text_col in text_cols:\n",
+					"        if text_col in df.columns:\n",
+					"            try:\n",
+					"                max_length = 35 if text_col.startswith(\"address\") else 20\n",
+					"                hashed_df = hashed_df.withColumn(text_col, \n",
+					"                    when(\n",
+					"                        col(text_col).isNull() | (col(text_col) == \"\"),\n",
+					"                        None\n",
+					"                    ).otherwise(\n",
+					"                        substring(hex(xxhash64(col(text_col))), 1, max_length)\n",
+					"                    )\n",
+					"                )\n",
+					"            except Exception as e:\n",
+					"                print(f\"Error hashing {text_col}: {str(e)}\")\n",
+					"                # Keep original if hashing fails\n",
+					"                pass\n",
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 51
+				"execution_count": 75
 			},
 			{
 				"cell_type": "markdown",
@@ -960,7 +976,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 52
+				"execution_count": 76
 			},
 			{
 				"cell_type": "markdown",
@@ -1051,7 +1067,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 53
+				"execution_count": 77
 			},
 			{
 				"cell_type": "markdown",
@@ -1093,7 +1109,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 54
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -1131,7 +1147,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 55
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -1181,7 +1197,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 56
+				"execution_count": 80
 			},
 			{
 				"cell_type": "markdown",
@@ -1396,7 +1412,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 57
+				"execution_count": 81
 			}
 		]
 	}

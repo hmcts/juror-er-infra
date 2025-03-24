@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b2bdbc46-62ec-47fe-aaf1-f00ea4c0aa7c"
+				"spark.autotune.trackingId": "0fc63281-3bee-4d30-b80c-0fa0fbd504b5"
 			}
 		},
 		"metadata": {
@@ -95,7 +95,6 @@
 					"        logger.info(f\"Reading voter data from {source_path}\")\n",
 					"        voters_df = spark.read.parquet(source_path)\n",
 					"        # Drop the hash_id and creation_date columns\n",
-					"        df_cleaned = voters_df.drop(\"hash_id\", \"creation_date\")\n",
 					"        record_count = voters_df.count()\n",
 					"        logger.info(f\"Loaded {record_count} voter records\")\n",
 					"        \n",
@@ -111,7 +110,7 @@
 					"        \n",
 					"        # Write the data to date-specific directory\n",
 					"        logger.info(f\"Writing data to date-specific path: {date_output_path}\")\n",
-					"        df_cleaned.write.mode(\"overwrite\").parquet(date_output_path)\n",
+					"        voters_df.write.mode(\"overwrite\").parquet(date_output_path)\n",
 					"        \n",
 					"        # Write metadata\n",
 					"        metadata_path = f\"{base_output_path}/metadata\"\n",

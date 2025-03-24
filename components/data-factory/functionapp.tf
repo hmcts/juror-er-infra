@@ -29,3 +29,9 @@ resource "azurerm_linux_function_app" "funcapp" {
 
   tags = module.tags.common_tags
 }
+
+resource "azurerm_role_assignment" "function_contributor" {
+  principal_id         = azurerm_linux_function_app.funcapp.identity[0].principal_id
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = azurerm_storage_account.adf_juror_sa.id
+}

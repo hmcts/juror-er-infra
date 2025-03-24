@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d2d11975-9f3d-4dd7-95ed-80d62f79f815"
+				"spark.autotune.trackingId": "e1f715a7-3077-4c38-886e-1154a75386e2"
 			}
 		},
 		"metadata": {
@@ -109,7 +109,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": 58
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -129,7 +129,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 59
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 60
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 61
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 62
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 63
+				"execution_count": 87
 			},
 			{
 				"cell_type": "markdown",
@@ -299,7 +299,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 64
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +371,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 65
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -392,7 +392,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 66
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -409,7 +409,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 67
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
@@ -436,7 +436,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 68
+				"execution_count": 92
 			},
 			{
 				"cell_type": "markdown",
@@ -477,7 +477,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 69
+				"execution_count": 93
 			},
 			{
 				"cell_type": "markdown",
@@ -544,7 +544,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 70
+				"execution_count": 94
 			},
 			{
 				"cell_type": "markdown",
@@ -597,7 +597,7 @@
 					"        logging.warning(\"Missing LA_Code or CreationDate columns, skipping deduplication\")\n",
 					"        return df"
 				],
-				"execution_count": 71
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -652,7 +652,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 72
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
@@ -705,7 +705,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 73
+				"execution_count": 97
 			},
 			{
 				"cell_type": "markdown",
@@ -752,7 +752,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 74
+				"execution_count": 98
 			},
 			{
 				"cell_type": "code",
@@ -838,7 +838,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 75
+				"execution_count": 99
 			},
 			{
 				"cell_type": "markdown",
@@ -976,7 +976,7 @@
 					"        \n",
 					"        return empty_df"
 				],
-				"execution_count": 76
+				"execution_count": 100
 			},
 			{
 				"cell_type": "markdown",
@@ -1067,7 +1067,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 77
+				"execution_count": 101
 			},
 			{
 				"cell_type": "markdown",
@@ -1109,7 +1109,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 78
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -1147,7 +1147,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 79
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -1197,7 +1197,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 80
+				"execution_count": 104
 			},
 			{
 				"cell_type": "markdown",
@@ -1412,7 +1412,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 81
+				"execution_count": 105
 			}
 		]
 	}

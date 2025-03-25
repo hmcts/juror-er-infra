@@ -22,3 +22,11 @@ subnet2_address_space = ["10.0.2.16/29"]
 
 
 subnet_function_space = ["10.0.2.24/29"]
+
+routes = {
+  ss-demo-vnet = {
+    address_prefix         = "10.51.64.0/18" # ss-demo-vnet 
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = "10.11.72.36"
+  }
+}

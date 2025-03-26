@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4f22c39a-8924-421d-ab0f-5cb15c2edace"
+				"spark.autotune.trackingId": "8d391d71-cd06-4fa0-ba38-aaee4b9ce4ab"
 			}
 		},
 		"metadata": {
@@ -50,6 +50,12 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"# PostgreSQL connection details\n",
 					"import logging\n",
@@ -82,31 +88,49 @@
 					"server = \"juror-api-demo.postgres.database.azure.com\"\n",
 					"database = \"juror\"\n",
 					"table = \"juror_eric.voters_temp\"\n",
+					"user = \"baubais-stg-functionapp\"  # Your managed identity username\n",
 					"\n",
 					"# SparkSession with PostgreSQL JDBC driver\n",
 					"spark = SparkSession.builder.appName(\"PostgreSQLManagedIdentity\").getOrCreate()\n",
 					"\n",
-					"# PostgreSQL JDBC URL with managed identity options\n",
-					"url = f\"jdbc:postgresql://{server}/{database}?user={';'}&password={';'}&sslmode=require&authenticationPluginClassName=com.microsoft.sqlserver.jdbc.SQLServerMSIAuthentication\"\n",
+					"# PostgreSQL JDBC URL for Azure PostgreSQL with managed identity\n",
+					"# Note: For managed identity with PostgreSQL, we just provide the username\n",
+					"# and authentication is handled at the service level\n",
+					"jdbc_url = f\"jdbc:postgresql://{server}:5432/{database}\"\n",
 					"\n",
 					"try:\n",
 					"    # Read data from PostgreSQL\n",
-					"    df = spark.read.format(\"jdbc\").option(\"url\", url).option(\"dbtable\", table).load()\n",
-					"\n",
-					"    # Perform operations on the DataFrame (e.g., display data)\n",
-					"    df.show()\n",
-					"\n",
+					"    df = spark.read \\\n",
+					"        .format(\"jdbc\") \\\n",
+					"        .option(\"url\", jdbc_url) \\\n",
+					"        .option(\"dbtable\", table) \\\n",
+					"        .option(\"user\", user) \\\n",
+					"        .option(\"driver\", \"org.postgresql.Driver\") \\\n",
+					"        .option(\"ssl\", \"true\") \\\n",
+					"        .option(\"sslmode\", \"require\") \\\n",
+					"        .load()\n",
+					"    \n",
+					"    # Perform operations on the DataFrame\n",
+					"    print(f\"Successfully connected. Row count: {df.count()}\")\n",
+					"    df.show(5)  # Show first 5 rows\n",
+					"    \n",
 					"except Exception as e:\n",
 					"    print(f\"Error: {e}\")\n",
-					"\n",
+					"    \n",
 					"finally:\n",
-					"    # Stop the SparkSession\n",
+					"    # Stop the SparkSession when done\n",
 					"    spark.stop()"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"try:\n",
 					"    df = spark.read.format(\"jdbc\").option(\"url\", url).option(\"dbtable\", table).load()\n",
@@ -118,6 +142,12 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"telnet juror-api-demo.postgres.database.azure.com 5432"
 				],

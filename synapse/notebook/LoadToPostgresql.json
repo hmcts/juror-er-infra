@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fbc1d814-5b56-4a38-81c5-4bb189cfed73"
+				"spark.autotune.trackingId": "5fcb4f08-fb8a-484d-8ffb-c98b0c1148f5"
 			}
 		},
 		"metadata": {
@@ -56,13 +56,8 @@
 					"from notebookutils import mssparkutils\n",
 					"import logging\n",
 					"import time\n",
-					"import psycopg2"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
+					"import psycopg2\n",
+					"\n",
 					"# Configure logging\n",
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"logger = logging.getLogger()\n",
@@ -71,7 +66,8 @@
 					"spark = SparkSession.builder \\\n",
 					"    .appName(\"Voters PostgreSQL Loader\") \\\n",
 					"    .config(\"spark.jars\", \"/opt/spark/jars/postgresql-42.2.18.jar\") \\\n",
-					"    .getOrCreate()"
+					"    .getOrCreate()\n",
+					""
 				],
 				"execution_count": null
 			},

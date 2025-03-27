@@ -1,0 +1,21 @@
+{
+	"name": "AzurePostgreSql1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzurePostgreSql",
+		"version": "2.0",
+		"typeProperties": {
+			"server": "juror-api-demo.postgres.database.azure.com",
+			"port": "5432",
+			"database": "juror",
+			"sslMode": 2,
+			"username": "DTS JIT Access Juror DB Admin",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQERGMTYzNzQ5LTFGRjItNEJFNy04NDNGLUNEOUIyNjZEQURCNl8zYjA0NDQ5NS1mMzI5LTRhMGUtYmUyYi01ZjNiYTRmNTQwMGQiDQp9"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

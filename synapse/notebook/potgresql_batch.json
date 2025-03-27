@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "72aa99d8-c3cc-4d25-963c-e9ab925d4980"
+				"spark.autotune.trackingId": "adaad873-1ae2-4f4f-b396-460b688e0226"
 			}
 		},
 		"metadata": {
@@ -57,8 +57,13 @@
 					"import time\n",
 					"import os\n",
 					"from notebookutils import mssparkutils\n",
-					"import tempfile\n",
-					"\n",
+					"import tempfile"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"# Configure logging\n",
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"logger = logging.getLogger()\n",
@@ -66,7 +71,13 @@
 					"# Initialize Spark session (should already be available in Synapse notebooks)\n",
 					"spark = SparkSession.builder \\\n",
 					"    .appName(\"CSV Export for PostgreSQL\") \\\n",
-					"    .getOrCreate()\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"\n",
 					"def export_to_csv_and_upload(source_path, filter_date=None, destination_container=\"postgresql-batch\"):\n",
 					"    \"\"\"\n",

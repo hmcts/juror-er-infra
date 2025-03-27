@@ -1,4 +1,9 @@
 {
 	"name": "baubais-data-factory-stg",
+	"properties": {
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "true"
+		}
+	},
 	"location": "uksouth"
 }

@@ -1,0 +1,22 @@
+{
+	"name": "db_whs",
+	"properties": {
+		"Name": "db_whs",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://baubais-storage-data-lake-stg@synapsebaubaisstg.dfs.core.windows.net/db_whs",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "baubais-synapse-stg-WorkspaceDefaultStorage"
+			}
+		}
+	},
+	"type": "DATABASE"
+}

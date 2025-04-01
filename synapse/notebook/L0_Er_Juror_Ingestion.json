@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ea29c498-d35f-4a44-b6d8-e73e8109b6e2"
+				"spark.autotune.trackingId": "995502f8-f68d-4d8f-9633-40c9c3bb517f"
 			}
 		},
 		"metadata": {
@@ -59,6 +59,69 @@
 				},
 				"source": [
 					"###"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Juror ETL Pipeline\n",
+					"\n",
+					"## Overview\n",
+					"This script implements an ETL pipeline for processing juror-related files stored in Azure Data Lake Storage (ADLS). It handles various file types (CSV, Excel, ZIP), moves files to appropriate folders (e.g., quarantine, metadata, overseas), and converts files to Parquet format for efficient storage and querying.\n",
+					"\n",
+					"## Features\n",
+					"- **File Type Support**: Processes CSV, Excel, and ZIP files.\n",
+					"- **Error Handling**: Gracefully handles errors and moves problematic files to quarantine.\n",
+					"- **Distributed Processing**: Uses Apache Spark for scalable file processing.\n",
+					"- **Azure Data Lake Integration**: Reads and writes files to ADLS.\n",
+					"- **Metadata and Logging**: Adds metadata columns to processed files and maintains detailed logs.\n",
+					"\n",
+					"## Workflow\n",
+					"1. **Initialization**:\n",
+					"   - Configures logging and initializes a Spark session.\n",
+					"2. **File Identification**:\n",
+					"   - Identifies file types (CSV/Excel) and checks for metadata or empty files.\n",
+					"3. **File Movement**:\n",
+					"   - Moves files to appropriate folders (e.g., quarantine, metadata, overseas).\n",
+					"4. **File Processing**:\n",
+					"   - Converts CSV/Excel files to Parquet format and merges files by date and LA folder.\n",
+					"5. **Folder Scanning**:\n",
+					"   - Recursively scans directories for files to process.\n",
+					"6. **Logging**:\n",
+					"   - Tracks operations and saves logs to ADLS.\n",
+					"\n",
+					"## Key Functions\n",
+					"`is_metadata_file(file_path)`\n",
+					"Checks if a file is a metadata file based on its name.\n",
+					"\n",
+					"`should_process_file(file_path)`\n",
+					"Determines if a file should be processed (CSV or Excel).\n",
+					"\n",
+					"`is_empty_file(file_path)`\n",
+					"Checks if a file is empty or contains only a header.\n",
+					"\n",
+					"`unzip_file(file_path, extract_to, storage_account)`\n",
+					"Extracts a ZIP file and uploads its contents to ADLS.\n",
+					"\n",
+					"`process_file(source_path, date_folder, la_folder, file_name, storage_account)`\n",
+					"Processes a CSV or Excel file and converts it to Parquet format.\n",
+					"\n",
+					"`move_to_quarantine(file_path, storage_account, moved_files, reason=None)`\n",
+					"Moves a file to the quarantine folder for manual inspection.\n",
+					"\n",
+					"`create_file_index(source_path, storage_account)`\n",
+					"Creates a JSON index of all files in the source path.\n",
+					"\n",
+					"`main()`\n",
+					"The main function that orchestrates the ETL workflow.\n",
+					""
 				]
 			},
 			{

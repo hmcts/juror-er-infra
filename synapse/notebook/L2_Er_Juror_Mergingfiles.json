@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ca5e75d1-390a-42e7-aa30-ad3b101246d8"
+				"spark.autotune.trackingId": "919dd7e8-a6cb-41a6-b16a-2bbca72db2c9"
 			}
 		},
 		"metadata": {
@@ -107,7 +107,8 @@
 					"import logging\n",
 					"from datetime import datetime\n",
 					"import os\n",
-					"import re"
+					"import re\n",
+					"from column_constraints import validate_and_transform_all_columns"
 				],
 				"execution_count": 82
 			},
@@ -857,7 +858,7 @@
 				"source": [
 					"def transform_to_target_schema(df, column_mapping):\n",
 					"    \"\"\"\n",
-					"    Transform the dataframe to match the target PostgreSQL schema\n",
+					"    Transform the dataframe to match the target PostgreSQL schema with column length validation\n",
 					"    \"\"\"\n",
 					"    print(f\"Starting transformation with DataFrame containing {df.count()} rows\")\n",
 					"    print(f\"Available columns: {df.columns}\")\n",

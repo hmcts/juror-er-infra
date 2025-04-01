@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "995502f8-f68d-4d8f-9633-40c9c3bb517f"
+				"spark.autotune.trackingId": "d8e7838b-a557-407a-b523-856fc4d19548"
 			}
 		},
 		"metadata": {
@@ -84,7 +84,7 @@
 					"- **Metadata and Logging**: Adds metadata columns to processed files and maintains detailed logs.\n",
 					"\n",
 					"## Workflow\n",
-					"1. **Initialization**:\n",
+					"1. **Initialisation**:\n",
 					"   - Configures logging and initializes a Spark session.\n",
 					"2. **File Identification**:\n",
 					"   - Identifies file types (CSV/Excel) and checks for metadata or empty files.\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "66d696fb-3668-41b9-b714-b20a74a53c9f"
+				"spark.autotune.trackingId": "37632c54-eaed-43cf-93fc-76a8de541b9d"
 			}
 		},
 		"metadata": {
@@ -617,7 +617,7 @@
 					"        \n",
 					"        # Use a different approach - focus on all the key identifying fields together\n",
 					"        key_fields = [\n",
-					"            \"Elector Number\", \"LA_Code\", \"poll_number\", \"register_lett\", \"rec_num\",\n",
+					"            \"Elector Number\",\"LA_code\",\"poll_number\", \"register_lett\", \"rec_num\",\n",
 					"            \"Elector Surname\", \"Elector Forename\", \"Address1\", \"PostCode\"\n",
 					"        ]\n",
 					"        \n",
@@ -738,8 +738,7 @@
 					"            coalesce(col(\"Address2\"), lit(\"\")), \n",
 					"            coalesce(col(\"Address3\"), lit(\"\")),\n",
 					"            coalesce(col(\"PostCode\"), lit(\"\")),\n",
-					"            coalesce(col(\"Elector Number\"), lit(\"\")),\n",
-					"            coalesce(col(\"LA_Code\"), lit(\"\"))\n",
+					"            coalesce(col(\"Elector Number\"), lit(\"\"))\n",
 					"            # Excluding CreationDate to maintain consistency\n",
 					"        ))\n",
 					"    )\n",

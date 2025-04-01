@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "919dd7e8-a6cb-41a6-b16a-2bbca72db2c9"
+				"spark.autotune.trackingId": "66d696fb-3668-41b9-b714-b20a74a53c9f"
 			}
 		},
 		"metadata": {
@@ -1291,6 +1291,16 @@
 					"        if transformed_data is None:\n",
 					"            logger.error(\"Transformed DataFrame is None\")\n",
 					"            return\n",
+					"        try:\n",
+					"            logger.info(\"Applying column length validation and constraints...\")\n",
+					"            transformed_data = validate_and_transform_all_columns(transformed_data)\n",
+					"            logger.info(\"Column validation and constraints applied successfully\")\n",
+					"        except Exception as e:\n",
+					"            logger.error(f\"Error applying column validation: {str(e)}\")\n",
+					"            import traceback\n",
+					"            logger.error(traceback.format_exc())\n",
+					"            # Continue with original transformed data rather than failing completely\n",
+					"            logger.warning(\"Continuing with original transformed data\")\n",
 					"        # Check that transformed_data is not empty\n",
 					"        if transformed_data.count() == 0:\n",
 					"            logger.warning(\"Transformed DataFrame is empty - nothing to hash\")\n",

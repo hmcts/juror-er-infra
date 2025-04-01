@@ -148,3 +148,10 @@ resource "azurerm_role_assignment" "teamcontributor" {
   role_definition_name = "Storage Blob Data Contributor"
   scope                = azurerm_storage_account.adf_juror_sa.id
 }
+
+resource "azurerm_synapse_role_assignment" "creduser" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Credential User"
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
+  depends_on           = [azurerm_synapse_firewall_rule.allowall]
+}

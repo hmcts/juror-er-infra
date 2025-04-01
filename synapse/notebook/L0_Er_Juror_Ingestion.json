@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ec00fe63-7b62-42d6-9d29-91dc688d4e82"
+				"spark.autotune.trackingId": "ea29c498-d35f-4a44-b6d8-e73e8109b6e2"
 			}
 		},
 		"metadata": {
@@ -1171,7 +1171,8 @@
 					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/quarantine\",\n",
 					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/empty\",\n",
 					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/index\",\n",
-					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/logs\"\n",
+					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/logs\",\n",
+					"        f\"abfss://etl-juror@{storage_account}.dfs.core.windows.net/overseas\" \n",
 					"    ]\n",
 					"    \n",
 					"    for dir_path in dest_dirs:\n",

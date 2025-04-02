@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cca95f6f-7f85-4fbe-bcf7-2b6c6f43e3ee"
+				"spark.autotune.trackingId": "a5cb2728-9c5e-46c9-9e6d-7c3ae1d1c756"
 			}
 		},
 		"metadata": {
@@ -141,6 +141,13 @@
 					"   python L1_MappingSchema.py\n",
 					""
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"%run Configuration/column_constraint"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

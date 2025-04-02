@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "827be6be-18d6-454c-92b4-6417d6ac8fa0"
+				"spark.autotune.trackingId": "fe0561ee-5803-4684-b47b-90ff605ed4c0"
 			}
 		},
 		"metadata": {
@@ -54,7 +54,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"# validation_rules.py\n",
+					"# validation_rules\n",
 					"\"\"\"\n",
 					"Configuration file for data validation rules and transformations.\n",
 					"This separates the validation logic from the main ETL pipeline.\n",

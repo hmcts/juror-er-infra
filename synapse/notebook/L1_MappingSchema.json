@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a5cb2728-9c5e-46c9-9e6d-7c3ae1d1c756"
+				"spark.autotune.trackingId": "27c95e9b-5e1b-412b-8456-0076315d0bc3"
 			}
 		},
 		"metadata": {
@@ -133,12 +133,6 @@
 					"\n",
 					"`main()`\n",
 					"Orchestrates the ETL workflow.\n",
-					"\n",
-					"## Usage\n",
-					"1. Update the `storage_account` variable with your Azure Data Lake Storage account name.\n",
-					"2. Run the script to process files in the source folder:\n",
-					"   ```bash\n",
-					"   python L1_MappingSchema.py\n",
 					""
 				]
 			},

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8f37ca7f-d5eb-4c3d-aff0-7894d11296e6"
+				"spark.autotune.trackingId": "29b95415-2a9a-45cf-bdf2-438560b75b21"
 			}
 		},
 		"metadata": {
@@ -298,6 +298,15 @@
 					"        # Read source data\n",
 					"        logger.info(f\"Reading voter data from {source_path}\")\n",
 					"        source_df = spark.read.parquet(source_path)\n",
+					"        \n",
+					"        # Replace any NaN values with nulls in the source data\n",
+					"        for column_name, dtype in source_df.dtypes:\n",
+					"            if dtype in ('double', 'float'):\n",
+					"                source_df = source_df.withColumn(\n",
+					"                    column_name, \n",
+					"                    when(isnan(col(column_name)), None).otherwise(col(column_name))\n",
+					"                )\n",
+					"                \n",
 					"        record_count = source_df.count()\n",
 					"        logger.info(f\"Loaded {record_count} voter records\")\n",
 					"        \n",
@@ -335,20 +344,31 @@
 					"                \"outer\"\n",
 					"            )\n",
 					"            \n",
-					"            # Define audit columns\n",
+					"            # Define audit columns with correct CDC logic\n",
 					"            audit_columns = {\n",
+					"                # For new records (only in incoming data), use the new timestamp\n",
+					"                # For existing records, preserve the original creation timestamp\n",
 					"                'AdtclmnFirstCreatedDatetime': when(col(\"main.hash_id\").isNull(), col(\"inc.AdtclmnFirstCreatedDatetime\"))\n",
 					"                                                .otherwise(col(\"main.AdtclmnFirstCreatedDatetime\")),\n",
+					"                \n",
+					"                # Preserve the original process name that created the record\n",
 					"                'AdtclmnInsertedByProcessName': when(col(\"main.hash_id\").isNull(), col(\"inc.AdtclmnInsertedByProcessName\"))\n",
 					"                                                 .otherwise(col(\"main.AdtclmnInsertedByProcessName\")),\n",
-					"                'AdtclmnModifiedDatetime': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull() & \n",
-					"                                               (col(\"main.hash_id\") != col(\"inc.hash_id\")), current_timestamp())\n",
+					"                \n",
+					"                # Update the modification timestamp for:\n",
+					"                # 1. Records that exist in both sources (these are updates)\n",
+					"                # 2. Records only in main (these are being deactivated)\n",
+					"                'AdtclmnModifiedDatetime': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull(), current_timestamp())\n",
 					"                                            .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), current_timestamp())\n",
 					"                                            .otherwise(col(\"main.AdtclmnModifiedDatetime\")),\n",
-					"                'AdtclmnModifiedByProcessName': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull() & \n",
-					"                                                   (col(\"main.hash_id\") != col(\"inc.hash_id\")), lit(\"CDC_Update\"))\n",
-					"                                                .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), lit(\"CDC_Update\"))\n",
+					"                \n",
+					"                # Update the modification process name similarly\n",
+					"                'AdtclmnModifiedByProcessName': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull(), lit(\"CDC_Update\"))\n",
+					"                                                .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), lit(\"CDC_Deactivate\"))\n",
 					"                                                .otherwise(col(\"main.AdtclmnModifiedByProcessName\")),\n",
+					"                \n",
+					"                # Mark records as inactive if they exist only in the main table (they've been removed in the source)\n",
+					"                # Otherwise mark as active (either new or updated records)\n",
 					"                'AdtclmnRecordActiveInd': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), lit(0).cast(DecimalType(1, 0)))\n",
 					"                                         .otherwise(lit(1).cast(DecimalType(1, 0)))\n",
 					"            }\n",
@@ -356,13 +376,26 @@
 					"            # Get all columns from existing dataframe\n",
 					"            all_columns = existing_df.columns\n",
 					"            \n",
-					"            # Combine columns with audit logic\n",
+					"            # Combine columns with audit logic - improved null handling\n",
 					"            combined_columns = []\n",
 					"            for c in all_columns:\n",
 					"                if c in audit_columns:\n",
 					"                    combined_columns.append(audit_columns[c].alias(c))\n",
 					"                else:\n",
-					"                    combined_columns.append(coalesce(col(f\"inc.{c}\"), col(f\"main.{c}\")).alias(c))\n",
+					"                    # Handle numeric columns differently to avoid NaN values\n",
+					"                    col_type = next((f.dataType for f in existing_df.schema.fields if f.name == c), None)\n",
+					"                    \n",
+					"                    if col_type and str(col_type).startswith((\"IntegerType\", \"LongType\", \"DoubleType\", \"FloatType\", \"DecimalType\")):\n",
+					"                        # For numeric columns, use COALESCE with explicit null handling\n",
+					"                        combined_columns.append(\n",
+					"                            when(col(f\"inc.{c}\").isNotNull(), col(f\"inc.{c}\"))\n",
+					"                            .when(col(f\"main.{c}\").isNotNull(), col(f\"main.{c}\"))\n",
+					"                            .otherwise(lit(None).cast(col_type))\n",
+					"                            .alias(c)\n",
+					"                        )\n",
+					"                    else:\n",
+					"                        # For non-numeric columns, use regular coalesce\n",
+					"                        combined_columns.append(coalesce(col(f\"inc.{c}\"), col(f\"main.{c}\")).alias(c))\n",
 					"            \n",
 					"            # Create the final DataFrame\n",
 					"            df_full_derived = df_full_outer.select(combined_columns)\n",
@@ -415,7 +448,7 @@
 					"        print(\"Data lake export with CDC failed\")\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -428,7 +461,7 @@
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -441,7 +474,7 @@
 				"source": [
 					"delta_df.count()"
 				],
-				"execution_count": null
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -455,7 +488,7 @@
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": null
+				"execution_count": 24
 			}
 		]
 	}

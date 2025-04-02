@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a6aa84aa-f433-4e2b-a3e3-6b81d7ce74f8"
+				"spark.autotune.trackingId": "5994a510-d031-4852-adc0-67aefb5bc2aa"
 			}
 		},
 		"metadata": {
@@ -152,7 +152,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 15
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -168,7 +168,7 @@
 					"    return SparkSession.builder.appName(\"Electoral Data ETL\").getOrCreate()\n",
 					""
 				],
-				"execution_count": 16
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -186,7 +186,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 17
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -219,7 +219,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 18
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -244,16 +244,16 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 19
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def list_files(folder_path, extensions=None):\n",
-					"    \"\"\"List all Parquet files in a folder\"\"\"\n",
+					"    \"\"\"List all Parquet and Excel files in a folder\"\"\"\n",
 					"    try:\n",
 					"        if extensions is None:\n",
-					"            extensions = ['.parquet']  # Default to parquet files\n",
+					"           extensions = ['.parquet', '.xlsx', '.xls']  # Include Excel files\n",
 					"            \n",
 					"        files = mssparkutils.fs.ls(folder_path)\n",
 					"        return [f.path for f in files if any(f.name.lower().endswith(ext) for ext in extensions)]\n",
@@ -261,17 +261,28 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 20
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def read_file(spark, file_path):\n",
-					"    \"\"\"Read a Parquet file\"\"\"\n",
-					"    logging.info(f\"Reading Parquet file: {file_path}\")\n",
-					"    return spark.read.parquet(file_path)"
+					"    \"\"\"Read a file based on its extension\"\"\"\n",
+					"    file_ext = os.path.splitext(file_path.lower())[1]\n",
+					"    \n",
+					"    if file_ext == '.parquet':\n",
+					"        logging.info(f\"Reading Parquet file: {file_path}\")\n",
+					"        return spark.read.parquet(file_path)\n",
+					"    elif file_ext in ['.xlsx', '.xls']:\n",
+					"        logging.info(f\"Reading Excel file: {file_path}\")\n",
+					"        return spark.read.format(\"com.crealytics.spark.excel\")\n",
+					"            .option(\"header\", \"true\")\n",
+					"            .option(\"inferSchema\", \"true\")\n",
+					"            .load(file_path)\n",
+					"    else:\n",
+					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": 21
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +315,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 22
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -336,7 +347,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 23
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -422,7 +433,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 24
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -479,7 +490,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 25
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +512,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 26
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -563,7 +574,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 27
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -620,7 +631,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 28
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -647,7 +658,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 29
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -682,7 +693,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 30
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -711,7 +722,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 31
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -756,7 +767,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 32
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -786,7 +797,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 33
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -925,7 +936,7 @@
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
 					"        return result"
 				],
-				"execution_count": 34
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -951,7 +962,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 35
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -988,7 +999,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 36
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1019,7 +1030,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 37
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -1206,7 +1217,7 @@
 					"        log_file_path = \"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/transformation/processed_files_log.json\"\n",
 					"        if mssparkutils.fs.exists(log_file_path):\n",
 					"            try:\n",
-					"                mssparkutils.fs.rm(log_file_path)\n",
+					"                mssparkutils.fs.rm(log_file_path, True)  # Add recursive=True parameter\n",
 					"                print(\"Deleted existing log to force fresh processing\")\n",
 					"            except Exception as e:\n",
 					"                print(f\"Error deleting log file: {str(e)}\")\n",
@@ -1215,7 +1226,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 38
+				"execution_count": 24
 			}
 		]
 	}

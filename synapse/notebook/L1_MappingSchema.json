@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "de13ae63-71e7-43fa-80aa-cb5251509e5a"
+				"spark.autotune.trackingId": "5c6b9edf-332a-4b7d-a966-04a96f789143"
 			}
 		},
 		"metadata": {
@@ -291,6 +291,10 @@
 					"        # Read with pandas\n",
 					"        logging.info(f\"Reading Excel file using pandas: {file_path}\")\n",
 					"        excel_df = pd.read_excel(temp_path)\n",
+					"        \n",
+					"        # Convert datetime columns to string to avoid Arrow conversion issues\n",
+					"        for col in excel_df.select_dtypes(include=['datetime64']).columns:\n",
+					"            excel_df[col] = excel_df[col].astype(str)\n",
 					"        \n",
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"

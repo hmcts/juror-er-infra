@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "251a3f3f-e7eb-4f61-a90e-848d180408f1"
+				"spark.autotune.trackingId": "bef8d9fa-826b-4268-9bee-6d161e9d8a61"
 			}
 		},
 		"metadata": {
@@ -135,6 +135,13 @@
 					"Orchestrates the ETL workflow.\n",
 					""
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"%pip install spark-excel"
+				],
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",

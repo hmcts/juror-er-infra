@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5994a510-d031-4852-adc0-67aefb5bc2aa"
+				"spark.autotune.trackingId": "511e9a37-b229-4510-8588-b90efe7edf91"
 			}
 		},
 		"metadata": {
@@ -1117,7 +1117,7 @@
 					"\n",
 					"    # List all files in the source folder with better error handling\n",
 					"    try:\n",
-					"        all_files = list_files(files_folder, ['.parquet'])\n",
+					"        all_files = list_files(files_folder, ['.parquet', '.xlsx', '.xls'])\n",
 					"        logging.info(f\"Found {len(all_files)} files to process\")\n",
 					"        if len(all_files) == 0:\n",
 					"            logging.warning(\"No files found in source directory - nothing to process\")\n",

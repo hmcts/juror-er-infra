@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b95204df-44f0-4ece-b937-f3f62aa7b391"
+				"spark.autotune.trackingId": "231762f6-27d7-4a85-a8f2-508da1ed9446"
 			}
 		},
 		"metadata": {
@@ -139,13 +139,6 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"%pip install spark-excel"
-				],
-				"execution_count": 73
-			},
-			{
-				"cell_type": "code",
-				"source": [
 					"import logging\n",
 					"import os\n",
 					"import json\n",
@@ -159,7 +152,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 25
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -169,7 +162,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": 26
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -183,7 +176,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -201,7 +194,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 27
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -234,7 +227,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 28
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -259,7 +252,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 29
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -276,7 +269,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 30
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -289,36 +282,12 @@
 					"        logging.info(f\"Reading Parquet file: {file_path}\")\n",
 					"        return spark.read.parquet(file_path)\n",
 					"    elif file_ext in ['.xlsx', '.xls']:\n",
-					"        try:\n",
-					"            # Try using spark-excel\n",
-					"            logging.info(f\"Reading Excel file: {file_path}\")\n",
-					"            return spark.read.format(\"com.crealytics.spark.excel\") \\\n",
-					"                .option(\"header\", \"true\") \\\n",
-					"                .option(\"inferSchema\", \"true\") \\\n",
-					"                .load(file_path)\n",
-					"        except Exception as e:\n",
-					"            logging.warning(f\"Failed to use spark-excel: {str(e)}\")\n",
-					"            logging.info(\"Falling back to pandas for Excel reading\")\n",
-					"            \n",
-					"            # Fallback to pandas + PyArrow for Excel reading\n",
-					"            import pandas as pd\n",
-					"            import pyarrow as pa\n",
-					"            import pyarrow.parquet as pq\n",
-					"            \n",
-					"            # Use mssparkutils to download the file to a temporary location\n",
-					"            with tempfile.NamedTemporaryFile(suffix=file_ext) as temp_file:\n",
-					"                temp_path = temp_file.name\n",
-					"                mssparkutils.fs.cp(file_path, f\"file://{temp_path}\")\n",
-					"                \n",
-					"                # Read with pandas\n",
-					"                excel_df = pd.read_excel(temp_path, engine='openpyxl')\n",
-					"                \n",
-					"                # Convert to Spark DataFrame\n",
-					"                return spark.createDataFrame(excel_df)\n",
+					"        logging.info(f\"Reading Excel file with pandas: {file_path}\")\n",
+					"        return read_excel_file(spark, file_path)  # Use the function from above\n",
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": 55
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -351,7 +320,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 56
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -383,7 +352,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 57
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -469,7 +438,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 58
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -526,7 +495,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 59
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -548,7 +517,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 60
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -610,7 +579,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 61
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -667,7 +636,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 62
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -694,7 +663,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 63
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -729,7 +698,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 64
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -758,7 +727,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 65
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
@@ -803,7 +772,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 66
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
@@ -833,7 +802,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 67
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -972,7 +941,7 @@
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
 					"        return result"
 				],
-				"execution_count": 68
+				"execution_count": 94
 			},
 			{
 				"cell_type": "code",
@@ -998,7 +967,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 69
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -1035,7 +1004,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 70
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
@@ -1066,7 +1035,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 71
+				"execution_count": 97
 			},
 			{
 				"cell_type": "code",
@@ -1262,7 +1231,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 72
+				"execution_count": 98
 			}
 		]
 	}

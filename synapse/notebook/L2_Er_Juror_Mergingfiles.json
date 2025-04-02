@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "76a21c9a-bab3-4c12-a976-e45a0dfa9898"
+				"spark.autotune.trackingId": "b785d1df-b42b-4250-a4fa-c7f19e7399a4"
 			}
 		},
 		"metadata": {
@@ -1267,7 +1267,7 @@
 					"        # Make sure directories exist\n",
 					"        for path in [\n",
 					"            config[\"output_path\"],\n",
-					"            f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
+					"            f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\",\n",
 					"        ]:\n",
 					"            dir_path = path\n",
 					"            from notebookutils import mssparkutils\n",
@@ -1293,7 +1293,7 @@
 					"        if success1:\n",
 					"            success2 = write_output_safely(\n",
 					"                final_data,\n",
-					"                f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\",\n",
+					"                f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\",\n",
 					"                \"deduplicated data\",\n",
 					"            )\n",
 					"\n",

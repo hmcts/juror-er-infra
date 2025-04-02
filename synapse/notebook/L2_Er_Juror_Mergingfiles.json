@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "37632c54-eaed-43cf-93fc-76a8de541b9d"
+				"spark.autotune.trackingId": "8da3ee80-c4ba-470b-b9e8-2b79a2569410"
 			}
 		},
 		"metadata": {
@@ -96,6 +96,14 @@
 					"merge_with_existing_data(spark, new_data, output_path): Updates existing data with new rec\n",
 					""
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"%run Configuration/validation_rules\n",
+					"%run Configuration/validation_handlers"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

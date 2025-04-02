@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "28307132-97d7-4c04-9d86-e3a52c777ca1"
+				"spark.autotune.trackingId": "07a2969d-55c5-44b7-aa44-6ed23c39ef9b"
 			}
 		},
 		"metadata": {
@@ -249,7 +249,7 @@
 					"#except ImportError as e:\n",
 					" #   print(f\"Error importing validation modules: {e}\")"
 				],
-				"execution_count": null
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -263,7 +263,7 @@
 					"import os\n",
 					"import re"
 				],
-				"execution_count": null
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -283,7 +283,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -294,7 +294,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -311,7 +311,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -347,7 +347,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": null
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -369,7 +369,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -408,7 +408,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -487,6 +487,172 @@
 					"    \n",
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
+				],
+				"execution_count": 58
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Add these imports at the top of your cell\n",
+					"from pyspark.sql import DataFrame\n",
+					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit\n",
+					"import logging\n",
+					"\n",
+					"def process_postcodes(df: DataFrame) -> DataFrame:\n",
+					"    \"\"\"\n",
+					"    Process postcodes to standardize format and handle invalid values\n",
+					"    \"\"\"\n",
+					"    # Get postcode settings from our loaded configuration\n",
+					"    postcode_settings = config_dict.get(\"validation_rules\", {}).get(\"POSTCODE_SETTINGS\", {})\n",
+					"    \n",
+					"    # Check if we have the necessary postcode columns\n",
+					"    possible_columns = postcode_settings.get(\"possible_columns\", [\"PostCode\", \"zip\"])\n",
+					"    postcode_columns = [col_name for col_name in possible_columns if col_name in df.columns]\n",
+					"    \n",
+					"    if not postcode_columns:\n",
+					"        print(\"No postcode columns found in DataFrame\")\n",
+					"        return df\n",
+					"        \n",
+					"    # Get the main postcode column (usually \"zip\" in target schema)\n",
+					"    main_postcode_col = \"zip\" if \"zip\" in df.columns else postcode_columns[0]\n",
+					"    \n",
+					"    # Get validation settings\n",
+					"    validation_pattern = postcode_settings.get(\"validation_pattern\", r'^[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][A-Z]{2}$')\n",
+					"    extraction_pattern = postcode_settings.get(\"extraction_pattern\", r'([A-Z0-9]{1,4})[ -]*([0-9][A-Z]{2})')\n",
+					"    format_template = postcode_settings.get(\"format_template\", '$1 $2')\n",
+					"    remove_invalid = postcode_settings.get(\"remove_invalid\", False)\n",
+					"    \n",
+					"    # Standardize format\n",
+					"    df = df.withColumn(\n",
+					"        main_postcode_col,\n",
+					"        when(col(main_postcode_col).isNotNull(),\n",
+					"             regexp_replace(upper(col(main_postcode_col)), extraction_pattern, format_template)\n",
+					"        ).otherwise(col(main_postcode_col))\n",
+					"    )\n",
+					"    \n",
+					"    # Filter invalid if requested\n",
+					"    if remove_invalid:\n",
+					"        df = df.filter(\n",
+					"            col(main_postcode_col).isNull() | col(main_postcode_col).rlike(validation_pattern)\n",
+					"        )\n",
+					"    \n",
+					"    # Extract postcode_start if needed\n",
+					"    if \"postcode_start\" in df.columns:\n",
+					"        postcode_start_pattern = postcode_settings.get(\"postcode_start_pattern\", r'^([A-Z]{1,2}[0-9][A-Z0-9]?)')\n",
+					"        df = df.withColumn(\n",
+					"            \"postcode_start\",\n",
+					"            regexp_extract(col(main_postcode_col), postcode_start_pattern, 1)\n",
+					"        )\n",
+					"    \n",
+					"    return df\n",
+					"\n",
+					"def enforce_null_columns(df: DataFrame) -> DataFrame:\n",
+					"    \"\"\"\n",
+					"    Set specific columns to NULL as defined in configuration\n",
+					"    \"\"\"\n",
+					"    null_columns = config_dict.get(\"validation_rules\", {}).get(\"NULL_COLUMNS\", [])\n",
+					"    \n",
+					"    for col_name in null_columns:\n",
+					"        if col_name in df.columns:\n",
+					"            df = df.withColumn(col_name, lit(None))\n",
+					"    \n",
+					"    return df\n",
+					"\n",
+					"def create_target_schema_df(df: DataFrame) -> DataFrame:\n",
+					"    \"\"\"\n",
+					"    Transform DataFrame to target schema\n",
+					"    \"\"\"\n",
+					"    # Get target schema from configuration\n",
+					"    target_schema = config_dict.get(\"validation_rules\", {}).get(\"TARGET_SCHEMA\", [])\n",
+					"    column_mappings = config_dict.get(\"validation_rules\", {}).get(\"COLUMN_MAPPINGS\", {})\n",
+					"    \n",
+					"    if not target_schema:\n",
+					"        print(\"No target schema defined in configuration\")\n",
+					"        return df\n",
+					"    \n",
+					"    # Get all target column names\n",
+					"    target_columns = [col_def[\"name\"] for col_def in target_schema]\n",
+					"    \n",
+					"    # First, apply column mappings if needed\n",
+					"    for source_col, target_col in column_mappings.items():\n",
+					"        if source_col in df.columns and source_col != target_col:\n",
+					"            # If target column doesn't exist, rename the source column\n",
+					"            if target_col not in df.columns:\n",
+					"                df = df.withColumnRenamed(source_col, target_col)\n",
+					"            # If both exist, keep target and drop source\n",
+					"            elif source_col != target_col:\n",
+					"                df = df.drop(source_col)\n",
+					"    \n",
+					"    # Add any missing columns with NULL values\n",
+					"    for col_def in target_schema:\n",
+					"        col_name = col_def[\"name\"]\n",
+					"        if col_name not in df.columns:\n",
+					"            df = df.withColumn(col_name, lit(None))\n",
+					"    \n",
+					"    # Select only the columns in the target schema, in the correct order\n",
+					"    df = df.select(target_columns)\n",
+					"    \n",
+					"    return df\n",
+					"\n",
+					"def enforce_column_lengths(df: DataFrame) -> DataFrame:\n",
+					"    \"\"\"\n",
+					"    Enforce maximum length constraints on string columns\n",
+					"    \"\"\"\n",
+					"    # Get string columns with length constraints from configuration\n",
+					"    string_columns = config_dict.get(\"column_constraints\", {}).get(\"string_columns\", {})\n",
+					"    \n",
+					"    for col_name, constraints in string_columns.items():\n",
+					"        if col_name in df.columns and \"max_length\" in constraints:\n",
+					"            max_length = constraints[\"max_length\"]\n",
+					"            df = df.withColumn(\n",
+					"                col_name,\n",
+					"                when(\n",
+					"                    (col(col_name).isNotNull()) & (length(col(col_name)) > max_length),\n",
+					"                    substring(col(col_name), 1, max_length)\n",
+					"                ).otherwise(col(col_name))\n",
+					"            )\n",
+					"            \n",
+					"            # Apply case transformation if specified\n",
+					"            if \"case\" in constraints and constraints[\"case\"] == \"upper\":\n",
+					"                df = df.withColumn(\n",
+					"                    col_name,\n",
+					"                    when(col(col_name).isNotNull(), upper(col(col_name)))\n",
+					"                    .otherwise(col(col_name))\n",
+					"                )\n",
+					"    \n",
+					"    return df\n",
+					"\n",
+					"def process_dataframe(df: DataFrame) -> DataFrame:\n",
+					"    \"\"\"\n",
+					"    Apply all validation and transformation rules to a DataFrame.\n",
+					"    \"\"\"\n",
+					"    logger = logging.getLogger()\n",
+					"    logger.info(f\"Starting data processing with {df.count()} rows\")\n",
+					"    \n",
+					"    try:\n",
+					"        # Step 1: Process postcodes (standardize and filter invalid)\n",
+					"        df = process_postcodes(df)\n",
+					"        \n",
+					"        # Step 2: Enforce NULL columns\n",
+					"        df = enforce_null_columns(df)\n",
+					"        \n",
+					"        # Step 3: Transform to target schema\n",
+					"        df = create_target_schema_df(df)\n",
+					"        \n",
+					"        # Step 4: Enforce column length limits\n",
+					"        df = enforce_column_lengths(df)\n",
+					"        \n",
+					"        logger.info(f\"Completed data processing with {df.count()} rows\")\n",
+					"        return df\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        logger.error(f\"Error during DataFrame processing: {str(e)}\")\n",
+					"        import traceback\n",
+					"        logger.error(traceback.format_exc())\n",
+					"        \n",
+					"        # Return the original DataFrame as fallback\n",
+					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
+					"        return df"
 				],
 				"execution_count": null
 			},
@@ -571,7 +737,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -643,7 +809,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -664,7 +830,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -681,7 +847,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -708,7 +874,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 63
 			},
 			{
 				"cell_type": "markdown",
@@ -749,7 +915,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": null
+				"execution_count": 64
 			},
 			{
 				"cell_type": "markdown",
@@ -816,7 +982,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": null
+				"execution_count": 65
 			},
 			{
 				"cell_type": "markdown",
@@ -853,7 +1019,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -908,7 +1074,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -961,7 +1127,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": null
+				"execution_count": 68
 			},
 			{
 				"cell_type": "markdown",
@@ -1007,7 +1173,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
@@ -1093,7 +1259,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 70
 			},
 			{
 				"cell_type": "markdown",
@@ -1143,7 +1309,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": null
+				"execution_count": 71
 			},
 			{
 				"cell_type": "markdown",
@@ -1233,7 +1399,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": null
+				"execution_count": 72
 			},
 			{
 				"cell_type": "markdown",
@@ -1275,7 +1441,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -1313,7 +1479,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -1363,7 +1529,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 75
 			},
 			{
 				"cell_type": "markdown",
@@ -1597,7 +1763,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 76
 			}
 		]
 	}

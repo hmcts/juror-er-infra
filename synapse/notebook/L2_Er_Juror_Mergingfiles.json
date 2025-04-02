@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e99edffa-92ca-4240-879a-70984ddccefa"
+				"spark.autotune.trackingId": "c5fa6682-0eb9-41db-ac92-b99cd35e19c6"
 			}
 		},
 		"metadata": {
@@ -388,11 +388,6 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"# Add these imports at the top of your cell\n",
-					"from pyspark.sql import DataFrame\n",
-					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit\n",
-					"import logging\n",
-					"\n",
 					"def process_postcodes(df: DataFrame) -> DataFrame:\n",
 					"    \"\"\"\n",
 					"    Process postcodes to standardize format and handle invalid values\n",
@@ -517,7 +512,7 @@
 					"    \n",
 					"    return df\n",
 					"\n",
-					"def process_dataframe(df: DataFrame) -> DataFrame:\n",
+					"def process_dataframe(df):\n",
 					"    \"\"\"\n",
 					"    Apply all validation and transformation rules to a DataFrame.\n",
 					"    \"\"\"\n",

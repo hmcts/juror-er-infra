@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6415116b-96ae-4847-8fce-38bc10411edb"
+				"spark.autotune.trackingId": "e1ea7b67-3a3b-46ba-8b8d-c0a13df13af3"
 			}
 		},
 		"metadata": {
@@ -410,6 +410,12 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"delta_df.count()"
 				],
@@ -418,9 +424,9 @@
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": true,
+					"editable": false,
 					"run_control": {
-						"frozen": false
+						"frozen": true
 					},
 					"collapsed": false
 				},

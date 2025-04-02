@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a41e7762-a8ae-48a7-be59-1b95c8469052"
+				"spark.autotune.trackingId": "6415116b-96ae-4847-8fce-38bc10411edb"
 			}
 		},
 		"metadata": {
@@ -393,24 +393,41 @@
 					"        print(\"Data lake export with CDC failed\")\n",
 					""
 				],
-				"execution_count": 3
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
-				],
-				"execution_count": 4
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
+				"source": [
+					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"delta_df.count()"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					},
 					"collapsed": false
 				},
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": null
+				"execution_count": 7
 			}
 		]
 	}

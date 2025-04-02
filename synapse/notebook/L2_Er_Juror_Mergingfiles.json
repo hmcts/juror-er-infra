@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d69a38af-73af-455b-8272-0d0ffcfc54a6"
+				"spark.autotune.trackingId": "8747d7d1-8143-4c02-9058-56c552b38263"
 			}
 		},
 		"metadata": {
@@ -239,8 +239,24 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"%run Configuration/validation_rules\n",
-					"%run Configuration/validation_handlers"
+					"import sys\n",
+					"sys.path.append('./Configuration')  # Add Configuration directory to Python path\n",
+					"\n",
+					"try:\n",
+					"    # Import from the Python modules\n",
+					"    import validation_rules\n",
+					"    import validation_handlers\n",
+					"    from column_constraint import validate_and_transform_all_columns\n",
+					"    print(\"Successfully imported validation modules\")\n",
+					"except ImportError as e:\n",
+					"    print(f\"Error importing validation modules: {e}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"%run /Configuration/validation_rules"
 				],
 				"execution_count": null
 			},
@@ -254,10 +270,9 @@
 					"import logging\n",
 					"from datetime import datetime\n",
 					"import os\n",
-					"import re\n",
-					"from column_constraints import validate_and_transform_all_columns"
+					"import re"
 				],
-				"execution_count": 82
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -277,7 +292,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 83
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +303,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 84
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -305,7 +320,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 85
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -341,7 +356,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 86
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -363,7 +378,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 87
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -446,7 +461,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 88
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -518,7 +533,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 89
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -539,7 +554,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 90
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -556,7 +571,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 91
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -583,7 +598,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 92
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -624,7 +639,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 93
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -691,7 +706,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 94
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -728,7 +743,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 95
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -783,7 +798,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 96
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -836,7 +851,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 97
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -882,7 +897,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 98
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -968,7 +983,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 99
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1018,7 +1033,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 100
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1108,7 +1123,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 101
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1150,7 +1165,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 102
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1188,7 +1203,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 103
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1238,7 +1253,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 104
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1472,7 +1487,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 105
+				"execution_count": null
 			}
 		]
 	}

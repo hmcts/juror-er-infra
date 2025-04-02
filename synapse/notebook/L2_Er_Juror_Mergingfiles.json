@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e36fb8b2-9510-4023-a67b-926323b5c4d8"
+				"spark.autotune.trackingId": "7010f2ef-32e9-47fc-90e0-fb684b23c6d0"
 			}
 		},
 		"metadata": {
@@ -1585,6 +1585,19 @@
 					"    print(f\"Looking for files in: {transformation_path}\")\n",
 					"\n",
 					"    try:\n",
+					"        from notebookutils import mssparkutils\n",
+					"        if not mssparkutils.fs.exists(transformation_path):\n",
+					"            logger.info(f\"Transformation folder does not exist. Creating: {transformation_path}\")\n",
+					"            print(f\"Transformation folder does not exist. Creating: {transformation_path}\")\n",
+					"            mssparkutils.fs.mkdirs(transformation_path)\n",
+					"            logger.info(f\"Successfully created transformation folder: {transformation_path}\")\n",
+					"            print(f\"Successfully created transformation folder: {transformation_path}\")\n",
+					"    except Exception as e:\n",
+					"        logger.error(f\"Error creating transformation folder: {str(e)}\")\n",
+					"        print(f\"Error creating transformation folder: {str(e)}\")\n",
+					"    \n",
+					"    try:\n",
+					"\n",
 					"        # 1. Get configuration and mapping\n",
 					"        column_mapping = read_column_mapping(\n",
 					"            spark, f\"{config['config_path']}/col_mapping_schema.json\"\n",

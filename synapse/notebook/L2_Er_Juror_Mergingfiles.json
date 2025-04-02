@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8050a663-9a52-488f-8858-28045fa836e6"
+				"spark.autotune.trackingId": "b9f6b9bb-4e74-481c-aaf3-384ace9a00af"
 			}
 		},
 		"metadata": {
@@ -249,7 +249,7 @@
 					"#except ImportError as e:\n",
 					" #   print(f\"Error importing validation modules: {e}\")"
 				],
-				"execution_count": 417
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -265,7 +265,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 418
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -285,7 +285,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 419
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -296,7 +296,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 420
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -313,7 +313,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 421
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -349,7 +349,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 422
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +371,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 423
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -532,7 +532,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 424
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -579,7 +579,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 425
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -591,7 +591,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 426
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -671,7 +671,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 427
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -754,7 +754,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 428
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -826,7 +826,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 429
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -847,7 +847,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 430
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -864,7 +864,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 431
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -917,7 +917,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 432
+				"execution_count": 16
 			},
 			{
 				"cell_type": "markdown",
@@ -958,7 +958,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 433
+				"execution_count": 17
 			},
 			{
 				"cell_type": "markdown",
@@ -1025,7 +1025,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 434
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -1062,7 +1062,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 435
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -1117,7 +1117,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 436
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -1170,7 +1170,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 437
+				"execution_count": 21
 			},
 			{
 				"cell_type": "markdown",
@@ -1216,7 +1216,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 438
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1302,7 +1302,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 439
+				"execution_count": 23
 			},
 			{
 				"cell_type": "markdown",
@@ -1352,7 +1352,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 440
+				"execution_count": 24
 			},
 			{
 				"cell_type": "markdown",
@@ -1442,7 +1442,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 441
+				"execution_count": 25
 			},
 			{
 				"cell_type": "markdown",
@@ -1484,7 +1484,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 442
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -1522,7 +1522,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 443
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -1533,6 +1533,12 @@
 					"    from pyspark.sql.types import StringType, TimestampType, StructType, StructField\n",
 					"    \n",
 					"    try:\n",
+					"        # First, ensure the parent directory exists\n",
+					"        parent_dir = \"/\".join(process_log_path.split(\"/\")[:-1])\n",
+					"        if not mssparkutils.fs.exists(parent_dir):\n",
+					"            print(f\"Creating log directory: {parent_dir}\")\n",
+					"            mssparkutils.fs.mkdirs(parent_dir)\n",
+					"            \n",
 					"        # Create schema with explicit types\n",
 					"        log_schema = StructType([\n",
 					"            StructField(\"file_path\", StringType(), False),\n",
@@ -1551,6 +1557,10 @@
 					"        # Update existing log if it exists\n",
 					"        if mssparkutils.fs.exists(process_log_path):\n",
 					"            try:\n",
+					"                # Clear cache to prevent stale references\n",
+					"                spark.catalog.clearCache()\n",
+					"                \n",
+					"                # Try to read with refreshed view\n",
 					"                existing_log = spark.read.parquet(process_log_path)\n",
 					"                # Ensure the timestamp field has the correct type\n",
 					"                existing_log = existing_log.withColumn(\"process_timestamp\", \n",
@@ -1562,17 +1572,35 @@
 					"        else:\n",
 					"            updated_log = new_log_df\n",
 					"            \n",
-					"        # Write updated log\n",
-					"        updated_log.write.mode(\"overwrite\").parquet(process_log_path)\n",
+					"        # Write updated log using a more reliable approach\n",
+					"        try:\n",
+					"            # Option 1: Use overwrite mode which creates directories\n",
+					"            updated_log.write.mode(\"overwrite\").parquet(process_log_path)\n",
+					"        except Exception as write_err:\n",
+					"            print(f\"Error with first write attempt: {str(write_err)}\")\n",
+					"            \n",
+					"            # Option 2: Try a more direct approach\n",
+					"            temp_path = f\"{parent_dir}/temp_log_{int(time.time())}\"\n",
+					"            updated_log.write.mode(\"overwrite\").parquet(temp_path)\n",
+					"            \n",
+					"            # Then move/rename the folder\n",
+					"            if mssparkutils.fs.exists(temp_path):\n",
+					"                # If destination exists, delete it first\n",
+					"                if mssparkutils.fs.exists(process_log_path):\n",
+					"                    mssparkutils.fs.rm(process_log_path, True)\n",
+					"                \n",
+					"                # Rename temp to final\n",
+					"                mssparkutils.fs.mv(temp_path, process_log_path)\n",
 					"        \n",
 					"        return True\n",
+					"        \n",
 					"    except Exception as e:\n",
 					"        print(f\"Error updating process log: {str(e)}\")\n",
 					"        import traceback\n",
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 444
+				"execution_count": 28
 			},
 			{
 				"cell_type": "markdown",
@@ -1821,7 +1849,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 445
+				"execution_count": 29
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d3bcc47f-8433-4c86-a72c-173cb259a2fc"
+				"spark.autotune.trackingId": "b89b81ad-55c8-4af2-b8c9-8360280a684a"
 			}
 		},
 		"metadata": {
@@ -263,7 +263,7 @@
 					"from pyspark.sql.types import DecimalType\n",
 					"from pyspark.sql.functions import col, when, coalesce, current_timestamp"
 				],
-				"execution_count": 1
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -279,7 +279,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 2
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -303,26 +303,8 @@
 					"        \n",
 					"        # Check for duplicates and null values in primary key (hash_id)\n",
 					"        logger.info(\"Validating primary key constraints on hash_id\")\n",
-					"        distinct_count = source_df.select(\"hash_id\").distinct().count()\n",
-					"        logger.info(f\"Distinct hash_id count: {distinct_count}, Total records: {record_count}\")\n",
-					"        \n",
-					"        if distinct_count != record_count:\n",
-					"            logger.warning(\"Duplicate primary keys found in source data. Filtering to keep only one instance of each hash_id.\")\n",
-					"            # Keep only one row per hash_id\n",
-					"            from pyspark.sql.window import Window\n",
-					"            window_spec = Window.partitionBy(\"hash_id\").orderBy(col(\"creation_date\").desc())\n",
-					"            source_df = source_df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
-					"                                .filter(col(\"row_num\") == 1) \\\n",
-					"                                .drop(\"row_num\")\n",
-					"        \n",
-					"        # Check for null hash_id values and filter them out if found\n",
-					"        null_count = source_df.filter(col(\"hash_id\").isNull()).count()\n",
-					"        if null_count > 0:\n",
-					"            logger.warning(f\"Found {null_count} records with null hash_id. These will be filtered out.\")\n",
-					"            source_df = source_df.filter(col(\"hash_id\").isNotNull())\n",
-					"        \n",
-					"        # Add the process name as a parameter\n",
-					"        process_name = \"VotersCDCLoad\"\n",
+					"        assert source_df.select(\"hash_id\").distinct().count() == source_df.count(), \"Duplicate primary keys found in source data\"\n",
+					"        assert source_df.na.drop(subset=[\"hash_id\"]).count() == source_df.count(), \"Null values found in primary keys (hash_id)\"\n",
 					"        \n",
 					"        # Check if Delta table exists\n",
 					"        if mssparkutils.fs.exists(delta_table_path):\n",
@@ -330,60 +312,39 @@
 					"            \n",
 					"            # Read existing Delta table\n",
 					"            existing_df = spark.read.format(\"delta\").load(delta_table_path)\n",
-					"            logger.info(f\"Read existing Delta table with {existing_df.count()} records\")\n",
-					"            \n",
-					"            # First, add audit columns to source data before joining\n",
-					"            source_df = source_df.withColumn(\"AdtclmnFirstCreatedDatetime\", current_timestamp()) \\\n",
-					"                                .withColumn(\"AdtclmnInsertedByProcessName\", lit(process_name)) \\\n",
-					"                                .withColumn(\"AdtclmnModifiedDatetime\", lit(None).cast(\"timestamp\")) \\\n",
-					"                                .withColumn(\"AdtclmnModifiedByProcessName\", lit(None).cast(\"string\")) \\\n",
-					"                                .withColumn(\"AdtclmnRecordActiveInd\", lit(1).cast(DecimalType(1, 0)))\n",
 					"            \n",
 					"            # Perform full outer join for CDC\n",
 					"            df_full_outer = existing_df.alias(\"main\").join(\n",
 					"                source_df.alias(\"inc\"), \n",
-					"                col(\"main.hash_id\") == col(\"inc.hash_id\"),  # Explicit join condition\n",
-					"                \"fullouter\"\n",
+					"                \"hash_id\",  # Join on primary key\n",
+					"                \"outer\"\n",
 					"            )\n",
 					"            \n",
 					"            # Define audit columns\n",
 					"            audit_columns = {\n",
 					"                'AdtclmnFirstCreatedDatetime': when(col(\"main.hash_id\").isNull(), col(\"inc.AdtclmnFirstCreatedDatetime\"))\n",
 					"                                                .otherwise(col(\"main.AdtclmnFirstCreatedDatetime\")),\n",
-					"                                                \n",
 					"                'AdtclmnInsertedByProcessName': when(col(\"main.hash_id\").isNull(), col(\"inc.AdtclmnInsertedByProcessName\"))\n",
-					"                                                .otherwise(col(\"main.AdtclmnInsertedByProcessName\")),\n",
-					"                                                \n",
-					"                'AdtclmnModifiedDatetime': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull(), current_timestamp())\n",
-					"                                          .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), current_timestamp())\n",
-					"                                          .otherwise(col(\"main.AdtclmnModifiedDatetime\")),\n",
-					"                                          \n",
-					"                'AdtclmnModifiedByProcessName': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull(), lit(process_name))\n",
-					"                                               .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), lit(process_name))\n",
-					"                                               .otherwise(col(\"main.AdtclmnModifiedByProcessName\")),\n",
-					"                                               \n",
-					"                'AdtclmnRecordActiveInd': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), lit(0))\n",
-					"                                         .otherwise(lit(1)).cast(DecimalType(1, 0))\n",
+					"                                                 .otherwise(col(\"main.AdtclmnInsertedByProcessName\")),\n",
+					"                'AdtclmnModifiedDatetime': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull() & \n",
+					"                                                 (col(\"main.HASH_ID\") != col(\"inc.HASH_ID\")), current_timestamp())\n",
+					"                                            .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), current_timestamp())\n",
+					"                                            .otherwise(None),\n",
+					"                'AdtclmnModifiedByProcessName': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull() & \n",
+					"                                                     (col(\"main.HASH_ID\") != col(\"inc.HASH_ID\")), col(\"inc.AdtclmnInsertedByProcessName\"))\n",
+					"                                                .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), col(\"inc.AdtclmnInsertedByProcessName\"))\n",
+					"                                                .otherwise(None)\n",
 					"            }\n",
 					"            \n",
-					"            # Get the list of all data columns (excluding audit columns)\n",
-					"            data_columns = [c for c in existing_df.columns if not c.startswith(\"Adtclmn\")]\n",
+					"            # Combine columns with audit logic\n",
+					"            combined_columns = [\n",
+					"                coalesce(col(f\"inc.{c}\"), col(f\"main.{c}\")).alias(c) if c not in audit_columns \n",
+					"                else audit_columns[c].alias(c) \n",
+					"                for c in existing_df.columns\n",
+					"            ]\n",
 					"            \n",
-					"            # Create a list of all columns to select, prioritizing incoming data for updates\n",
-					"            select_expressions = []\n",
-					"            \n",
-					"            # First add all data columns with coalesce to prioritize incoming data\n",
-					"            for c in data_columns:\n",
-					"                select_expressions.append(\n",
-					"                    coalesce(col(f\"inc.{c}\"), col(f\"main.{c}\")).alias(c)\n",
-					"                )\n",
-					"            \n",
-					"            # Then add all audit columns with their specific logic\n",
-					"            for c in audit_columns:\n",
-					"                select_expressions.append(audit_columns[c].alias(c))\n",
-					"            \n",
-					"            # Create the final DataFrame with all columns\n",
-					"            df_full_derived = df_full_outer.select(*select_expressions)\n",
+					"            # Create the final DataFrame\n",
+					"            df_full_derived = df_full_outer.select(combined_columns)\n",
 					"            \n",
 					"            # Write the merged data back to the Delta table\n",
 					"            logger.info(f\"Writing merged data to Delta table at {delta_table_path}\")\n",
@@ -399,11 +360,10 @@
 					"            \n",
 					"            # Add audit columns to source data\n",
 					"            source_df = source_df.withColumn(\"AdtclmnFirstCreatedDatetime\", current_timestamp()) \\\n",
-					"                               .withColumn(\"AdtclmnInsertedByProcessName\", lit(process_name)) \\\n",
-					"                               .withColumn(\"AdtclmnModifiedDatetime\", lit(None).cast(\"timestamp\")) \\\n",
-					"                               .withColumn(\"AdtclmnModifiedByProcessName\", lit(None).cast(\"string\")) \\\n",
-					"                               .withColumn(\"AdtclmnRecordActiveInd\", lit(1).cast(DecimalType(1, 0)))\n",
-					"            \n",
+					"                                 .withColumn(\"AdtclmnInsertedByProcessName\", lit(\"InitialLoad\")) \\\n",
+					"                                 .withColumn(\"AdtclmnModifiedDatetime\", lit(None).cast(\"timestamp\")) \\\n",
+					"                                 .withColumn(\"AdtclmnModifiedByProcessName\", lit(None).cast(\"string\"))\n",
+					"    \n",
 					"            # Write the source data as a new Delta table\n",
 					"            source_df.write \\\n",
 					"                .mode(\"overwrite\") \\\n",
@@ -412,11 +372,6 @@
 					"                .save(delta_table_path)\n",
 					"            \n",
 					"            logger.info(f\"Successfully created new Delta table at {delta_table_path}\")\n",
-					"        \n",
-					"        # Create a latest.txt file with the current date for easy identification of latest data\n",
-					"        latest_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/latest.txt\"\n",
-					"        current_date = datetime.now().strftime(\"%Y-%m-%d\")\n",
-					"        mssparkutils.fs.put(latest_path, current_date, True)\n",
 					"        \n",
 					"        # Return success\n",
 					"        return True, delta_table_path\n",
@@ -438,7 +393,7 @@
 					"        print(\"Data lake export with CDC failed\")\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -451,34 +406,34 @@
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 6
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					}
 				},
 				"source": [
 					"delta_df.count()"
 				],
-				"execution_count": 8
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					},
 					"collapsed": false
 				},
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": 7
+				"execution_count": 14
 			}
 		]
 	}

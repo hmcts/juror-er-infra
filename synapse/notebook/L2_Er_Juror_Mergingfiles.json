@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b785d1df-b42b-4250-a4fa-c7f19e7399a4"
+				"spark.autotune.trackingId": "512d8455-7f33-44e2-a9b3-21000614f46c"
 			}
 		},
 		"metadata": {
@@ -583,10 +583,10 @@
 					"                         .filter(col(\"row_num\") == 1) \\\n",
 					"                         .drop(\"row_num\")\n",
 					"        \n",
-					"        logging.info(f\"Kept {deduplicated.count()} records after deduplication\")\n",
+					"        logging.info(f\"Kept {deduplicated.count()} records after transformation\")\n",
 					"        return deduplicated\n",
 					"    else:\n",
-					"        logging.warning(\"Missing CreationDate column, skipping deduplication\")\n",
+					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
 				"execution_count": 95
@@ -1175,7 +1175,7 @@
 					"            logger.error(\"Deduplicated DataFrame is None\")\n",
 					"            return\n",
 					"\n",
-					"        logger.info(f\"After deduplication: {deduplicated_data.count()} rows\")\n",
+					"        logger.info(f\"After transformation: {deduplicated_data.count()} rows\")\n",
 					"\n",
 					"        # 6. Apply hashing\n",
 					"        hashed_data = apply_hashing(merged_new_data)\n",
@@ -1259,7 +1259,7 @@
 					"\n",
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
 					"        deduplicated_data = improved_deduplicate_data(merged_new_data)\n",
-					"        logger.info(f\"After deduplication: {deduplicated_data.count()} rows\")\n",
+					"        logger.info(f\"After tranformation: {deduplicated_data.count()} rows\")\n",
 					"\n",
 					"        # 9. Write output to both locations\n",
 					"        logger.info(f\"Writing {final_data.count()} records to {config['output_path']}\")\n",

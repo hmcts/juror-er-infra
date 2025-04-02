@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "05ce3d7e-fa49-490e-8817-6eccf98e899f"
+				"spark.autotune.trackingId": "a41e7762-a8ae-48a7-be59-1b95c8469052"
 			}
 		},
 		"metadata": {
@@ -263,7 +263,7 @@
 					"from pyspark.sql.types import DecimalType\n",
 					"from pyspark.sql.functions import col, when, coalesce, current_timestamp"
 				],
-				"execution_count": 14
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -279,7 +279,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 15
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -292,7 +292,7 @@
 					"    try:\n",
 					"        # Initialize storage paths\n",
 					"        storage_account = \"baubaisadfsastg\"\n",
-					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\"\n",
+					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
 					"        delta_table_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
 					"        \n",
 					"        # Read source data\n",
@@ -393,14 +393,14 @@
 					"        print(\"Data lake export with CDC failed\")\n",
 					""
 				],
-				"execution_count": 16
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 20
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -410,7 +410,7 @@
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": 26
+				"execution_count": null
 			}
 		]
 	}

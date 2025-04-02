@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ae2fba38-12b3-4ca4-a1af-ecf42c67f1ba"
+				"spark.autotune.trackingId": "76a21c9a-bab3-4c12-a976-e45a0dfa9898"
 			}
 		},
 		"metadata": {
@@ -1258,8 +1258,8 @@
 					"            return\n",
 					"\n",
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
-					"        deduplicated_by_la = deduplicate_by_la_code_and_date(merged_new_data)\n",
-					"        logger.info(f\"After LA_Code deduplication: {deduplicated_by_la.count()} rows\")\n",
+					"        deduplicated_data = improved_deduplicate_data(merged_new_data)\n",
+					"        logger.info(f\"After deduplication: {deduplicated_data.count()} rows\")\n",
 					"\n",
 					"        # 9. Write output to both locations\n",
 					"        logger.info(f\"Writing {final_data.count()} records to {config['output_path']}\")\n",

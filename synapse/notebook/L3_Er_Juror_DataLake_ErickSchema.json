@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b89b81ad-55c8-4af2-b8c9-8360280a684a"
+				"spark.autotune.trackingId": "8f37ca7f-d5eb-4c3d-aff0-7894d11296e6"
 			}
 		},
 		"metadata": {
@@ -263,7 +263,7 @@
 					"from pyspark.sql.types import DecimalType\n",
 					"from pyspark.sql.functions import col, when, coalesce, current_timestamp"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -279,7 +279,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -313,6 +313,21 @@
 					"            # Read existing Delta table\n",
 					"            existing_df = spark.read.format(\"delta\").load(delta_table_path)\n",
 					"            \n",
+					"            # Add audit columns to source data before the join if they don't exist\n",
+					"            # This is important because we reference these in the join logic\n",
+					"            for audit_col in [\"AdtclmnFirstCreatedDatetime\", \"AdtclmnInsertedByProcessName\", \n",
+					"                             \"AdtclmnModifiedDatetime\", \"AdtclmnModifiedByProcessName\", \n",
+					"                             \"AdtclmnRecordActiveInd\"]:\n",
+					"                if audit_col not in source_df.columns:\n",
+					"                    if audit_col == \"AdtclmnFirstCreatedDatetime\":\n",
+					"                        source_df = source_df.withColumn(audit_col, current_timestamp())\n",
+					"                    elif audit_col == \"AdtclmnInsertedByProcessName\":\n",
+					"                        source_df = source_df.withColumn(audit_col, lit(\"CDC_Update\"))\n",
+					"                    elif audit_col in [\"AdtclmnModifiedDatetime\", \"AdtclmnModifiedByProcessName\"]:\n",
+					"                        source_df = source_df.withColumn(audit_col, lit(None).cast(\"timestamp\" if \"Datetime\" in audit_col else \"string\"))\n",
+					"                    elif audit_col == \"AdtclmnRecordActiveInd\":\n",
+					"                        source_df = source_df.withColumn(audit_col, lit(1).cast(DecimalType(1, 0)))\n",
+					"            \n",
 					"            # Perform full outer join for CDC\n",
 					"            df_full_outer = existing_df.alias(\"main\").join(\n",
 					"                source_df.alias(\"inc\"), \n",
@@ -327,21 +342,27 @@
 					"                'AdtclmnInsertedByProcessName': when(col(\"main.hash_id\").isNull(), col(\"inc.AdtclmnInsertedByProcessName\"))\n",
 					"                                                 .otherwise(col(\"main.AdtclmnInsertedByProcessName\")),\n",
 					"                'AdtclmnModifiedDatetime': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull() & \n",
-					"                                                 (col(\"main.HASH_ID\") != col(\"inc.HASH_ID\")), current_timestamp())\n",
+					"                                               (col(\"main.hash_id\") != col(\"inc.hash_id\")), current_timestamp())\n",
 					"                                            .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), current_timestamp())\n",
-					"                                            .otherwise(None),\n",
+					"                                            .otherwise(col(\"main.AdtclmnModifiedDatetime\")),\n",
 					"                'AdtclmnModifiedByProcessName': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNotNull() & \n",
-					"                                                     (col(\"main.HASH_ID\") != col(\"inc.HASH_ID\")), col(\"inc.AdtclmnInsertedByProcessName\"))\n",
-					"                                                .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), col(\"inc.AdtclmnInsertedByProcessName\"))\n",
-					"                                                .otherwise(None)\n",
+					"                                                   (col(\"main.hash_id\") != col(\"inc.hash_id\")), lit(\"CDC_Update\"))\n",
+					"                                                .when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), lit(\"CDC_Update\"))\n",
+					"                                                .otherwise(col(\"main.AdtclmnModifiedByProcessName\")),\n",
+					"                'AdtclmnRecordActiveInd': when(col(\"main.hash_id\").isNotNull() & col(\"inc.hash_id\").isNull(), lit(0).cast(DecimalType(1, 0)))\n",
+					"                                         .otherwise(lit(1).cast(DecimalType(1, 0)))\n",
 					"            }\n",
 					"            \n",
+					"            # Get all columns from existing dataframe\n",
+					"            all_columns = existing_df.columns\n",
+					"            \n",
 					"            # Combine columns with audit logic\n",
-					"            combined_columns = [\n",
-					"                coalesce(col(f\"inc.{c}\"), col(f\"main.{c}\")).alias(c) if c not in audit_columns \n",
-					"                else audit_columns[c].alias(c) \n",
-					"                for c in existing_df.columns\n",
-					"            ]\n",
+					"            combined_columns = []\n",
+					"            for c in all_columns:\n",
+					"                if c in audit_columns:\n",
+					"                    combined_columns.append(audit_columns[c].alias(c))\n",
+					"                else:\n",
+					"                    combined_columns.append(coalesce(col(f\"inc.{c}\"), col(f\"main.{c}\")).alias(c))\n",
 					"            \n",
 					"            # Create the final DataFrame\n",
 					"            df_full_derived = df_full_outer.select(combined_columns)\n",
@@ -360,9 +381,10 @@
 					"            \n",
 					"            # Add audit columns to source data\n",
 					"            source_df = source_df.withColumn(\"AdtclmnFirstCreatedDatetime\", current_timestamp()) \\\n",
-					"                                 .withColumn(\"AdtclmnInsertedByProcessName\", lit(\"InitialLoad\")) \\\n",
-					"                                 .withColumn(\"AdtclmnModifiedDatetime\", lit(None).cast(\"timestamp\")) \\\n",
-					"                                 .withColumn(\"AdtclmnModifiedByProcessName\", lit(None).cast(\"string\"))\n",
+					"                               .withColumn(\"AdtclmnInsertedByProcessName\", lit(\"InitialLoad\")) \\\n",
+					"                               .withColumn(\"AdtclmnModifiedDatetime\", lit(None).cast(\"timestamp\")) \\\n",
+					"                               .withColumn(\"AdtclmnModifiedByProcessName\", lit(None).cast(\"string\")) \\\n",
+					"                               .withColumn(\"AdtclmnRecordActiveInd\", lit(1).cast(DecimalType(1, 0)))\n",
 					"    \n",
 					"            # Write the source data as a new Delta table\n",
 					"            source_df.write \\\n",
@@ -393,7 +415,7 @@
 					"        print(\"Data lake export with CDC failed\")\n",
 					""
 				],
-				"execution_count": 11
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -406,7 +428,7 @@
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 12
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -419,7 +441,7 @@
 				"source": [
 					"delta_df.count()"
 				],
-				"execution_count": 13
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -433,7 +455,7 @@
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": 14
+				"execution_count": null
 			}
 		]
 	}

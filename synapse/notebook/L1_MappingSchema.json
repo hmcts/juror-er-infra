@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2e438c2b-557b-452e-88a5-86e573ee4f51"
+				"spark.autotune.trackingId": "b95204df-44f0-4ece-b937-f3f62aa7b391"
 			}
 		},
 		"metadata": {
@@ -179,6 +179,8 @@
 					"    return SparkSession.builder \\\n",
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .config(\"spark.jars.packages\", \"com.crealytics:spark-excel_2.12:0.13.7\") \\\n",
+					"        .config(\"spark.executor.memory\", \"4g\") \\\n",
+					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
 				"execution_count": null

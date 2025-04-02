@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bef8d9fa-826b-4268-9bee-6d161e9d8a61"
+				"spark.autotune.trackingId": "2e438c2b-557b-452e-88a5-86e573ee4f51"
 			}
 		},
 		"metadata": {
@@ -167,15 +167,21 @@
 					"# Configure logging\n",
 					"logging.basicConfig(\n",
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
-					")\n",
-					"\n",
-					"\n",
-					"def create_spark_session():\n",
-					"    \"\"\"Create and return a Spark session\"\"\"\n",
-					"    return SparkSession.builder.appName(\"Electoral Data ETL\").getOrCreate()\n",
-					""
+					")"
 				],
 				"execution_count": 26
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def create_spark_session():\n",
+					"    \"\"\"Create and return a Spark session with Excel support\"\"\"\n",
+					"    return SparkSession.builder \\\n",
+					"        .appName(\"Electoral Data ETL\") \\\n",
+					"        .config(\"spark.jars.packages\", \"com.crealytics:spark-excel_2.12:0.13.7\") \\\n",
+					"        .getOrCreate()"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

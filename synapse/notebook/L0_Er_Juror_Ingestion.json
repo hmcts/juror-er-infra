@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "404c9630-2d34-4bb3-a37b-85ced96752c7"
+				"spark.autotune.trackingId": "23bdba72-e269-48db-9af3-19568588aaa9"
 			}
 		},
 		"metadata": {
@@ -142,7 +142,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 134
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -161,7 +161,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 135
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +174,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 136
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -196,7 +196,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 137
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -257,7 +257,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 138
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -335,7 +335,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 139
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -377,7 +377,7 @@
 					"    \"\"\"Move a file to the overseas folder\"\"\"\n",
 					"    try:\n",
 					"        # Make sure overseas directory exists\n",
-					"        overseas_dir = f\"abfss://etl-juror@{storage_account}.dfs.core.windows.net/overseas\"\n",
+					"        overseas_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/overseas\"\n",
 					"        if not mssparkutils.fs.exists(overseas_dir):\n",
 					"            print(f\"Creating overseas directory: {overseas_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(overseas_dir)\n",
@@ -405,7 +405,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -455,7 +455,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 140
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -489,7 +489,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 141
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -526,7 +526,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 142
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -567,7 +567,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 143
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -647,7 +647,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 144
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -692,7 +692,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 145
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -757,7 +757,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 146
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -810,7 +810,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 147
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -899,7 +899,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 148
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -1031,7 +1031,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 149
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -1159,7 +1159,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 150
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -1185,7 +1185,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 151
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -1235,7 +1235,7 @@
 					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/empty\",\n",
 					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/index\",\n",
 					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/logs\",\n",
-					"        f\"abfss://etl-juror@{storage_account}.dfs.core.windows.net/overseas\" \n",
+					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/overseas\" \n",
 					"    ]\n",
 					"    \n",
 					"    for dir_path in dest_dirs:\n",
@@ -1446,7 +1446,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 152
+				"execution_count": 20
 			}
 		]
 	}

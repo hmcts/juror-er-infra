@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8b7a1f31-b0f7-4c84-be11-38248e4f506b"
+				"spark.autotune.trackingId": "f3354795-49ec-4a2a-ac8f-367a28e33ada"
 			}
 		},
 		"metadata": {
@@ -249,7 +249,7 @@
 					"#except ImportError as e:\n",
 					" #   print(f\"Error importing validation modules: {e}\")"
 				],
-				"execution_count": 186
+				"execution_count": 301
 			},
 			{
 				"cell_type": "code",
@@ -265,7 +265,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 187
+				"execution_count": 302
 			},
 			{
 				"cell_type": "code",
@@ -285,7 +285,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 188
+				"execution_count": 303
 			},
 			{
 				"cell_type": "code",
@@ -296,7 +296,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 189
+				"execution_count": 304
 			},
 			{
 				"cell_type": "code",
@@ -313,7 +313,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 190
+				"execution_count": 305
 			},
 			{
 				"cell_type": "code",
@@ -349,7 +349,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 191
+				"execution_count": 306
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +371,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 192
+				"execution_count": 307
 			},
 			{
 				"cell_type": "code",
@@ -532,7 +532,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 193
+				"execution_count": 308
 			},
 			{
 				"cell_type": "code",
@@ -579,7 +579,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 279
+				"execution_count": 309
 			},
 			{
 				"cell_type": "code",
@@ -591,7 +591,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 280
+				"execution_count": 310
 			},
 			{
 				"cell_type": "code",
@@ -671,7 +671,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 281
+				"execution_count": 311
 			},
 			{
 				"cell_type": "markdown",
@@ -754,7 +754,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 282
+				"execution_count": 312
 			},
 			{
 				"cell_type": "code",
@@ -826,7 +826,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 283
+				"execution_count": 313
 			},
 			{
 				"cell_type": "code",
@@ -847,7 +847,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 284
+				"execution_count": 314
 			},
 			{
 				"cell_type": "code",
@@ -864,7 +864,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 285
+				"execution_count": 315
 			},
 			{
 				"cell_type": "code",
@@ -891,7 +891,7 @@
 					"    \n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 286
+				"execution_count": 316
 			},
 			{
 				"cell_type": "markdown",
@@ -932,7 +932,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 287
+				"execution_count": 317
 			},
 			{
 				"cell_type": "markdown",
@@ -999,7 +999,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 288
+				"execution_count": 318
 			},
 			{
 				"cell_type": "markdown",
@@ -1036,7 +1036,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 289
+				"execution_count": 319
 			},
 			{
 				"cell_type": "code",
@@ -1091,7 +1091,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 290
+				"execution_count": 320
 			},
 			{
 				"cell_type": "code",
@@ -1144,7 +1144,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 291
+				"execution_count": 321
 			},
 			{
 				"cell_type": "markdown",
@@ -1190,7 +1190,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 292
+				"execution_count": 322
 			},
 			{
 				"cell_type": "code",
@@ -1276,7 +1276,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 293
+				"execution_count": 323
 			},
 			{
 				"cell_type": "markdown",
@@ -1326,7 +1326,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 294
+				"execution_count": 324
 			},
 			{
 				"cell_type": "markdown",
@@ -1416,7 +1416,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 295
+				"execution_count": 325
 			},
 			{
 				"cell_type": "markdown",
@@ -1458,7 +1458,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 296
+				"execution_count": 326
 			},
 			{
 				"cell_type": "code",
@@ -1496,7 +1496,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 297
+				"execution_count": 327
 			},
 			{
 				"cell_type": "code",
@@ -1546,7 +1546,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 298
+				"execution_count": 328
 			},
 			{
 				"cell_type": "markdown",
@@ -1795,7 +1795,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 300
+				"execution_count": 329
 			}
 		]
 	}

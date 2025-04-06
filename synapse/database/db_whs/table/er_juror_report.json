@@ -29,7 +29,7 @@
 				},
 				{
 					"Name": "creation_date",
-					"Description": "",
+					"Description": "creation of the file in BAIS",
 					"OriginDataTypeName": {
 						"TypeName": "date",
 						"IsNullable": false,
@@ -43,7 +43,7 @@
 				},
 				{
 					"Name": "count_juror",
-					"Description": "",
+					"Description": "count rows",
 					"OriginDataTypeName": {
 						"TypeName": "integer",
 						"IsNullable": false,

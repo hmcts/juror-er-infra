@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c5fd157f-d67c-4e3a-8e22-ef7ffb0e3026"
+				"spark.autotune.trackingId": "108561e7-777c-4c60-9bb0-01ba3cf6e4ad"
 			}
 		},
 		"metadata": {
@@ -142,7 +142,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 101
+				"execution_count": 121
 			},
 			{
 				"cell_type": "code",
@@ -161,7 +161,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 102
+				"execution_count": 122
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +174,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 103
+				"execution_count": 123
 			},
 			{
 				"cell_type": "code",
@@ -196,7 +196,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 104
+				"execution_count": 124
 			},
 			{
 				"cell_type": "code",
@@ -257,7 +257,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 105
+				"execution_count": 125
 			},
 			{
 				"cell_type": "code",
@@ -335,7 +335,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 106
+				"execution_count": 126
 			},
 			{
 				"cell_type": "code",
@@ -405,7 +405,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 107
+				"execution_count": 127
 			},
 			{
 				"cell_type": "code",
@@ -455,7 +455,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 108
+				"execution_count": 128
 			},
 			{
 				"cell_type": "code",
@@ -489,7 +489,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 109
+				"execution_count": 129
 			},
 			{
 				"cell_type": "code",
@@ -526,7 +526,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 110
+				"execution_count": 130
 			},
 			{
 				"cell_type": "code",
@@ -567,7 +567,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 111
+				"execution_count": 131
 			},
 			{
 				"cell_type": "code",
@@ -647,7 +647,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 112
+				"execution_count": 132
 			},
 			{
 				"cell_type": "code",
@@ -692,7 +692,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 113
+				"execution_count": 133
 			},
 			{
 				"cell_type": "code",
@@ -757,7 +757,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 114
+				"execution_count": 134
 			},
 			{
 				"cell_type": "code",
@@ -810,7 +810,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 115
+				"execution_count": 135
 			},
 			{
 				"cell_type": "code",
@@ -899,7 +899,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 116
+				"execution_count": 136
 			},
 			{
 				"cell_type": "code",
@@ -1031,18 +1031,18 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 117
+				"execution_count": 137
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def process_file_group(file_group, date_folder, la_folder, storage_account, moved_files):\n",
-					"    \"\"\"Process files with the same date and LA folder but save them individually\"\"\"\n",
+					"    \"\"\"Process a group of files with the same date and LA folder and convert to Parquet\"\"\"\n",
 					"    try:\n",
 					"        print(f\"\\nProcessing file group: date={date_folder}, LA={la_folder}, files={len(file_group)}\")\n",
 					"        \n",
-					"        # Create the base folder name in the format YYYYMMDD_LA-Name\n",
-					"        base_folder_key = f\"{date_folder}_{la_folder}\"\n",
+					"        # Create the folder name in the format YYYYMMDD_LA-Name\n",
+					"        folder_key = f\"{date_folder}_{la_folder}\"\n",
 					"        \n",
 					"        # Ensure the destination directory exists\n",
 					"        dest_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
@@ -1050,101 +1050,144 @@
 					"            print(f\"Creating destination directory: {dest_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(dest_dir)\n",
 					"        \n",
-					"        successful_files = 0\n",
+					"        # Destination path for Parquet file\n",
+					"        dest_path = f\"{dest_dir}/{folder_key}.parquet\"\n",
 					"        \n",
-					"        # Process each file individually instead of merging\n",
-					"        for idx, info in enumerate(file_group):\n",
-					"            file_path = info[\"path\"]\n",
-					"            file_name = info[\"file_name\"]\n",
-					"            file_type = info[\"file_type\"]\n",
+					"        # Check which files still exist and get their types\n",
+					"        valid_files = []\n",
+					"        for info in file_group:\n",
+					"            path = info[\"path\"]\n",
+					"            if mssparkutils.fs.exists(path):\n",
+					"                valid_files.append(info)\n",
+					"                print(f\"  File exists and is valid: {path}\")\n",
+					"            else:\n",
+					"                print(f\"  File doesn't exist, skipping from group: {path}\")\n",
+					"        \n",
+					"        if not valid_files:\n",
+					"            print(\"  No valid files remain in this group\")\n",
+					"            return False, None\n",
 					"            \n",
-					"            print(f\"DEBUG: Processing file {idx+1}/{len(file_group)}: {file_path}\")\n",
-					"            \n",
-					"            # Skip if file doesn't exist\n",
-					"            if not mssparkutils.fs.exists(file_path):\n",
-					"                print(f\"  File doesn't exist, skipping: {file_path}\")\n",
-					"                continue\n",
-					"            \n",
-					"            # Create a unique filename that includes original name\n",
-					"            base_name = os.path.splitext(file_name)[0]  # Remove extension\n",
-					"            sanitized_name = re.sub(r'[^\\w\\-]', '_', base_name)  # Clean up name\n",
-					"            unique_folder_key = f\"{base_folder_key}_{sanitized_name}\"\n",
-					"            \n",
-					"            # DIRECT APPROACH: Try to read and then write the file directly\n",
+					"        # Group files by type for easier processing\n",
+					"        csv_files = [info for info in valid_files if info[\"file_type\"] == \"csv\"]\n",
+					"        excel_files = [info for info in valid_files if info[\"file_type\"] == \"excel\"]\n",
+					"        \n",
+					"        print(f\"  Found {len(csv_files)} CSV files and {len(excel_files)} Excel files to process\")\n",
+					"        \n",
+					"        # Process all files and merge into a single Parquet file\n",
+					"        dfs = []\n",
+					"        \n",
+					"        # Process CSV files if present\n",
+					"        for info in csv_files:\n",
 					"            try:\n",
-					"                if file_type == 'excel':\n",
-					"                    print(f\"  Reading Excel file: {file_path}\")\n",
+					"                print(f\"  Reading CSV file: {info['path']}\")\n",
+					"                df = spark.read \\\n",
+					"                    .option(\"header\", \"true\") \\\n",
+					"                    .option(\"inferSchema\", \"true\") \\\n",
+					"                    .csv(info[\"path\"])\n",
+					"                \n",
+					"                # Add metadata\n",
+					"                df = df.withColumn(\"source_file\", lit(info[\"path\"]))\n",
+					"                df = df.withColumn(\"source_type\", lit(\"csv\"))\n",
+					"                \n",
+					"                dfs.append(df)\n",
+					"                print(f\"  Successfully read CSV file with {df.count()} rows\")\n",
+					"            except Exception as e:\n",
+					"                print(f\"  Error reading CSV file {info['path']}: {str(e)}\")\n",
+					"                moved_files['failed'].append(f\"{info['path']} (CSV read failed)\")\n",
+					"        \n",
+					"        # Process Excel files if present\n",
+					"        for i, info in enumerate(excel_files):\n",
+					"            try:\n",
+					"                print(f\"  Reading Excel file {i+1}/{len(excel_files)}: {info['path']}\")\n",
+					"                \n",
+					"                # Use more options to handle Excel files better\n",
+					"                df = spark.read.format(\"com.crealytics.spark.excel\") \\\n",
+					"                    .option(\"header\", \"true\") \\\n",
+					"                    .option(\"inferSchema\", \"true\") \\\n",
+					"                    .option(\"dataAddress\", \"'Sheet1'!A1\") \\\n",
+					"                    .option(\"treatEmptyValuesAsNulls\", \"true\") \\\n",
+					"                    .load(info[\"path\"])\n",
+					"                \n",
+					"                # Add metadata\n",
+					"                df = df.withColumn(\"source_file\", lit(info[\"path\"]))\n",
+					"                df = df.withColumn(\"source_type\", lit(\"excel\"))\n",
+					"                \n",
+					"                dfs.append(df)\n",
+					"                print(f\"  Successfully read Excel file {i+1} with {df.count()} rows\")\n",
+					"            except Exception as e:\n",
+					"                print(f\"  Error reading Excel file {info['path']}: {str(e)}\")\n",
+					"                print(f\"  Exception details: {type(e).__name__}: {str(e)}\")\n",
+					"                import traceback\n",
+					"                print(f\"  Traceback: {traceback.format_exc()}\")\n",
+					"                moved_files['failed'].append(f\"{info['path']} (Excel read failed)\")\n",
+					"                \n",
+					"                # Try again with different sheet name\n",
+					"                try:\n",
+					"                    print(f\"  Retrying with default sheet...\")\n",
 					"                    df = spark.read.format(\"com.crealytics.spark.excel\") \\\n",
 					"                        .option(\"header\", \"true\") \\\n",
 					"                        .option(\"inferSchema\", \"true\") \\\n",
-					"                        .load(file_path)\n",
+					"                        .load(info[\"path\"])\n",
 					"                    \n",
-					"                    # Create destination path for Excel\n",
-					"                    dest_path = f\"{dest_dir}/{unique_folder_key}.xlsx\"\n",
-					"                    print(f\"  Will save Excel data to: {dest_path}\")\n",
+					"                    df = df.withColumn(\"source_file\", lit(info[\"path\"]))\n",
+					"                    df = df.withColumn(\"source_type\", lit(\"excel\"))\n",
 					"                    \n",
-					"                    # Save directly to destination with required format\n",
-					"                    dest_csv_path = f\"{dest_dir}/{unique_folder_key}.csv\"\n",
-					"                    print(f\"  Converting Excel to CSV at: {dest_csv_path}\")\n",
-					"                    \n",
-					"                    # Write to CSV (more reliable format)\n",
-					"                    df.write.mode(\"overwrite\").option(\"header\", \"true\").csv(dest_csv_path)\n",
-					"                    \n",
-					"                    # Also copy the original Excel file\n",
-					"                    print(f\"  Copying original Excel file to: {dest_path}\")\n",
-					"                    mssparkutils.fs.cp(file_path, dest_path, True)\n",
-					"                    \n",
-					"                else:  # csv\n",
-					"                    print(f\"  Reading CSV file: {file_path}\")\n",
-					"                    df = spark.read \\\n",
-					"                        .option(\"header\", \"true\") \\\n",
-					"                        .option(\"inferSchema\", \"true\") \\\n",
-					"                        .csv(file_path)\n",
-					"                    \n",
-					"                    # Create destination path for CSV\n",
-					"                    dest_path = f\"{dest_dir}/{unique_folder_key}.csv\"\n",
-					"                    print(f\"  Will save CSV data to: {dest_path}\")\n",
-					"                    \n",
-					"                    # Write to destination\n",
-					"                    df.write.mode(\"overwrite\").option(\"header\", \"true\").csv(dest_path)\n",
-					"                \n",
-					"                print(f\"  Success: File processed and saved to destination\")\n",
-					"                moved_files['data_success'].append(dest_path)\n",
-					"                successful_files += 1\n",
-					"                \n",
-					"            except Exception as read_error:\n",
-					"                print(f\"  Error reading/writing file: {str(read_error)}\")\n",
-					"                \n",
-					"                # FALLBACK: Try direct file copy\n",
-					"                try:\n",
-					"                    print(f\"  Attempting direct file copy instead\")\n",
-					"                    \n",
-					"                    if file_type == 'excel':\n",
-					"                        dest_path = f\"{dest_dir}/{unique_folder_key}.xlsx\"\n",
-					"                    else:  # csv\n",
-					"                        dest_path = f\"{dest_dir}/{unique_folder_key}.csv\"\n",
-					"                    \n",
-					"                    print(f\"  Copying from {file_path} to {dest_path}\")\n",
-					"                    mssparkutils.fs.cp(file_path, dest_path, True)\n",
-					"                    \n",
-					"                    # Verify the copy\n",
-					"                    if mssparkutils.fs.exists(dest_path):\n",
-					"                        print(f\"  Successfully copied file to: {dest_path}\")\n",
-					"                        moved_files['data_success'].append(dest_path)\n",
-					"                        successful_files += 1\n",
-					"                    else:\n",
-					"                        print(f\"  ERROR: File copy failed - not found at destination\")\n",
-					"                        moved_files['failed'].append(f\"{file_path} (copy failed)\")\n",
-					"                        \n",
-					"                except Exception as copy_error:\n",
-					"                    print(f\"  Error in direct file copy: {str(copy_error)}\")\n",
-					"                    moved_files['failed'].append(f\"{file_path} (all copy methods failed)\")\n",
+					"                    dfs.append(df)\n",
+					"                    print(f\"  Successfully read Excel file on retry with {df.count()} rows\")\n",
+					"                except Exception as retry_e:\n",
+					"                    print(f\"  Retry also failed: {str(retry_e)}\")\n",
 					"        \n",
-					"        if successful_files > 0:\n",
-					"            print(f\"  Successfully processed {successful_files} out of {len(file_group)} files\")\n",
-					"            return True, dest_dir\n",
+					"        if dfs:\n",
+					"            print(f\"  Successfully read {len(dfs)} files, now merging...\")\n",
+					"            \n",
+					"            # Add common metadata\n",
+					"            for i in range(len(dfs)):\n",
+					"                dfs[i] = dfs[i].withColumn(\"ingestion_date\", lit(current_timestamp()))\n",
+					"                dfs[i] = dfs[i].withColumn(\"date_folder\", lit(date_folder))\n",
+					"                dfs[i] = dfs[i].withColumn(\"la_folder\", lit(la_folder))\n",
+					"            \n",
+					"            # Merge the dataframes\n",
+					"            try:\n",
+					"                # Print schema of each DataFrame to help debug unionByName issues\n",
+					"                for i, df in enumerate(dfs):\n",
+					"                    print(f\"  DataFrame {i+1} schema:\")\n",
+					"                    df.printSchema()\n",
+					"                \n",
+					"                merged_df = dfs[0]\n",
+					"                for i, df in enumerate(dfs[1:]):\n",
+					"                    print(f\"  Merging DataFrame {i+2}...\")\n",
+					"                    # Use allowMissingColumns to handle different schemas\n",
+					"                    merged_df = merged_df.unionByName(df, allowMissingColumns=True)\n",
+					"                \n",
+					"                # Write the merged dataframe as Parquet\n",
+					"                print(f\"  Writing merged data to Parquet: {dest_path}\")\n",
+					"                merged_df.write.mode(\"overwrite\").parquet(dest_path)\n",
+					"                \n",
+					"                # Check if Parquet file was created\n",
+					"                if mssparkutils.fs.exists(dest_path):\n",
+					"                    print(f\"  Successfully created merged Parquet file with {merged_df.count()} rows\")\n",
+					"                    \n",
+					"                    # Update success tracking\n",
+					"                    for info in valid_files:\n",
+					"                        moved_files['data_success'].append(dest_path)\n",
+					"                    \n",
+					"                    return True, dest_path\n",
+					"                else:\n",
+					"                    print(f\"  ERROR: Parquet file not created\")\n",
+					"                    return False, None\n",
+					"            except Exception as merge_error:\n",
+					"                print(f\"  Error merging dataframes: {str(merge_error)}\")\n",
+					"                import traceback\n",
+					"                print(f\"  Traceback: {traceback.format_exc()}\")\n",
+					"                \n",
+					"                # Fallback to processing files individually\n",
+					"                print(f\"  Falling back to individual file processing\")\n",
+					"                for info in valid_files:\n",
+					"                    process_individual_file(info, storage_account, moved_files)\n",
+					"                \n",
+					"                return False, None\n",
 					"        else:\n",
-					"            print(f\"  Failed to process any files in the group\")\n",
+					"            print(f\"  No dataframes created from input files\")\n",
 					"            return False, None\n",
 					"            \n",
 					"    except Exception as e:\n",
@@ -1153,7 +1196,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 118
+				"execution_count": 138
 			},
 			{
 				"cell_type": "code",
@@ -1179,7 +1222,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 119
+				"execution_count": 139
 			},
 			{
 				"cell_type": "code",
@@ -1440,7 +1483,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 120
+				"execution_count": 140
 			}
 		]
 	}

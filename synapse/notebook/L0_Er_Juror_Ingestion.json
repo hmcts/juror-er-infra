@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1dcf46ce-e14c-4db2-8c2d-84b6265ae2ed"
+				"spark.autotune.trackingId": "59c92817-31e8-4424-9908-f11a9c2243b4"
 			}
 		},
 		"metadata": {
@@ -1104,7 +1104,6 @@
 					"                df = spark.read.format(\"com.crealytics.spark.excel\") \\\n",
 					"                    .option(\"header\", \"true\") \\\n",
 					"                    .option(\"inferSchema\", \"true\") \\\n",
-					"                    .option(\"dataAddress\", \"'Sheet1'!A1\") \\\n",
 					"                    .option(\"treatEmptyValuesAsNulls\", \"true\") \\\n",
 					"                    .load(info[\"path\"])\n",
 					"                \n",

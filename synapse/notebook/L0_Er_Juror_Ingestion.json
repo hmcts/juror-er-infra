@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "570af7b0-f217-464b-aa46-edfdf3c5925f"
+				"spark.autotune.trackingId": "c5fd157f-d67c-4e3a-8e22-ef7ffb0e3026"
 			}
 		},
 		"metadata": {
@@ -142,7 +142,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 101
 			},
 			{
 				"cell_type": "code",
@@ -161,7 +161,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +174,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": null
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -196,7 +196,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -257,7 +257,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -335,7 +335,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 106
 			},
 			{
 				"cell_type": "code",
@@ -405,7 +405,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -455,7 +455,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -489,7 +489,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -526,7 +526,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 110
 			},
 			{
 				"cell_type": "code",
@@ -567,7 +567,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 111
 			},
 			{
 				"cell_type": "code",
@@ -647,7 +647,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 112
 			},
 			{
 				"cell_type": "code",
@@ -692,7 +692,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 113
 			},
 			{
 				"cell_type": "code",
@@ -757,7 +757,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 114
 			},
 			{
 				"cell_type": "code",
@@ -810,7 +810,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 115
 			},
 			{
 				"cell_type": "code",
@@ -899,7 +899,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 116
 			},
 			{
 				"cell_type": "code",
@@ -1031,7 +1031,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 117
 			},
 			{
 				"cell_type": "code",
@@ -1039,21 +1039,17 @@
 					"def process_file_group(file_group, date_folder, la_folder, storage_account, moved_files):\n",
 					"    \"\"\"Process files with the same date and LA folder but save them individually\"\"\"\n",
 					"    try:\n",
-					"        print(f\"\\nDEBUG: process_file_group called with {len(file_group)} files for {date_folder}_{la_folder}\")\n",
+					"        print(f\"\\nProcessing file group: date={date_folder}, LA={la_folder}, files={len(file_group)}\")\n",
 					"        \n",
 					"        # Create the base folder name in the format YYYYMMDD_LA-Name\n",
 					"        base_folder_key = f\"{date_folder}_{la_folder}\"\n",
 					"        \n",
 					"        # Ensure the destination directory exists\n",
 					"        dest_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
-					"        print(f\"DEBUG: Destination directory: {dest_dir}\")\n",
-					"        \n",
 					"        if not mssparkutils.fs.exists(dest_dir):\n",
 					"            print(f\"Creating destination directory: {dest_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(dest_dir)\n",
-					"        else:\n",
-					"            print(f\"Destination directory already exists\")\n",
-					"            \n",
+					"        \n",
 					"        successful_files = 0\n",
 					"        \n",
 					"        # Process each file individually instead of merging\n",
@@ -1074,39 +1070,75 @@
 					"            sanitized_name = re.sub(r'[^\\w\\-]', '_', base_name)  # Clean up name\n",
 					"            unique_folder_key = f\"{base_folder_key}_{sanitized_name}\"\n",
 					"            \n",
-					"            # Preserve original file extension\n",
-					"            if file_type == 'excel':\n",
-					"                dest_path = f\"{dest_dir}/{unique_folder_key}.xlsx\"\n",
-					"            else:  # csv\n",
-					"                dest_path = f\"{dest_dir}/{unique_folder_key}.csv\"\n",
-					"                \n",
-					"            print(f\"DEBUG: Will copy from {file_path} to {dest_path}\")\n",
-					"            \n",
+					"            # DIRECT APPROACH: Try to read and then write the file directly\n",
 					"            try:\n",
-					"                # Check if source exists\n",
-					"                if not mssparkutils.fs.exists(file_path):\n",
-					"                    print(f\"  ERROR: Source file doesn't exist: {file_path}\")\n",
-					"                    continue\n",
+					"                if file_type == 'excel':\n",
+					"                    print(f\"  Reading Excel file: {file_path}\")\n",
+					"                    df = spark.read.format(\"com.crealytics.spark.excel\") \\\n",
+					"                        .option(\"header\", \"true\") \\\n",
+					"                        .option(\"inferSchema\", \"true\") \\\n",
+					"                        .load(file_path)\n",
+					"                    \n",
+					"                    # Create destination path for Excel\n",
+					"                    dest_path = f\"{dest_dir}/{unique_folder_key}.xlsx\"\n",
+					"                    print(f\"  Will save Excel data to: {dest_path}\")\n",
+					"                    \n",
+					"                    # Save directly to destination with required format\n",
+					"                    dest_csv_path = f\"{dest_dir}/{unique_folder_key}.csv\"\n",
+					"                    print(f\"  Converting Excel to CSV at: {dest_csv_path}\")\n",
+					"                    \n",
+					"                    # Write to CSV (more reliable format)\n",
+					"                    df.write.mode(\"overwrite\").option(\"header\", \"true\").csv(dest_csv_path)\n",
+					"                    \n",
+					"                    # Also copy the original Excel file\n",
+					"                    print(f\"  Copying original Excel file to: {dest_path}\")\n",
+					"                    mssparkutils.fs.cp(file_path, dest_path, True)\n",
+					"                    \n",
+					"                else:  # csv\n",
+					"                    print(f\"  Reading CSV file: {file_path}\")\n",
+					"                    df = spark.read \\\n",
+					"                        .option(\"header\", \"true\") \\\n",
+					"                        .option(\"inferSchema\", \"true\") \\\n",
+					"                        .csv(file_path)\n",
+					"                    \n",
+					"                    # Create destination path for CSV\n",
+					"                    dest_path = f\"{dest_dir}/{unique_folder_key}.csv\"\n",
+					"                    print(f\"  Will save CSV data to: {dest_path}\")\n",
+					"                    \n",
+					"                    # Write to destination\n",
+					"                    df.write.mode(\"overwrite\").option(\"header\", \"true\").csv(dest_path)\n",
 					"                \n",
-					"                # Simple copy without conversion\n",
-					"                print(f\"  Executing copy: {file_path} -> {dest_path}\")\n",
-					"                mssparkutils.fs.cp(file_path, dest_path, True)\n",
+					"                print(f\"  Success: File processed and saved to destination\")\n",
+					"                moved_files['data_success'].append(dest_path)\n",
+					"                successful_files += 1\n",
 					"                \n",
-					"                # Verify the file was copied\n",
-					"                if mssparkutils.fs.exists(dest_path):\n",
-					"                    print(f\"  Successfully copied file to: {dest_path}\")\n",
-					"                    moved_files['data_success'].append(dest_path)\n",
-					"                    successful_files += 1\n",
-					"                else:\n",
-					"                    print(f\"  ERROR: File not found at destination after copy: {dest_path}\")\n",
-					"                    moved_files['failed'].append(f\"{file_path} (copy failed - file not found)\")\n",
-					"            except Exception as copy_error:\n",
-					"                print(f\"  ERROR copying file: {str(copy_error)}\")\n",
-					"                import traceback\n",
-					"                print(f\"  Traceback: {traceback.format_exc()}\")\n",
-					"                moved_files['failed'].append(f\"{file_path} (copy error: {str(copy_error)})\")\n",
-					"        \n",
-					"        print(f\"DEBUG: process_file_group completed. Successful files: {successful_files}/{len(file_group)}\")\n",
+					"            except Exception as read_error:\n",
+					"                print(f\"  Error reading/writing file: {str(read_error)}\")\n",
+					"                \n",
+					"                # FALLBACK: Try direct file copy\n",
+					"                try:\n",
+					"                    print(f\"  Attempting direct file copy instead\")\n",
+					"                    \n",
+					"                    if file_type == 'excel':\n",
+					"                        dest_path = f\"{dest_dir}/{unique_folder_key}.xlsx\"\n",
+					"                    else:  # csv\n",
+					"                        dest_path = f\"{dest_dir}/{unique_folder_key}.csv\"\n",
+					"                    \n",
+					"                    print(f\"  Copying from {file_path} to {dest_path}\")\n",
+					"                    mssparkutils.fs.cp(file_path, dest_path, True)\n",
+					"                    \n",
+					"                    # Verify the copy\n",
+					"                    if mssparkutils.fs.exists(dest_path):\n",
+					"                        print(f\"  Successfully copied file to: {dest_path}\")\n",
+					"                        moved_files['data_success'].append(dest_path)\n",
+					"                        successful_files += 1\n",
+					"                    else:\n",
+					"                        print(f\"  ERROR: File copy failed - not found at destination\")\n",
+					"                        moved_files['failed'].append(f\"{file_path} (copy failed)\")\n",
+					"                        \n",
+					"                except Exception as copy_error:\n",
+					"                    print(f\"  Error in direct file copy: {str(copy_error)}\")\n",
+					"                    moved_files['failed'].append(f\"{file_path} (all copy methods failed)\")\n",
 					"        \n",
 					"        if successful_files > 0:\n",
 					"            print(f\"  Successfully processed {successful_files} out of {len(file_group)} files\")\n",
@@ -1121,7 +1153,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 118
 			},
 			{
 				"cell_type": "code",
@@ -1147,7 +1179,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 119
 			},
 			{
 				"cell_type": "code",
@@ -1408,7 +1440,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 120
 			}
 		]
 	}

@@ -1,5 +1,5 @@
 {
-	"name": "p_juror_potgresql",
+	"name": "p_crime_er_juror_etl",
 	"properties": {
 		"activities": [
 			{
@@ -150,6 +150,72 @@
 					"driverSize": "Small",
 					"numExecutors": null
 				}
+			},
+			{
+				"name": "PowerBI_FilesReport",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L0_Er_Juror_Ingestion",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true
+				}
+			},
+			{
+				"name": "PowerBI_LA_ReceivedFiles_Report",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L3_Er_Juror_DataLake_ErickSchema",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"snapshot": true
+				}
+			},
+			{
+				"name": "LoadToPostgreSQL",
+				"type": "AzureFunctionActivity",
+				"dependsOn": [
+					{
+						"activity": "L2_Er_Juror_Mergingfiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
 			}
 		],
 		"annotations": []

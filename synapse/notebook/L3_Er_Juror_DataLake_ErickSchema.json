@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "44742cd2-f304-4a38-83e3-897a007e5610"
+				"spark.autotune.trackingId": "5b4ab386-edd9-4c52-8b53-106465a2e780"
 			}
 		},
 		"metadata": {
@@ -533,7 +533,34 @@
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 12
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
+				"source": [
+					"delta_df.count()"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
+					"collapsed": false
+				},
+				"source": [
+					"display(delta_df)"
+				],
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -568,34 +595,7 @@
 					"foo_df = delta_df.filter(delta_df.rec_num==249)\n",
 					"foo_df.count()"
 				],
-				"execution_count": 17
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": false,
-					"run_control": {
-						"frozen": true
-					}
-				},
-				"source": [
-					"delta_df.count()"
-				],
-				"execution_count": 14
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": false,
-					"run_control": {
-						"frozen": true
-					},
-					"collapsed": false
-				},
-				"source": [
-					"display(delta_df)"
-				],
-				"execution_count": 15
+				"execution_count": 8
 			}
 		]
 	}

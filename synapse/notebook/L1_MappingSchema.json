@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5c6b9edf-332a-4b7d-a966-04a96f789143"
+				"spark.autotune.trackingId": "53d57f11-a0c5-4f19-a515-dd6edc0fcba8"
 			}
 		},
 		"metadata": {
@@ -42,7 +42,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -151,7 +152,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": null
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -161,7 +162,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -175,7 +176,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -193,7 +194,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -226,7 +227,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": null
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -251,7 +252,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": null
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -268,7 +269,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -298,7 +299,7 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": null
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -316,7 +317,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": null
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -349,7 +350,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -381,7 +382,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -467,7 +468,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -524,7 +525,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -546,7 +547,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -608,7 +609,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -665,7 +666,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -692,7 +693,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -727,7 +728,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -756,7 +757,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -801,7 +802,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -831,7 +832,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -970,7 +971,7 @@
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
 					"        return result"
 				],
-				"execution_count": null
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -996,7 +997,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -1033,7 +1034,114 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 50
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def update_process_log(spark, new_file_paths, process_log_path):\n",
+					"    \"\"\"Update the processing log with newly processed files\"\"\"\n",
+					"    from notebookutils import mssparkutils\n",
+					"    from pyspark.sql.types import StringType, TimestampType, StructType, StructField\n",
+					"    \n",
+					"    try:\n",
+					"        # First, ensure the parent directory exists\n",
+					"        parent_dir = \"/\".join(process_log_path.split(\"/\")[:-1])\n",
+					"        if not mssparkutils.fs.exists(parent_dir):\n",
+					"            print(f\"Creating log directory: {parent_dir}\")\n",
+					"            mssparkutils.fs.mkdirs(parent_dir)\n",
+					"            \n",
+					"        # Create schema with explicit types\n",
+					"        log_schema = StructType([\n",
+					"            StructField(\"file_path\", StringType(), False),\n",
+					"            StructField(\"process_timestamp\", StrigType(), False)\n",
+					"        ])\n",
+					"        \n",
+					"        # Get current timestamp\n",
+					"        from datetime import datetime\n",
+					"        timestamp_str = datetime.now().isoformat()\n",
+					"        \n",
+					"        # Create new log entries\n",
+					"        new_log_entries = [(file_path, timestamp_str) for file_path in new_file_paths]\n",
+					"        \n",
+					"        # Create DataFrame\n",
+					"        new_log_df = spark.createDataFrame(new_log_entries, log_schema)\n",
+					"        \n",
+					"        # Update existing log if it exists\n",
+					"        if mssparkutils.fs.exists(process_log_path):\n",
+					"            try:\n",
+					"                existing_log = spark.read.parquet(process_log_path)\n",
+					"                updated_log = existing_log.union(new_log_df)\n",
+					"            except Exception as e:\n",
+					"                print(f\"Error reading existing log: {str(e)}. Creating new log.\")\n",
+					"                updated_log = new_log_df\n",
+					"        else:\n",
+					"            updated_log = new_log_df\n",
+					"            \n",
+					"        # Write updated log\n",
+					"        updated_log.write.mode(\"overwrite\").parquet(process_log_path)\n",
+					"        return True\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        print(f\"Error updating process log: {str(e)}\")\n",
+					"        import traceback\n",
+					"        print(traceback.format_exc())\n",
+					"        return False"
+				],
+				"execution_count": 51
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def get_new_files(spark, input_path, process_log_path):\n",
+					"    \"\"\"Identify which files are new and need processing\"\"\"\n",
+					"    from notebookutils import mssparkutils\n",
+					"    \n",
+					"    # Get all files in the input directory\n",
+					"    all_files = []\n",
+					"    \n",
+					"    # List all items in the directory\n",
+					"    try:\n",
+					"        items = mssparkutils.fs.ls(input_path)\n",
+					"        \n",
+					"        # Log what we found for debugging\n",
+					"        print(f\"Found {len(items)} items in {input_path}\")\n",
+					"        \n",
+					"        for item in items:\n",
+					"            # Check if it's a file we should process\n",
+					"            if (hasattr(item, 'path') and should_process_file(item.path)):\n",
+					"                all_files.append(item.path)\n",
+					"                print(f\"Found file for processing: {item.path}\")\n",
+					"            elif (hasattr(item, 'path') and is_zip_file(item.path)):\n",
+					"                all_files.append(item.path)\n",
+					"                print(f\"Found ZIP file for processing: {item.path}\")\n",
+					"    except Exception as e:\n",
+					"        print(f\"Error listing files in {input_path}: {str(e)}\")\n",
+					"    \n",
+					"    # Read process log to get previously processed files\n",
+					"    processed_files = []\n",
+					"    if mssparkutils.fs.exists(process_log_path):\n",
+					"        try:\n",
+					"            processed_files = spark.read.parquet(process_log_path) \\\n",
+					"                                .select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"            print(f\"Found {len(processed_files)} previously processed files in log\")\n",
+					"        except Exception as e:\n",
+					"            print(f\"Error reading process log: {str(e)}\")\n",
+					"            print(f\"Treating all files as new due to log error\")\n",
+					"    \n",
+					"    # Identify new files with more detailed logging\n",
+					"    new_files = []\n",
+					"    for f in all_files:\n",
+					"        if f not in processed_files:\n",
+					"            new_files.append(f)\n",
+					"            print(f\"New file to process: {f}\")\n",
+					"        else:\n",
+					"            print(f\"Skipping already processed file: {f}\")\n",
+					"    \n",
+					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
+					"    return new_files, all_files"
+				],
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -1064,7 +1172,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": null
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -1260,7 +1368,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": null
+				"execution_count": 54
 			}
 		]
 	}

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2efcb70c-9e0a-4a0c-960f-86854fa84b04"
+				"spark.autotune.trackingId": "b8ecdd37-687e-4bba-8be2-e7ab5cc4a951"
 			}
 		},
 		"metadata": {
@@ -62,12 +62,15 @@
 			{
 				"cell_type": "code",
 				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
 					"collapsed": false
 				},
 				"source": [
 					"# Connect to your Delta table\n",
-					"delta_table_path = \"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\"\n",
-					"delta_df = spark.read.format(\"delta\").load(delta_table_path)\n",
+					"delta_df =spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")\n",
 					"\n",
 					"# Count total rows\n",
 					"total_rows = delta_df.count()\n",
@@ -149,6 +152,14 @@
 					"display(foo_df)"
 				],
 				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Connect to your Delta table\n",
+					"df =spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "33c21dda-5e9a-45b9-b76d-4111923ef106"
+				"spark.autotune.trackingId": "213a5b2f-4eb3-477e-88ce-ce674dcd5bd2"
 			}
 		},
 		"metadata": {
@@ -249,7 +249,7 @@
 					"#except ImportError as e:\n",
 					" #   print(f\"Error importing validation modules: {e}\")"
 				],
-				"execution_count": 1
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -266,7 +266,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -286,7 +286,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +297,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 4
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -310,11 +310,11 @@
 					"    # Check if path is missing container info\n",
 					"    if not path.startswith(\"abfss://\"):\n",
 					"        # Add default storage and container\n",
-					"        path = f\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/{path}\"\n",
+					"        path = f\"abfss://juror- etl@baubaisadfsastg.dfs.core.windows.net/{path}\"\n",
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 5
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -350,7 +350,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -372,7 +372,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -533,7 +533,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 8
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -580,7 +580,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -592,7 +592,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -672,7 +672,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 11
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -755,7 +755,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 12
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -827,7 +827,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 13
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -848,7 +848,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 14
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -865,7 +865,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 15
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -918,7 +918,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 16
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -959,7 +959,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 17
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1026,7 +1026,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 18
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1063,7 +1063,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1118,7 +1118,7 @@
 					"        print(\"Returning original DataFrame\")\n",
 					"        return df"
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1171,7 +1171,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 21
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1217,7 +1217,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 22
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1303,7 +1303,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1353,7 +1353,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 24
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1445,7 +1445,7 @@
 					"        # No existing data, just return the new data\n",
 					"        return new_data"
 				],
-				"execution_count": 25
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1487,7 +1487,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 26
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1525,7 +1525,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 27
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1603,7 +1603,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 28
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1675,7 +1675,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": 29
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1887,26 +1887,34 @@
 					"        # Branch for PostgreSQL-specific processing\n",
 					"        if final_data.count() > 0:\n",
 					"            logger.info(\"Starting PostgreSQL-specific transformation\")\n",
-					"            postgresql_data = prepare_postgresql_data(final_data)\n",
-					"            \n",
-					"            # Define PostgreSQL output path\n",
-					"            postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
-					"            \n",
-					"            # Ensure directory exists\n",
-					"            if not mssparkutils.fs.exists(postgresql_path):\n",
-					"                logger.info(f\"Creating PostgreSQL output directory: {postgresql_path}\")\n",
-					"                mssparkutils.fs.mkdirs(postgresql_path)\n",
-					"            \n",
-					"            # Write PostgreSQL data\n",
-					"            success_pg = write_output_safely(\n",
-					"                postgresql_data, postgresql_path, \"PostgreSQL-formatted data\"\n",
-					"            )\n",
-					"            \n",
-					"            if success_pg:\n",
-					"                logger.info(f\"Successfully wrote {postgresql_data.count()} records to PostgreSQL output path\")\n",
-					"            else:\n",
-					"                logger.error(\"Failed to write PostgreSQL data\")\n",
+					"            try: \n",
+					"                postgresql_data = prepare_postgresql_data(final_data)\n",
+					"                # Define PostgreSQL output path using normalize_storage_path for consistency\n",
+					"                postgresql_path = normalize_storage_path(f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\")\n",
+					"                 # Make sure the parent directory exists\n",
+					"                parent_dir = \"/\".join(postgresql_path.split(\"/\")[:-1])            \n",
+					"                if not mssparkutils.fs.exists(parent_dir):\n",
+					"                    logger.info(f\"Creating parent directory for PostgreSQL data: {parent_dir}\")\n",
+					"                    mssparkutils.fs.mkdirs(parent_dir))\n",
+					"                 # Check postgresql_data is not empty\n",
+					"                if postgresql_data.count() == 0:\n",
+					"                    logger.warning(\"PostgreSQL data is empty, skipping write operation\")\n",
+					"                else: \n",
+					"                    # Write PostgreSQL data with detailed error handling\n",
+					"                    logger.info(f\"Writing {postgresql_data.count()} records to PostgreSQL format at {postgresql_path}\")\n",
 					"\n",
+					"                    postgresql_data.write.mode(\"overwrite\").parquet(postgresql_path)\n",
+					"                # Verify the output was written\n",
+					"                if mssparkutils.fs.exists(postgresql_path):\n",
+					"                    logger.info(f\"Successfully wrote PostgreSQL data to {postgresql_path}\"\n",
+					"                else: \n",
+					"                    logger.error(f\"Failed to write PostgreSQL data - output path {postgresql_path} does not exist after write\")\n",
+					"            except Exception as pg_error:\n",
+					"                logger.error(f\"Error in PostgreSQL branch: {str(pg_error)}\")\n",
+					"                import traceback\n",
+					"                logger.error(traceback.format_exc())          \n",
+					"\n",
+					"        \n",
 					"        if success1 and success2:\n",
 					"            logger.info(f\"Successfully processed {len(new_file_paths)} files\")\n",
 					"            logger.info(f\"Total records in output: {final_data.count()}\")\n",
@@ -1932,7 +1940,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 30
+				"execution_count": null
 			}
 		]
 	}

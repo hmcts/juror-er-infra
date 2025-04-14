@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9a6ffcde-3aa0-4ed8-8c30-a190cb59b9a2"
+				"spark.autotune.trackingId": "fceca983-3f8b-4bc8-85c0-cc5abae94715"
 			}
 		},
 		"metadata": {
@@ -828,6 +828,37 @@
 					""
 				],
 				"execution_count": 42
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def ensure_register_lett_exists(df):\n",
+					"    \"\"\"\n",
+					"    Ensure register_lett exists in the DataFrame and is synchronized with poll_number.\n",
+					"    Returns the DataFrame with register_lett added/synchronized if needed.\n",
+					"    \"\"\"\n",
+					"    # Check if register_lett already exists\n",
+					"    has_reg_lett = \"register_lett\" in df.columns\n",
+					"    \n",
+					"    # If it doesn't exist, add it from poll_number or Elector Number\n",
+					"    if not has_reg_lett:\n",
+					"        if \"poll_number\" in df.columns:\n",
+					"            print(\"Adding register_lett as copy of poll_number\")\n",
+					"            df = df.withColumn(\"register_lett\", col(\"poll_number\"))\n",
+					"        elif \"Elector Number\" in df.columns:\n",
+					"            print(\"Adding register_lett as copy of Elector Number\")\n",
+					"            df = df.withColumn(\"register_lett\", col(\"Elector Number\"))\n",
+					"    else:\n",
+					"        # If it does exist, make sure it matches poll_number\n",
+					"        if \"poll_number\" in df.columns:\n",
+					"            mismatches = df.filter(col(\"register_lett\") != col(\"poll_number\")).count()\n",
+					"            if mismatches > 0:\n",
+					"                print(f\"Found {mismatches} mismatches between register_lett and poll_number. Synchronizing...\")\n",
+					"                df = df.withColumn(\"register_lett\", col(\"poll_number\"))\n",
+					"    \n",
+					"    return df"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

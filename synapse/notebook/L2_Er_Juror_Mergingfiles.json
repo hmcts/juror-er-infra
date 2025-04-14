@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a431bec0-cdaf-4b31-93e6-13a970a4f9fe"
+				"spark.autotune.trackingId": "d235f67b-7c25-4e97-b70e-def24311a813"
 			}
 		},
 		"metadata": {
@@ -1894,13 +1894,14 @@
 					"                postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"                \n",
 					"                # Ensure directory exists\n",
-					"                if not mssparkutils.fs.exists(postgresql_path):\n",
-					"                    logger.info(f\"Creating PostgreSQL output directory: {postgresql_path}\")\n",
-					"                    mssparkutils.fs.mkdirs(postgresql_path)\n",
+					"                if mssparkutils.fs.exists(postgresql_path):\n",
+					"                    logger.info(f\"Deleting existing PostgreSQL output at {postgresql_path}\")\n",
+					"                    mssparkutils.fs.rm(postgresql_path, True)\n",
 					"                \n",
 					"                # Write PostgreSQL data\n",
 					"                logger.info(f\"Writing {postgresql_data.count()} records to PostgreSQL format\")\n",
-					"                postgresql_data.write.mode(\"overwrite\").parquet(postgresql_path)\n",
+					"                postgresql_data.write.parquet(postgresql_path)\n",
+					"                #postgresql_data.write.mode(\"overwrite\").parquet(postgresql_path)\n",
 					"                \n",
 					"                logger.info(f\"Successfully wrote PostgreSQL data to {postgresql_path}\")\n",
 					"            except Exception as pg_error:\n",

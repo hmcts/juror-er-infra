@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0e41ef7c-cabe-4042-a07b-2476804a6369"
+				"spark.autotune.trackingId": "461fbacd-8d87-49fb-848e-1d56ef14651e"
 			}
 		},
 		"metadata": {
@@ -249,7 +249,7 @@
 					"#except ImportError as e:\n",
 					" #   print(f\"Error importing validation modules: {e}\")"
 				],
-				"execution_count": null
+				"execution_count": 120
 			},
 			{
 				"cell_type": "code",
@@ -266,7 +266,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": null
+				"execution_count": 121
 			},
 			{
 				"cell_type": "code",
@@ -286,7 +286,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 122
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +297,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 123
 			},
 			{
 				"cell_type": "code",
@@ -314,7 +314,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 124
 			},
 			{
 				"cell_type": "code",
@@ -350,7 +350,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": null
+				"execution_count": 125
 			},
 			{
 				"cell_type": "code",
@@ -372,7 +372,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 126
 			},
 			{
 				"cell_type": "code",
@@ -533,7 +533,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 127
 			},
 			{
 				"cell_type": "code",
@@ -580,7 +580,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 128
 			},
 			{
 				"cell_type": "code",
@@ -592,7 +592,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 129
 			},
 			{
 				"cell_type": "code",
@@ -672,7 +672,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 130
 			},
 			{
 				"cell_type": "markdown",
@@ -755,7 +755,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 131
 			},
 			{
 				"cell_type": "code",
@@ -827,7 +827,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 132
 			},
 			{
 				"cell_type": "code",
@@ -858,7 +858,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 133
 			},
 			{
 				"cell_type": "code",
@@ -879,7 +879,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 134
 			},
 			{
 				"cell_type": "code",
@@ -896,13 +896,13 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 135
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def get_new_files(spark, input_path, process_log_path):\n",
-					"    \"\"\"Identify which files are new and need processing\"\"\"\n",
+					"    \"\"\"Identify which files are new and need processing with improved error handling\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
 					"    \n",
 					"    # Get all files in the input directory\n",
@@ -932,10 +932,16 @@
 					"    processed_files = []\n",
 					"    if mssparkutils.fs.exists(process_log_path):\n",
 					"        try:\n",
-					"            processed_files = spark.read.parquet(process_log_path) \\\n",
-					"                                  .select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"            # Check if it's a JSON or Parquet file based on extension\n",
+					"            if process_log_path.endswith(\".json\"):\n",
+					"                processed_files = spark.read.json(process_log_path) \\\n",
+					"                                      .select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"            else:\n",
+					"                processed_files = spark.read.parquet(process_log_path) \\\n",
+					"                                      .select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
 					"        except Exception as e:\n",
 					"            print(f\"Error reading process log: {str(e)}\")\n",
+					"            print(\"Treating all files as new since process log couldn't be read\")\n",
 					"    \n",
 					"    # Identify new files with more detailed logging\n",
 					"    new_files = []\n",
@@ -949,7 +955,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 136
 			},
 			{
 				"cell_type": "markdown",
@@ -1008,7 +1014,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": null
+				"execution_count": 137
 			},
 			{
 				"cell_type": "markdown",
@@ -1075,7 +1081,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": null
+				"execution_count": 138
 			},
 			{
 				"cell_type": "markdown",
@@ -1112,7 +1118,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 139
 			},
 			{
 				"cell_type": "code",
@@ -1170,7 +1176,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": null
+				"execution_count": 140
 			},
 			{
 				"cell_type": "code",
@@ -1223,7 +1229,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": null
+				"execution_count": 141
 			},
 			{
 				"cell_type": "markdown",
@@ -1317,7 +1323,7 @@
 					"    \n",
 					"    return df_with_hash"
 				],
-				"execution_count": null
+				"execution_count": 142
 			},
 			{
 				"cell_type": "markdown",
@@ -1367,7 +1373,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": null
+				"execution_count": 143
 			},
 			{
 				"cell_type": "markdown",
@@ -1484,7 +1490,7 @@
 					"        logging.info(f\"Output path {output_path} does not exist yet. Using only new data.\")\n",
 					"        return new_data"
 				],
-				"execution_count": null
+				"execution_count": 144
 			},
 			{
 				"cell_type": "markdown",
@@ -1534,7 +1540,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 145
 			},
 			{
 				"cell_type": "code",
@@ -1572,7 +1578,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 146
 			},
 			{
 				"cell_type": "code",
@@ -1624,7 +1630,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 147
 			},
 			{
 				"cell_type": "code",
@@ -1704,7 +1710,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 148
 			},
 			{
 				"cell_type": "markdown",
@@ -1960,7 +1966,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 149
 			}
 		]
 	}

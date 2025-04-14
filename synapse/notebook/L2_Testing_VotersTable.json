@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d2b5b446-4ed9-454e-a39f-931b675ee1f0"
+				"spark.autotune.trackingId": "3df9cdec-cc1f-496a-80bb-3998754e8441"
 			}
 		},
 		"metadata": {
@@ -55,15 +55,139 @@
 				"cell_type": "code",
 				"source": [
 					"from pyspark.sql import SparkSession\n",
-					"from pyspark.sql.functions import *"
+					"from pyspark.sql.functions import *\n",
+					"import logging"
 				],
-				"execution_count": 22
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
 				"source": [
+					"from notebookutils import mssparkutils\n",
+					"path = \"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_postgresql\"\n",
+					"exists = mssparkutils.fs.exists(path)\n",
+					"print(f\"Path exists: {exists}\")"
+				],
+				"execution_count": 23
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"import logging  # Ensure logging is imported\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, TimestampType\n",
+					"from pyspark.sql.utils import AnalysisException\n",
+					"import os  # Import os for file system checks\n",
+					"\n",
+					"def handle_null_values(df):\n",
+					"    \"\"\"\n",
+					"    Handle NaN, NaT, and other invalid values in the DataFrame\n",
+					"    Convert them to None (NULL in SQL) to avoid PostgreSQL errors\n",
+					"    \"\"\"\n",
+					"    from pyspark.sql.functions import col, when, lit\n",
+					"\n",
+					"    # Log the initial state\n",
+					"    logging.info(f\"Starting null value handling for DataFrame with {df.count()} rows\")\n",
+					"\n",
+					"    # First, handle timestamp columns which might contain NaT\n",
+					"    timestamp_columns = ['date_selected1', 'date_selected2', 'date_selected3']\n",
+					"    for column in timestamp_columns:\n",
+					"        if column in df.columns:\n",
+					"            # For timestamp columns, explicitly set null values\n",
+					"            df = df.withColumn(\n",
+					"                column,\n",
+					"                when(\n",
+					"                    (col(column).isNull()) |\n",
+					"                    (col(column).cast(\"string\") == \"NaT\") |\n",
+					"                    (col(column).cast(\"string\") == \"nat\") |\n",
+					"                    (col(column).cast(\"string\") == \"nan\") |\n",
+					"                    (col(column).cast(\"string\") == \"NaN\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(col(column))\n",
+					"            )\n",
+					"            logging.info(f\"Processed timestamp column: {column}\")\n",
+					"\n",
+					"    # For all other columns, handle NaN and empty strings\n",
+					"    for column in df.columns:  # Use df.columns instead of undefined df_single.columns\n",
+					"        if column not in timestamp_columns:\n",
+					"            # Replace empty strings, \"NaN\", \"nan\", etc. with NULL\n",
+					"            df = df.withColumn(\n",
+					"                column,\n",
+					"                when(\n",
+					"                    (col(column).isNull()) |\n",
+					"                    (col(column).cast(\"string\") == \"\") |\n",
+					"                    (col(column).cast(\"string\") == \"nan\") |\n",
+					"                    (col(column).cast(\"string\") == \"NaN\") |\n",
+					"                    (col(column).cast(\"string\") == \"NULL\") |\n",
+					"                    (col(column).cast(\"string\") == \"NAN\") |\n",
+					"                    (col(column).cast(\"string\") == \"None\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(col(column))\n",
+					"            )\n",
+					"\n",
+					"    logging.info(f\"Completed null value handling, DataFrame now has {df.count()} rows\")\n",
+					"    return df\n",
+					"\n",
+					"# Now to read existing data, clean it, and overwrite it:\n",
+					"storage_account = \"baubaisadfsastg\"\n",
+					"postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"\n",
+					"# Define schema manually in case the directory is empty or schema cannot be inferred\n",
+					"schema = StructType([\n",
+					"    StructField(\"date_selected1\", TimestampType(), True),\n",
+					"    StructField(\"date_selected2\", TimestampType(), True),\n",
+					"    StructField(\"date_selected3\", TimestampType(), True),\n",
+					"    StructField(\"other_column\", StringType(), True)  # Add other fields as needed\n",
+					"])\n",
+					"\n",
+					"# Read the existing data\n",
+					"try:\n",
+					"    print(f\"Checking if path exists and contains files: {postgresql_path}\")\n",
+					"    \n",
+					"    # Check if the directory exists and contains files\n",
+					"    hadoop_path = spark._jvm.org.apache.hadoop.fs.Path(postgresql_path)\n",
+					"    fs = spark._jvm.org.apache.hadoop.fs.FileSystem.get(spark._jsc.hadoopConfiguration())\n",
+					"    \n",
+					"    if not fs.exists(hadoop_path):\n",
+					"        raise Exception(f\"The specified path does not exist: {postgresql_path}\")\n",
+					"    \n",
+					"    # Check if the directory contains files\n",
+					"    file_status = fs.listStatus(hadoop_path)\n",
+					"    if not file_status or len(file_status) == 0:\n",
+					"        raise Exception(f\"The directory exists but contains no files: {postgresql_path}\")\n",
+					"\n",
+					"    # Read the Parquet files\n",
+					"    existing_data = spark.read.schema(schema).parquet(postgresql_path)\n",
+					"    print(f\"Read {existing_data.count()} records from {postgresql_path}\")\n",
+					"\n",
+					"    # Apply the null value handler\n",
+					"    cleaned_data = handle_null_values(existing_data)\n",
+					"\n",
+					"    # Overwrite the existing data\n",
+					"    print(f\"Writing cleaned data back to {postgresql_path}\")\n",
+					"    cleaned_data.write.mode(\"overwrite\").parquet(postgresql_path)\n",
+					"\n",
+					"    print(f\"Successfully overwrote data at {postgresql_path}\")\n",
+					"except AnalysisException as e:\n",
+					"    print(f\"Error reading data: {e}\")\n",
+					"    print(\"The directory might be empty or inaccessible.\")\n",
+					"except Exception as e:\n",
+					"    print(f\"Error processing data: {str(e)}\")\n",
+					"    import traceback\n",
+					"    print(traceback.format_exc())"
+				],
+				"execution_count": 26
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
 					"# Read the data\n",
-					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_transformed\")\n",
+					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_postgresql\")\n",
 					"\n",
 					"# Coalesce to a single partition\n",
 					"df_single = df.coalesce(1)\n",
@@ -72,7 +196,7 @@
 					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 23
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -82,14 +206,14 @@
 				"source": [
 					"display(df_single.limit(10))"
 				],
-				"execution_count": 24
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"df_single.count()"
 				],
-				"execution_count": 25
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -109,7 +233,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 26
+				"execution_count": null
 			}
 		]
 	}

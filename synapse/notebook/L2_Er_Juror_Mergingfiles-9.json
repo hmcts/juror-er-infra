@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bd839e7f-0fbb-40a5-92ac-0ab89b3a5e5b"
+				"spark.autotune.trackingId": "7e00a4be-5c41-4d67-b524-edaac4e73280"
 			}
 		},
 		"metadata": {
@@ -1802,11 +1802,11 @@
 					"                logger.warning(f\"Found {invalid_postcodes} records with potentially invalid postcodes\")\n",
 					"            else:\n",
 					"                logger.info(\"All postcodes passed validation\")\n",
-					"\n",
+					"        \n",
+					"        final_data = ensure_consistent_schema(transformed_data, TARGET_SCHEMA)\n",
+					"        logger.info(f\"Schema standardized with {len(TARGET_SCHEMA)} columns\")\n",
 					"        # 8. Merge with existing data\n",
-					"        final_data = merge_with_existing_data(\n",
-					"            spark, final_deduplicated, config[\"output_path\"]\n",
-					"        )\n",
+					"       final_data = merge_with_existing_data(spark, final_data, config[\"output_path\"])\n",
 					"        if final_data is None:\n",
 					"            logger.error(\"Final DataFrame is None\")\n",
 					"            return\n",

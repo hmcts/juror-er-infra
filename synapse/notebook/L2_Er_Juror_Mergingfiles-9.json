@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "469f5b25-de48-4c41-b86c-70b1bf2e00c0"
+				"spark.autotune.trackingId": "b593a3fe-8f8e-4e8b-8d73-cda15ca7b168"
 			}
 		},
 		"metadata": {
@@ -1860,7 +1860,7 @@
 					"\n",
 					"        logger.info(f\"Merged data contains {merged_new_data.count()} rows\")\n",
 					"        # Ensure register_lett exists and is synchronized with poll_number\n",
-					"        merged_new_data = ensure_register_lett_exists(merged_new_data)\n",
+					"        merged_new_data = ensure_register_poll_consistency(merged_new_data)\n",
 					"        logger.info(\"Verified register_lett exists and is synchronized with poll_number\")\n",
 					"\n",
 					"        # 5. Ensure register_lett matches poll_number\n",

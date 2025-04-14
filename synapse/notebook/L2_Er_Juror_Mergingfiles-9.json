@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e13cf182-1139-4001-bcf1-499c2888d878"
+				"spark.autotune.trackingId": "9a6ffcde-3aa0-4ed8-8c30-a190cb59b9a2"
 			}
 		},
 		"metadata": {
@@ -1355,6 +1355,9 @@
 					"    \"\"\"Merge new data with existing data using SQL-based approach with hash_id join\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
 					"    \n",
+					"    # Ensure register_lett exists in new_data\n",
+					"    new_data = ensure_register_lett_exists(new_data)\n",
+					"    \n",
 					"    # Ensure hash_id exists\n",
 					"    if \"hash_id\" not in new_data.columns:\n",
 					"        new_data = generate_hash_id(new_data)\n",
@@ -1372,6 +1375,9 @@
 					"            # Try to read with explicit schema inference\n",
 					"            existing_data = spark.read.option(\"mergeSchema\", \"true\").schema(existing_schema).parquet(output_path)\n",
 					"            \n",
+					"            # Ensure register_lett exists in existing_data\n",
+					"            existing_data = ensure_register_lett_exists(existing_data)\n",
+					"            \n",
 					"            # Ensure hash_id exists in existing data\n",
 					"            if \"hash_id\" not in existing_data.columns:\n",
 					"                existing_data = generate_hash_id(existing_data)\n",
@@ -1381,7 +1387,7 @@
 					"            # Now refresh to avoid stale references\n",
 					"            spark.sql(\"REFRESH TABLE existing_data\")\n",
 					"            \n",
-					"            # Use SQL approach with hash_id as the join key - with full update logic\n",
+					"            # Use SQL approach with hash_id as the join key\n",
 					"            merged_data = spark.sql(\"\"\"\n",
 					"                -- Keep all new records that don't exist in the existing data\n",
 					"                SELECT n.*\n",
@@ -1427,6 +1433,9 @@
 					"                ON e.hash_id = n.hash_id\n",
 					"                WHERE n.hash_id IS NULL OR n.creation_date > e.creation_date\n",
 					"            \"\"\")\n",
+					"            \n",
+					"            # Ensure register_lett is synchronized with poll_number in merged result\n",
+					"            merged_data = ensure_register_lett_exists(merged_data)\n",
 					"            \n",
 					"            return merged_data\n",
 					"            \n",

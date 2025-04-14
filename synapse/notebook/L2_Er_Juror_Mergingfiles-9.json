@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7bd03ba5-4c9c-4c69-8ad8-cf3d2a1807b5"
+				"spark.autotune.trackingId": "469f5b25-de48-4c41-b86c-70b1bf2e00c0"
 			}
 		},
 		"metadata": {
@@ -1702,6 +1702,8 @@
 					"    logger.info(f\"Preparing PostgreSQL data from {df.count()} records\")\n",
 					"    \n",
 					"    try:\n",
+					"        # Ensure poll_number and register_lett are synchronized\n",
+					"        df = ensure_register_poll_consistency(df)\n",
 					"        # 1. Select only columns needed for PostgreSQL\n",
 					"        pg_columns = [\"part_no\", \"register_lett\", \"poll_number\", \"new_marker\", \n",
 					"                     \"title\", \"lname\", \"fname\", \"dob\", \"flags\", \"address\", \n",

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c5eab333-0d6b-44cf-8b40-a0cee92aeed0"
+				"spark.autotune.trackingId": "90a5240b-273a-4f5e-818f-044a8e12db7d"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 1
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -70,16 +70,16 @@
 				},
 				"source": [
 					"# Read the data\n",
-					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_transformed\")\n",
+					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp\")\n",
 					"\n",
 					"# Coalesce to a single partition\n",
-					"df_single = df.coalesce(1)\n",
+					"#df_single = df.coalesce(1)\n",
 					"\n",
 					"# Write as a single file to a different location\n",
 					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 4
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -87,16 +87,33 @@
 					"collapsed": false
 				},
 				"source": [
-					"display(df_single.limit(10))"
+					"display(df.limit(10))"
 				],
-				"execution_count": 5
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import col\n",
+					"non_empty_zip = df.filter(col(\"poll_number\").isNull())\n",
+					"\n",
+					"# Print the number of rows where 'zip' is not null\n",
+					"print(f\"Number of rows where 'pol' is not null: {non_empty_zip.count()}\")\n",
+					"\n",
+					"# Display all columns of the filtered DataFrame\n",
+					"display(non_empty_zip)"
+				],
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"df_single.count()"
 				],
-				"execution_count": 6
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +129,7 @@
 					"exists = mssparkutils.fs.exists(path)\n",
 					"print(f\"Path exists: {exists}\")"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -225,7 +242,7 @@
 					"    import traceback\n",
 					"    print(traceback.format_exc())"
 				],
-				"execution_count": 26
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

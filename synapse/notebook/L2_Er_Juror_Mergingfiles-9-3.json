@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7b9ba739-022b-4c8e-838b-90bcad43680c"
+				"spark.autotune.trackingId": "8d2b0198-24d2-4c0b-8a18-28ad6a5bd1c6"
 			}
 		},
 		"metadata": {
@@ -1924,6 +1924,13 @@
 					"        # This ensures rec_num and other required fields exist\n",
 					"        logger.info(\"Generating hash_id...\")\n",
 					"        hashed_data = generate_hash_id(transformed_data)\n",
+					"        logger.info(\"Applying hashing to sensitive fields...\")\n",
+					"        #First apply the general hashing to create unique identifiers\n",
+					"        hashed_data = apply_hashing(hashed_data)\n",
+					"        # Then apply the specific hashing for voters table sensitive columns\n",
+					"        hashed_data = apply_hashing_to_voters(hashed_data)\n",
+					"        logger.info(\"Completed hashing of sensitive data fields\")\n",
+					"        \n",
 					"        if hashed_data is None or hashed_data.count() == 0:\n",
 					"            logger.error(\"Hashed DataFrame is empty or None\")\n",
 					"            return\n",

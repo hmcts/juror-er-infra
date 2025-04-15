@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0847c210-b365-458e-b9f5-c7a2d982595b"
+				"spark.autotune.trackingId": "2b154fa1-0a00-4132-9447-d1950d85eb63"
 			}
 		},
 		"metadata": {
@@ -1902,7 +1902,7 @@
 					"    spark = create_spark_session()\n",
 					"    config = load_config()\n",
 					"    storage_account = config[\"storage_account\"]\n",
-					"    process_log_path = f\"{config['output_path']}_process_log\"\n",
+					"    process_log_path = f\"{config['output_path']}_process_log.parquet\"\n",
 					"    \n",
 					"    # Ensure all required directories exist\n",
 					"    from notebookutils import mssparkutils\n",

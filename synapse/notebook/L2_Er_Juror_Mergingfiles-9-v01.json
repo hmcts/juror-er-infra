@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4a3100b4-b033-4d5c-908c-5a44ee8130d5"
+				"spark.autotune.trackingId": "e9730196-c9dc-445b-b1a9-a85442ca81e5"
 			}
 		},
 		"metadata": {
@@ -1283,11 +1283,7 @@
 				"source": [
 					"def apply_hashing_to_voters(df):\n",
 					"    \"\"\"Apply hashing specifically for voters_temp table column structure\"\"\"\n",
-					"    from pyspark.sql.functions import col, xxhash64, lit, concat_ws, coalesce, expr, substring, hex, when\n",
-					"    \n",
-					"    # Skip if hash_id already exists, we just need to hash sensitive fields\n",
-					"    if \"hash_id\" not in df.columns:\n",
-					"        print(\"WARNING: hash_id not found in DataFrame. Run generate_hash_id first.\")\n",
+					"    from pyspark.sql.functions import col, xxhash64, lit, concat_ws, coalesce, expr, substring, hex, when, trim\n",
 					"    \n",
 					"    # List of sensitive fields to hash with their max lengths\n",
 					"    sensitive_fields = [\n",

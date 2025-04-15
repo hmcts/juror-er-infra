@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2b154fa1-0a00-4132-9447-d1950d85eb63"
+				"spark.autotune.trackingId": "d819251b-2ccc-4636-a03f-712facef1cde"
 			}
 		},
 		"metadata": {
@@ -1903,6 +1903,23 @@
 					"    config = load_config()\n",
 					"    storage_account = config[\"storage_account\"]\n",
 					"    process_log_path = f\"{config['output_path']}_process_log.parquet\"\n",
+					"    ## CLEAN UP PROBLEMATIC FILES FIRST\n",
+					"    try:\n",
+					"        from notebookutils import mssparkutils\n",
+					"        cleanup_paths = [\n",
+					"            process_log_path,\n",
+					"            f\"{config['output_path']}_process_log\",\n",
+					"            f\"{config['output_path']}_process_log.json\",\n",
+					"            f\"{config['input_path']}/processing_summary.json\"\n",
+					"        ]\n",
+					"        print(\"Cleaning up any existing log files before starting...\")\n",
+					"        for path in cleanup_paths:\n",
+					"            if mssparkutils.fs.exists(path):\n",
+					"                print(f\"Removing existing path: {path}\")\n",
+					"                mssparkutils.fs.rm(path, True)\n",
+					"                print(f\"Successfully removed: {path}\")\n",
+					"    except Exception as cleanup_err:\n",
+					"        print(f\"Error during cleanup: {str(cleanup_err)}\")\n",
 					"    \n",
 					"    # Ensure all required directories exist\n",
 					"    from notebookutils import mssparkutils\n",

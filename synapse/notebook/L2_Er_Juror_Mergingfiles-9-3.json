@@ -3,6 +3,10 @@
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -13,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e0ab5be4-68dd-4384-97f7-fb13a01d1edf"
+				"spark.autotune.trackingId": "9cddd34f-c9b3-42af-844c-3d0ab4d89e36"
 			}
 		},
 		"metadata": {
@@ -25,6 +29,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -1178,6 +1197,56 @@
 				"source": [
 					"## Apply Hashing for Sensitive Data"
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def apply_hashing_to_voters(df):\n",
+					"    \"\"\"Apply hashing specifically for voters_temp table column structure\"\"\"\n",
+					"    from pyspark.sql.functions import col, xxhash64, lit, concat_ws, coalesce, expr, substring, hex, when\n",
+					"    \n",
+					"    # Skip if hash_id already exists, we just need to hash sensitive fields\n",
+					"    if \"hash_id\" not in df.columns:\n",
+					"        print(\"WARNING: hash_id not found in DataFrame. Run generate_hash_id first.\")\n",
+					"    \n",
+					"    # List of sensitive fields to hash with their max lengths\n",
+					"    sensitive_fields = [\n",
+					"        (\"fname\", 20),\n",
+					"        (\"lname\", 20),\n",
+					"        (\"dob\", 10),\n",
+					"        (\"address\", 35),\n",
+					"        (\"address2\", 35),\n",
+					"        (\"address3\", 35)\n",
+					"    ]\n",
+					"    \n",
+					"    # Store original values for reference\n",
+					"    hashed_df = df\n",
+					"    for field, _ in sensitive_fields:\n",
+					"        if field in df.columns:\n",
+					"            original_col = f\"original_{field}\"\n",
+					"            if original_col not in df.columns:\n",
+					"                hashed_df = hashed_df.withColumn(original_col, col(field))\n",
+					"    \n",
+					"    # Hash each sensitive field\n",
+					"    for field, max_length in sensitive_fields:\n",
+					"        if field in hashed_df.columns:\n",
+					"            try:\n",
+					"                hashed_df = hashed_df.withColumn(\n",
+					"                    field,\n",
+					"                    when(\n",
+					"                        (col(field).isNull()) | (trim(col(field)) == \"\"),\n",
+					"                        None\n",
+					"                    ).otherwise(\n",
+					"                        substring(hex(xxhash64(col(field))), 1, max_length)\n",
+					"                    )\n",
+					"                )\n",
+					"                print(f\"Successfully hashed field: {field}\")\n",
+					"            except Exception as e:\n",
+					"                print(f\"Error hashing {field}: {str(e)}\")\n",
+					"    \n",
+					"    return hashed_df"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

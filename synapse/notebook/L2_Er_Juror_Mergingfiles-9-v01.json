@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e5f880e1-4036-4b4f-b5b4-754d2072995f"
+				"spark.autotune.trackingId": "f72a4d8f-9db4-40f0-9fd5-1472f9fa4710"
 			}
 		},
 		"metadata": {
@@ -939,7 +939,20 @@
 					"        try:\n",
 					"            # Check if it's a JSON or Parquet file based on extension\n",
 					"            print(f\"Reading process log from {process_log_path}\")\n",
-					"            if process_log_path.endswith(\".json\"):\n",
+					"            \n",
+					"            # First try to determine if it's actually a directory containing Parquet files\n",
+					"            if mssparkutils.fs.isDir(process_log_path):\n",
+					"                try:\n",
+					"                    log_df = spark.read.parquet(process_log_path)\n",
+					"                    if \"file_path\" in log_df.columns:\n",
+					"                        processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"                        print(f\"Successfully read {len(processed_files)} entries from Parquet directory\")\n",
+					"                    else:\n",
+					"                        print(f\"Warning: Process log at {process_log_path} doesn't have 'file_path' column\")\n",
+					"                except Exception as dir_err:\n",
+					"                    print(f\"Error reading process log as directory: {str(dir_err)}\")\n",
+					"            # If it's not a directory or reading as directory failed, try based on extension\n",
+					"            elif process_log_path.endswith(\".json\"):\n",
 					"                # If it's a JSON file, use JSON reader\n",
 					"                try:\n",
 					"                    log_df = spark.read.json(process_log_path)\n",
@@ -961,6 +974,16 @@
 					"                        print(f\"Warning: Process log at {process_log_path} doesn't have 'file_path' column\")\n",
 					"                except Exception as parquet_err:\n",
 					"                    print(f\"Error reading Parquet process log: {str(parquet_err)}\")\n",
+					"                    # Try as JSON as last resort\n",
+					"                    try:\n",
+					"                        log_df = spark.read.json(process_log_path)\n",
+					"                        if \"file_path\" in log_df.columns:\n",
+					"                            processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"                            print(f\"Successfully read {len(processed_files)} entries using JSON as fallback\")\n",
+					"                        else:\n",
+					"                            print(f\"Warning: Process log doesn't have 'file_path' column\")\n",
+					"                    except Exception as final_err:\n",
+					"                        print(f\"All attempts to read process log failed: {str(final_err)}\")\n",
 					"        except Exception as e:\n",
 					"            print(f\"Error reading process log: {str(e)}\")\n",
 					"            print(\"Treating all files as new since process log couldn't be read\")\n",
@@ -1520,6 +1543,34 @@
 				"source": [
 					"## Merge with Existing Data"
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def ensure_register_lett_exists(df):\n",
+					"    \"\"\"Ensure register_lett column exists and is populated correctly\"\"\"\n",
+					"    # Check if register_lett already exists\n",
+					"    if \"register_lett\" in df.columns:\n",
+					"        return df\n",
+					"    \n",
+					"    # If register_lett doesn't exist but poll_number does, create register_lett from poll_number\n",
+					"    if \"poll_number\" in df.columns:\n",
+					"        print(\"Creating register_lett from poll_number\")\n",
+					"        df = df.withColumn(\"register_lett\", col(\"poll_number\"))\n",
+					"        return df\n",
+					"    \n",
+					"    # If neither exists but Elector Number does, create both from Elector Number\n",
+					"    if \"Elector Number\" in df.columns:\n",
+					"        print(\"Creating register_lett from Elector Number\")\n",
+					"        df = df.withColumn(\"register_lett\", col(\"Elector Number\"))\n",
+					"        return df\n",
+					"    \n",
+					"    # If no suitable source column exists, create an empty register_lett\n",
+					"    print(\"WARNING: No source column for register_lett found, creating empty column\")\n",
+					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
+					"    return df"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

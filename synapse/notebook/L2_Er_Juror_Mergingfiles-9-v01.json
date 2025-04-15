@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f2338116-d56b-42f7-8397-5eb83528ac27"
+				"spark.autotune.trackingId": "ba4d91c4-d587-43c4-ab62-6bf2b2ca8b41"
 			}
 		},
 		"metadata": {
@@ -251,7 +251,7 @@
 					"#except ImportError as e:\n",
 					" #   print(f\"Error importing validation modules: {e}\")"
 				],
-				"execution_count": null
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -268,7 +268,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": null
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +288,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -299,7 +299,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -316,7 +316,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -352,7 +352,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": null
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -374,7 +374,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -535,7 +535,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -582,7 +582,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -594,7 +594,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -674,7 +674,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 42
 			},
 			{
 				"cell_type": "markdown",
@@ -743,7 +743,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -863,7 +863,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -884,7 +884,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -901,13 +901,13 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def get_new_files(spark, input_path, process_log_path):\n",
-					"    \"\"\"Identify which files are new and need processing with improved error handling\"\"\"\n",
+					"    \"\"\"Identify which files are new and need processing with robust format detection\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
 					"    \n",
 					"    # Get all files in the input directory\n",
@@ -916,15 +916,11 @@
 					"    # List all items in the directory\n",
 					"    try:\n",
 					"        items = mssparkutils.fs.ls(input_path)\n",
-					"        \n",
-					"        # Log what we found for debugging\n",
 					"        print(f\"Found {len(items)} items in {input_path}\")\n",
 					"        \n",
 					"        for item in items:\n",
-					"            # Try multiple ways to identify Parquet data\n",
 					"            if (hasattr(item, 'path') and (\n",
 					"                   item.path.endswith(\".parquet\") or \n",
-					"                   # Also check for Parquet directories that Spark might have written\n",
 					"                   (hasattr(item, 'isDir') and item.isDir and \n",
 					"                    mssparkutils.fs.exists(f\"{item.path}/_SUCCESS\"))\n",
 					"               )):\n",
@@ -937,53 +933,90 @@
 					"    processed_files = []\n",
 					"    if mssparkutils.fs.exists(process_log_path):\n",
 					"        try:\n",
-					"            # Check if it's a JSON or Parquet file based on extension\n",
 					"            print(f\"Reading process log from {process_log_path}\")\n",
 					"            \n",
-					"            # First try to determine if it's actually a directory containing Parquet files\n",
+					"            # Check if log path is a directory containing JSON or Parquet files\n",
 					"            if mssparkutils.fs.isDir(process_log_path):\n",
-					"                try:\n",
-					"                    log_df = spark.read.parquet(process_log_path)\n",
-					"                    if \"file_path\" in log_df.columns:\n",
-					"                        processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
-					"                        print(f\"Successfully read {len(processed_files)} entries from Parquet directory\")\n",
-					"                    else:\n",
-					"                        print(f\"Warning: Process log at {process_log_path} doesn't have 'file_path' column\")\n",
-					"                except Exception as dir_err:\n",
-					"                    print(f\"Error reading process log as directory: {str(dir_err)}\")\n",
-					"            # If it's not a directory or reading as directory failed, try based on extension\n",
-					"            elif process_log_path.endswith(\".json\"):\n",
-					"                # If it's a JSON file, use JSON reader\n",
-					"                try:\n",
-					"                    log_df = spark.read.json(process_log_path)\n",
-					"                    if \"file_path\" in log_df.columns:\n",
-					"                        processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
-					"                        print(f\"Successfully read {len(processed_files)} entries from JSON process log\")\n",
-					"                    else:\n",
-					"                        print(f\"Warning: Process log at {process_log_path} doesn't have 'file_path' column\")\n",
-					"                except Exception as json_err:\n",
-					"                    print(f\"Error reading JSON process log: {str(json_err)}\")\n",
-					"            else:\n",
-					"                # Otherwise, use Parquet reader\n",
-					"                try:\n",
-					"                    log_df = spark.read.parquet(process_log_path)\n",
-					"                    if \"file_path\" in log_df.columns:\n",
-					"                        processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
-					"                        print(f\"Successfully read {len(processed_files)} entries from Parquet process log\")\n",
-					"                    else:\n",
-					"                        print(f\"Warning: Process log at {process_log_path} doesn't have 'file_path' column\")\n",
-					"                except Exception as parquet_err:\n",
-					"                    print(f\"Error reading Parquet process log: {str(parquet_err)}\")\n",
-					"                    # Try as JSON as last resort\n",
+					"                # List files in directory to determine format\n",
+					"                log_files = mssparkutils.fs.ls(process_log_path)\n",
+					"                json_files = [f for f in log_files if hasattr(f, 'path') and f.path.endswith(\".json\")]\n",
+					"                parquet_files = [f for f in log_files if hasattr(f, 'path') and f.path.endswith(\".parquet\")]\n",
+					"                \n",
+					"                if json_files:\n",
+					"                    print(f\"Found {len(json_files)} JSON files in log directory\")\n",
 					"                    try:\n",
-					"                        log_df = spark.read.json(process_log_path)\n",
+					"                        # Read as JSON\n",
+					"                        log_df = spark.read.option(\"multiLine\", \"true\").json(process_log_path)\n",
 					"                        if \"file_path\" in log_df.columns:\n",
 					"                            processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
-					"                            print(f\"Successfully read {len(processed_files)} entries using JSON as fallback\")\n",
+					"                            print(f\"Successfully read {len(processed_files)} entries from JSON directory\")\n",
 					"                        else:\n",
-					"                            print(f\"Warning: Process log doesn't have 'file_path' column\")\n",
-					"                    except Exception as final_err:\n",
-					"                        print(f\"All attempts to read process log failed: {str(final_err)}\")\n",
+					"                            print(f\"Warning: JSON log doesn't have 'file_path' column\")\n",
+					"                    except Exception as json_err:\n",
+					"                        print(f\"Error reading JSON directory: {str(json_err)}\")\n",
+					"                elif parquet_files:\n",
+					"                    print(f\"Found {len(parquet_files)} Parquet files in log directory\")\n",
+					"                    try:\n",
+					"                        # Read as Parquet\n",
+					"                        log_df = spark.read.parquet(process_log_path)\n",
+					"                        if \"file_path\" in log_df.columns:\n",
+					"                            processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"                            print(f\"Successfully read {len(processed_files)} entries from Parquet directory\")\n",
+					"                        else:\n",
+					"                            print(f\"Warning: Parquet log doesn't have 'file_path' column\")\n",
+					"                    except Exception as parquet_err:\n",
+					"                        print(f\"Error reading Parquet directory: {str(parquet_err)}\")\n",
+					"                else:\n",
+					"                    print(f\"No recognizable log files found in directory\")\n",
+					"            else:\n",
+					"                # It's a file, try to read based on extension\n",
+					"                if process_log_path.endswith(\".json\"):\n",
+					"                    try:\n",
+					"                        # Text reading approach to handle potentially malformed JSON\n",
+					"                        raw_text = spark.read.text(process_log_path).collect()\n",
+					"                        if raw_text:\n",
+					"                            # Try to parse JSON manually if needed\n",
+					"                            import json\n",
+					"                            try:\n",
+					"                                json_content = \"\".join([row[0] for row in raw_text])\n",
+					"                                parsed_data = json.loads(json_content)\n",
+					"                                if isinstance(parsed_data, dict) and \"file_path\" in parsed_data:\n",
+					"                                    processed_files = [parsed_data[\"file_path\"]]\n",
+					"                                elif isinstance(parsed_data, list):\n",
+					"                                    processed_files = [item[\"file_path\"] for item in parsed_data if \"file_path\" in item]\n",
+					"                                print(f\"Successfully parsed JSON manually: {len(processed_files)} entries\")\n",
+					"                            except json.JSONDecodeError:\n",
+					"                                print(\"Manual JSON parsing failed, trying Spark JSON reader\")\n",
+					"                                log_df = spark.read.option(\"multiLine\", \"true\").json(process_log_path)\n",
+					"                                if \"file_path\" in log_df.columns:\n",
+					"                                    processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"                                    print(f\"Successfully read {len(processed_files)} entries from JSON file\")\n",
+					"                                else:\n",
+					"                                    print(f\"Warning: JSON file doesn't have 'file_path' column\")\n",
+					"                        else:\n",
+					"                            print(\"Empty or missing JSON file\")\n",
+					"                    except Exception as json_err:\n",
+					"                        print(f\"All JSON reading approaches failed: {str(json_err)}\")\n",
+					"                else:\n",
+					"                    try:\n",
+					"                        # Try Parquet\n",
+					"                        log_df = spark.read.parquet(process_log_path)\n",
+					"                        if \"file_path\" in log_df.columns:\n",
+					"                            processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"                            print(f\"Successfully read {len(processed_files)} entries from Parquet file\")\n",
+					"                        else:\n",
+					"                            print(f\"Warning: Parquet file doesn't have 'file_path' column\")\n",
+					"                    except Exception as parquet_err:\n",
+					"                        print(f\"Error reading as Parquet, trying JSON as fallback: {str(parquet_err)}\")\n",
+					"                        try:\n",
+					"                            log_df = spark.read.option(\"multiLine\", \"true\").json(process_log_path)\n",
+					"                            if \"file_path\" in log_df.columns:\n",
+					"                                processed_files = log_df.select(\"file_path\").rdd.flatMap(lambda x: x).collect()\n",
+					"                                print(f\"Successfully read {len(processed_files)} entries using JSON fallback\")\n",
+					"                            else:\n",
+					"                                print(f\"Warning: JSON fallback doesn't have 'file_path' column\")\n",
+					"                        except Exception as final_err:\n",
+					"                            print(f\"All reading attempts failed: {str(final_err)}\")\n",
 					"        except Exception as e:\n",
 					"            print(f\"Error reading process log: {str(e)}\")\n",
 					"            print(\"Treating all files as new since process log couldn't be read\")\n",
@@ -1002,7 +1035,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 47
 			},
 			{
 				"cell_type": "markdown",
@@ -1054,7 +1087,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": null
+				"execution_count": 48
 			},
 			{
 				"cell_type": "markdown",
@@ -1114,7 +1147,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": null
+				"execution_count": 49
 			},
 			{
 				"cell_type": "markdown",
@@ -1144,7 +1177,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -1202,7 +1235,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": null
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -1255,7 +1288,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": null
+				"execution_count": 52
 			},
 			{
 				"cell_type": "markdown",
@@ -1341,7 +1374,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -1387,7 +1420,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -1468,7 +1501,7 @@
 					"    \n",
 					"    return df_with_hash"
 				],
-				"execution_count": null
+				"execution_count": 55
 			},
 			{
 				"cell_type": "markdown",
@@ -1536,7 +1569,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": null
+				"execution_count": 56
 			},
 			{
 				"cell_type": "markdown",
@@ -1570,7 +1603,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -1674,7 +1707,7 @@
 					"        logging.info(f\"Output path {output_path} does not exist yet. Using only new data.\")\n",
 					"        return new_data"
 				],
-				"execution_count": null
+				"execution_count": 58
 			},
 			{
 				"cell_type": "markdown",
@@ -1717,7 +1750,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -1749,7 +1782,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -1823,7 +1856,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -1924,7 +1957,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 62
 			},
 			{
 				"cell_type": "markdown",
@@ -2208,7 +2241,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 63
 			}
 		]
 	}

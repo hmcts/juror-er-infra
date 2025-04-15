@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "30224f78-2833-4230-b60d-6c071d933585"
+				"spark.autotune.trackingId": "afb3b00b-d4fa-496a-8a61-1c6e7a770bf6"
 			}
 		},
 		"metadata": {
@@ -907,14 +907,13 @@
 				"cell_type": "code",
 				"source": [
 					"def get_new_files(spark, input_path, process_log_path):\n",
-					"    \"\"\"Identify which files are new and need processing using text-based logging\"\"\"\n",
+					"    \"\"\"Identify which files are new using text-based logging\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
 					"    \n",
 					"    # Adjust log path to use text format\n",
-					"    if not process_log_path.endswith(\".txt\"):\n",
-					"        text_log_path = process_log_path + \".txt\"\n",
-					"    else:\n",
-					"        text_log_path = process_log_path\n",
+					"    text_log_path = process_log_path\n",
+					"    if not text_log_path.endswith(\".txt\"):\n",
+					"        text_log_path = f\"{process_log_path}.txt\"\n",
 					"    \n",
 					"    # Get all files in the input directory\n",
 					"    all_files = []\n",

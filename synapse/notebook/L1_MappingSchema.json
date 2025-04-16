@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e8d095c3-41d1-4255-bf3b-438574f2e79c"
+				"spark.autotune.trackingId": "eb158490-4903-43af-9eb1-bf3434e6d549"
 			}
 		},
 		"metadata": {
@@ -152,7 +152,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 27
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -162,7 +162,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": 28
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -176,7 +176,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 29
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 30
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -227,7 +227,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 31
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -252,7 +252,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 32
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -269,7 +269,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 33
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -299,7 +299,7 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": 34
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -317,7 +317,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": 35
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -350,7 +350,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 36
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -382,7 +382,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 37
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -468,7 +468,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 38
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -525,7 +525,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 39
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -547,7 +547,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 40
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -637,7 +637,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 41
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -694,7 +694,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 42
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -721,7 +721,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 43
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -756,7 +756,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 44
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -806,7 +806,7 @@
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
 					"    return df"
 				],
-				"execution_count": 45
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -851,7 +851,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 46
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -881,7 +881,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 47
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -1020,7 +1020,7 @@
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
 					"        return result"
 				],
-				"execution_count": 48
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1046,7 +1046,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 49
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -1083,7 +1083,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 50
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -1137,7 +1137,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 51
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -1190,7 +1190,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 52
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -1221,7 +1221,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 53
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -1405,6 +1405,7 @@
 					"    \n",
 					"    # Delete log file if forcing a clean run\n",
 					"    if FORCE_CLEAN_RUN:\n",
+					"        storage_account = \"baubaisadfsastg\"\n",
 					"        log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
 					"        if mssparkutils.fs.exists(log_file_path):\n",
 					"            try:\n",
@@ -1417,7 +1418,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 54
+				"execution_count": 29
 			}
 		]
 	}

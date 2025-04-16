@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2b2d31ae-6b4f-42ae-885d-b41797d25fd8"
+				"spark.autotune.trackingId": "bc849e98-fd5b-455a-b0b1-fe70772007fd"
 			}
 		},
 		"metadata": {
@@ -1510,6 +1510,9 @@
 					"    \"\"\"Merge new data with existing data using SQL-based approach with hash_id join\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
 					"    \n",
+					"    # Add debug logging\n",
+					"    print(f\"New data has {new_data.count()} rows\")\n",
+					"    \n",
 					"    # Ensure register_lett exists in new_data\n",
 					"    new_data = ensure_register_lett_exists(new_data)\n",
 					"    \n",
@@ -1529,6 +1532,7 @@
 					"            \n",
 					"            # Try to read with explicit schema inference\n",
 					"            existing_data = spark.read.option(\"mergeSchema\", \"true\").schema(existing_schema).parquet(output_path)\n",
+					"            print(f\"Existing data has {existing_data.count()} rows\")\n",
 					"            \n",
 					"            # Ensure register_lett exists in existing_data\n",
 					"            existing_data = ensure_register_lett_exists(existing_data)\n",
@@ -1552,7 +1556,7 @@
 					"                \n",
 					"                UNION ALL\n",
 					"                \n",
-					"                -- For existing records, either keep them or update with new values if available\n",
+					"                -- Keep all existing records\n",
 					"                SELECT \n",
 					"                    COALESCE(n.part_no, e.part_no) as part_no,\n",
 					"                    COALESCE(n.register_lett, e.register_lett) as register_lett,\n",
@@ -1586,8 +1590,11 @@
 					"                FROM existing_data e\n",
 					"                LEFT JOIN new_data n\n",
 					"                ON e.hash_id = n.hash_id\n",
-					"                WHERE n.hash_id IS NULL OR n.creation_date > e.creation_date\n",
 					"            \"\"\")\n",
+					"            \n",
+					"            # Count rows after merge\n",
+					"            merged_count = merged_data.count()\n",
+					"            print(f\"Merged data has {merged_count} rows\")\n",
 					"            \n",
 					"            # Ensure register_lett is synchronized with poll_number in merged result\n",
 					"            merged_data = ensure_register_lett_exists(merged_data)\n",

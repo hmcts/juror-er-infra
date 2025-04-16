@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bf0a15c6-4f5d-4479-91da-be39c70809d6"
+				"spark.autotune.trackingId": "2f38ced8-3f02-404e-8a03-7208dce7243d"
 			}
 		},
 		"metadata": {
@@ -251,7 +251,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 278
+				"execution_count": 309
 			},
 			{
 				"cell_type": "code",
@@ -271,7 +271,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 279
+				"execution_count": 310
 			},
 			{
 				"cell_type": "code",
@@ -282,7 +282,7 @@
 					"        .appName(\"Electoral Data ETL\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 280
+				"execution_count": 311
 			},
 			{
 				"cell_type": "code",
@@ -299,7 +299,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 281
+				"execution_count": 312
 			},
 			{
 				"cell_type": "code",
@@ -335,7 +335,7 @@
 					"    (\"creation_date\", StringType())\n",
 					"]"
 				],
-				"execution_count": 282
+				"execution_count": 313
 			},
 			{
 				"cell_type": "code",
@@ -357,7 +357,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 283
+				"execution_count": 314
 			},
 			{
 				"cell_type": "code",
@@ -518,7 +518,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 284
+				"execution_count": 315
 			},
 			{
 				"cell_type": "code",
@@ -565,7 +565,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 285
+				"execution_count": 316
 			},
 			{
 				"cell_type": "code",
@@ -577,7 +577,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 286
+				"execution_count": 317
 			},
 			{
 				"cell_type": "code",
@@ -657,7 +657,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 287
+				"execution_count": 318
 			},
 			{
 				"cell_type": "markdown",
@@ -740,7 +740,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 288
+				"execution_count": 319
 			},
 			{
 				"cell_type": "code",
@@ -812,7 +812,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 289
+				"execution_count": 320
 			},
 			{
 				"cell_type": "code",
@@ -862,7 +862,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 290
+				"execution_count": 321
 			},
 			{
 				"cell_type": "code",
@@ -883,7 +883,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 291
+				"execution_count": 322
 			},
 			{
 				"cell_type": "code",
@@ -900,7 +900,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 292
+				"execution_count": 323
 			},
 			{
 				"cell_type": "code",
@@ -968,7 +968,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 293
+				"execution_count": 324
 			},
 			{
 				"cell_type": "markdown",
@@ -1027,7 +1027,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 294
+				"execution_count": 325
 			},
 			{
 				"cell_type": "markdown",
@@ -1094,7 +1094,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 295
+				"execution_count": 326
 			},
 			{
 				"cell_type": "markdown",
@@ -1131,7 +1131,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 296
+				"execution_count": 327
 			},
 			{
 				"cell_type": "code",
@@ -1189,7 +1189,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 297
+				"execution_count": 328
 			},
 			{
 				"cell_type": "code",
@@ -1242,7 +1242,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 298
+				"execution_count": 329
 			},
 			{
 				"cell_type": "markdown",
@@ -1319,7 +1319,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": 299
+				"execution_count": 330
 			},
 			{
 				"cell_type": "code",
@@ -1385,7 +1385,7 @@
 					"    \n",
 					"    return df_with_hash"
 				],
-				"execution_count": 300
+				"execution_count": 331
 			},
 			{
 				"cell_type": "markdown",
@@ -1460,7 +1460,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 301
+				"execution_count": 332
 			},
 			{
 				"cell_type": "code",
@@ -1488,7 +1488,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": 302
+				"execution_count": 333
 			},
 			{
 				"cell_type": "markdown",
@@ -1519,8 +1519,9 @@
 					"    # Ensure hash_id exists\n",
 					"    if \"hash_id\" not in new_data.columns:\n",
 					"        new_data = generate_hash_id(new_data)\n",
-					"        \n",
-					"    # Check if existing data is available\n",
+					"    \n",
+					"    # Check if existing data is available and has content\n",
+					"    existing_data_empty = True\n",
 					"    if mssparkutils.fs.exists(output_path):\n",
 					"        try:\n",
 					"            # Read existing data with schema from new_data\n",
@@ -1529,93 +1530,102 @@
 					"            \n",
 					"            # Try to read with explicit schema inference\n",
 					"            existing_data = spark.read.option(\"mergeSchema\", \"true\").schema(existing_schema).parquet(output_path)\n",
-					"            print(f\"Existing data has {existing_data.count()} rows\")\n",
+					"            existing_count = existing_data.count()\n",
+					"            print(f\"Existing data has {existing_count} rows\")\n",
 					"            \n",
-					"            # Special case: If existing data is empty, just return new data\n",
-					"            if existing_data.count() == 0:\n",
-					"                print(\"Existing data is empty, returning only new data\")\n",
-					"                return new_data\n",
-					"            \n",
-					"            # Ensure register_lett exists in existing_data\n",
-					"            existing_data = ensure_register_lett_exists(existing_data)\n",
-					"            \n",
-					"            # Ensure hash_id exists in existing data\n",
-					"            if \"hash_id\" not in existing_data.columns:\n",
-					"                existing_data = generate_hash_id(existing_data)\n",
+					"            # If existing data is empty, treat as initial load\n",
+					"            if existing_count == 0:\n",
+					"                print(\"Existing data is empty - treating as initial load\")\n",
+					"                existing_data_empty = True\n",
+					"            else:\n",
+					"                existing_data_empty = False\n",
 					"                \n",
-					"            # Register temporary views\n",
-					"            new_data.createOrReplaceTempView(\"new_data\")\n",
-					"            existing_data.createOrReplaceTempView(\"existing_data\")\n",
-					"            \n",
-					"            # Now refresh to avoid stale references\n",
-					"            spark.sql(\"REFRESH TABLE existing_data\")\n",
-					"            \n",
-					"            # Use SQL approach with hash_id as the join key\n",
-					"            merged_data = spark.sql(\"\"\"\n",
-					"                -- Keep all new records that don't exist in the existing data\n",
-					"                SELECT n.*\n",
-					"                FROM new_data n\n",
-					"                LEFT ANTI JOIN existing_data e\n",
-					"                ON n.hash_id = e.hash_id\n",
+					"                # Ensure register_lett exists in existing_data\n",
+					"                existing_data = ensure_register_lett_exists(existing_data)\n",
 					"                \n",
-					"                UNION ALL\n",
-					"                \n",
-					"                -- Keep all existing records\n",
-					"                SELECT \n",
-					"                    COALESCE(n.part_no, e.part_no) as part_no,\n",
-					"                    COALESCE(n.register_lett, e.register_lett) as register_lett,\n",
-					"                    COALESCE(n.poll_number, e.poll_number) as poll_number,\n",
-					"                    COALESCE(n.new_marker, e.new_marker) as new_marker,\n",
-					"                    COALESCE(n.title, e.title) as title,\n",
-					"                    COALESCE(n.lname, e.lname) as lname,\n",
-					"                    COALESCE(n.fname, e.fname) as fname,\n",
-					"                    COALESCE(n.dob, e.dob) as dob,\n",
-					"                    COALESCE(n.flags, e.flags) as flags,\n",
-					"                    COALESCE(n.address, e.address) as address,\n",
-					"                    COALESCE(n.address2, e.address2) as address2, \n",
-					"                    COALESCE(n.address3, e.address3) as address3,\n",
-					"                    COALESCE(n.address4, e.address4) as address4,\n",
-					"                    COALESCE(n.address5, e.address5) as address5,\n",
-					"                    COALESCE(n.address6, e.address6) as address6,\n",
-					"                    COALESCE(n.zip, e.zip) as zip,\n",
-					"                    COALESCE(n.date_selected1, e.date_selected1) as date_selected1,\n",
-					"                    COALESCE(n.date_selected2, e.date_selected2) as date_selected2,\n",
-					"                    COALESCE(n.date_selected3, e.date_selected3) as date_selected3,\n",
-					"                    COALESCE(n.rec_num, e.rec_num) as rec_num,\n",
-					"                    COALESCE(n.perm_disqual, e.perm_disqual) as perm_disqual,\n",
-					"                    COALESCE(n.source_id, e.source_id) as source_id,\n",
-					"                    COALESCE(n.postcode_start, e.postcode_start) as postcode_start,\n",
-					"                    e.hash_id as hash_id,\n",
-					"                    CASE \n",
-					"                        WHEN n.creation_date > e.creation_date THEN n.creation_date\n",
-					"                        ELSE e.creation_date\n",
-					"                    END as creation_date\n",
-					"                FROM existing_data e\n",
-					"                LEFT JOIN new_data n\n",
-					"                ON e.hash_id = n.hash_id\n",
-					"            \"\"\")\n",
-					"            \n",
-					"            # Count rows after merge\n",
-					"            merged_count = merged_data.count()\n",
-					"            print(f\"Merged data has {merged_count} rows\")\n",
-					"            \n",
-					"            # Ensure register_lett is synchronized with poll_number in merged result\n",
-					"            merged_data = ensure_register_lett_exists(merged_data)\n",
-					"            \n",
-					"            return merged_data\n",
-					"            \n",
+					"                # Ensure hash_id exists in existing data\n",
+					"                if \"hash_id\" not in existing_data.columns:\n",
+					"                    existing_data = generate_hash_id(existing_data)\n",
 					"        except Exception as e:\n",
-					"            logging.error(f\"Error merging with existing data: {str(e)}\")\n",
-					"            logging.warning(\"Returning only new data due to merge error\")\n",
-					"            import traceback\n",
-					"            logging.error(traceback.format_exc())\n",
-					"            return new_data\n",
-					"    else:\n",
-					"        # No existing data, just return the new data\n",
-					"        logging.info(f\"Output path {output_path} does not exist yet. Using only new data.\")\n",
+					"            print(f\"Error reading existing data: {str(e)}\")\n",
+					"            existing_data_empty = True\n",
+					"    \n",
+					"    # Initial load case - just return new data\n",
+					"    if existing_data_empty:\n",
+					"        print(\"Using new data only (initial load)\")\n",
+					"        return new_data\n",
+					"    \n",
+					"    # Regular merge case - existing data has content\n",
+					"    try:\n",
+					"        # Register temporary views\n",
+					"        new_data.createOrReplaceTempView(\"new_data\")\n",
+					"        existing_data.createOrReplaceTempView(\"existing_data\")\n",
+					"        \n",
+					"        # Now refresh to avoid stale references\n",
+					"        spark.sql(\"REFRESH TABLE existing_data\")\n",
+					"        \n",
+					"        # Use SQL approach with hash_id as the join key\n",
+					"        merged_data = spark.sql(\"\"\"\n",
+					"            -- Keep all new records that don't exist in the existing data\n",
+					"            SELECT n.*\n",
+					"            FROM new_data n\n",
+					"            LEFT ANTI JOIN existing_data e\n",
+					"            ON n.hash_id = e.hash_id\n",
+					"            \n",
+					"            UNION ALL\n",
+					"            \n",
+					"            -- Keep all existing records\n",
+					"            SELECT \n",
+					"                COALESCE(n.part_no, e.part_no) as part_no,\n",
+					"                COALESCE(n.register_lett, e.register_lett) as register_lett,\n",
+					"                COALESCE(n.poll_number, e.poll_number) as poll_number,\n",
+					"                COALESCE(n.new_marker, e.new_marker) as new_marker,\n",
+					"                COALESCE(n.title, e.title) as title,\n",
+					"                COALESCE(n.lname, e.lname) as lname,\n",
+					"                COALESCE(n.fname, e.fname) as fname,\n",
+					"                COALESCE(n.dob, e.dob) as dob,\n",
+					"                COALESCE(n.flags, e.flags) as flags,\n",
+					"                COALESCE(n.address, e.address) as address,\n",
+					"                COALESCE(n.address2, e.address2) as address2, \n",
+					"                COALESCE(n.address3, e.address3) as address3,\n",
+					"                COALESCE(n.address4, e.address4) as address4,\n",
+					"                COALESCE(n.address5, e.address5) as address5,\n",
+					"                COALESCE(n.address6, e.address6) as address6,\n",
+					"                COALESCE(n.zip, e.zip) as zip,\n",
+					"                COALESCE(n.date_selected1, e.date_selected1) as date_selected1,\n",
+					"                COALESCE(n.date_selected2, e.date_selected2) as date_selected2,\n",
+					"                COALESCE(n.date_selected3, e.date_selected3) as date_selected3,\n",
+					"                COALESCE(n.rec_num, e.rec_num) as rec_num,\n",
+					"                COALESCE(n.perm_disqual, e.perm_disqual) as perm_disqual,\n",
+					"                COALESCE(n.source_id, e.source_id) as source_id,\n",
+					"                COALESCE(n.postcode_start, e.postcode_start) as postcode_start,\n",
+					"                e.hash_id as hash_id,\n",
+					"                CASE \n",
+					"                    WHEN n.creation_date > e.creation_date THEN n.creation_date\n",
+					"                    ELSE e.creation_date\n",
+					"                END as creation_date\n",
+					"            FROM existing_data e\n",
+					"            LEFT JOIN new_data n\n",
+					"            ON e.hash_id = n.hash_id\n",
+					"        \"\"\")\n",
+					"        \n",
+					"        # Count rows after merge\n",
+					"        merged_count = merged_data.count()\n",
+					"        print(f\"Merged data has {merged_count} rows\")\n",
+					"        \n",
+					"        # Ensure register_lett is synchronized with poll_number in merged result\n",
+					"        merged_data = ensure_register_lett_exists(merged_data)\n",
+					"        \n",
+					"        return merged_data\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Error merging with existing data: {str(e)}\")\n",
+					"        logging.warning(\"Returning only new data due to merge error\")\n",
+					"        import traceback\n",
+					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": 303
+				"execution_count": 334
 			},
 			{
 				"cell_type": "markdown",
@@ -1665,7 +1675,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 304
+				"execution_count": 335
 			},
 			{
 				"cell_type": "code",
@@ -1703,7 +1713,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 305
+				"execution_count": 336
 			},
 			{
 				"cell_type": "code",
@@ -1758,7 +1768,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 306
+				"execution_count": 337
 			},
 			{
 				"cell_type": "code",
@@ -1867,7 +1877,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": 307
+				"execution_count": 338
 			},
 			{
 				"cell_type": "markdown",
@@ -2124,7 +2134,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 308
+				"execution_count": 339
 			}
 		]
 	}

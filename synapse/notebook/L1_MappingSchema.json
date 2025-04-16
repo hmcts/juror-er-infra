@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cd14f715-2e36-49ac-9134-08505b480e7b"
+				"spark.autotune.trackingId": "08c42403-5895-42e0-8830-c1684b9be6dd"
 			}
 		},
 		"metadata": {
@@ -1244,7 +1244,7 @@
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
 					"    error_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation_errors\"\n",
 					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
-					"    summary_file_path= f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log\"\n",
+					"    summary_folder= f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log\"\n",
 					"\n",
 					"    # Check for inconsistent state (log exists but folder doesn't)\n",
 					"    transform_folder_exists = mssparkutils.fs.exists(transform_folder)\n",
@@ -1326,8 +1326,8 @@
 					"            empty_df = spark.createDataFrame([], empty_schema)\n",
 					"            \n",
 					"            # Ensure directory exists before writing\n",
-					"            ensure_folder_exists(summary_file_path)\n",
-					"            empty_df.write.mode(\"overwrite\").json(f\"{summary_file_path}/processing_summary.json\")\n",
+					"            ensure_folder_exists(summary_folder)\n",
+					"            empty_df.write.mode(\"overwrite\").json(f\"{summary_folder}/processing_summary.json\")\n",
 					"            logging.info(\"Created empty processing summary\")\n",
 					"            return []\n",
 					"    except Exception as e:\n",
@@ -1365,8 +1365,8 @@
 					"    if results:\n",
 					"        try:\n",
 					"            summary_df = spark.createDataFrame(results)\n",
-					"            summary_df.write.mode(\"overwrite\").json(f\"{summary_file_path}/processing_summary.json\")\n",
-					"            logging.info(f\"Wrote processing summary to {summary_file_path}/processing_summary.json\")\n",
+					"            summary_df.write.mode(\"overwrite\").json(f\"{summary_folder}/processing_summary.json\")\n",
+					"            logging.info(f\"Wrote processing summary to {summary_folder}/processing_summary.json\")\n",
 					"        except Exception as e:\n",
 					"            logging.error(f\"Error creating summary DataFrame: {str(e)}\")\n",
 					"            print(f\"Error creating summary: {str(e)}\")\n",

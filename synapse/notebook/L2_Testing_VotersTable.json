@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9e4d1099-976a-476c-9aa0-e9f1361eb4b2"
+				"spark.autotune.trackingId": "5c90157b-e919-427a-9bf9-1edcbb6b3848"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 1
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -79,7 +79,14 @@
 					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df.count()"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -89,11 +96,28 @@
 				"source": [
 					"display(df.limit(10))"
 				],
-				"execution_count": 8
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"df.limit(10).show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
 					"collapsed": false
 				},
 				"source": [
@@ -105,13 +129,6 @@
 					"\n",
 					"# Display all columns of the filtered DataFrame\n",
 					"display(non_empty_zip)"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"df_single.count()"
 				],
 				"execution_count": null
 			},

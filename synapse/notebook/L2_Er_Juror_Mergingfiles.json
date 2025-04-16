@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9742b4ba-eedb-477d-8911-3c6f77da1f6e"
+				"spark.autotune.trackingId": "e56dbcf0-e54c-4604-b939-fed623105d0a"
 			}
 		},
 		"metadata": {
@@ -295,7 +295,7 @@
 					"    # Check if path is missing container info\n",
 					"    if not path.startswith(\"abfss://\"):\n",
 					"        # Add default storage and container\n",
-					"        path = f\"abfss://juror- etl@baubaisadfsastg.dfs.core.windows.net/{path}\"\n",
+					"        path = f\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/{path}\"\n",
 					"    \n",
 					"    return path"
 				],

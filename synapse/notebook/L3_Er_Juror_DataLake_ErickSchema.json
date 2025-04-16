@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b0349983-011f-479b-ae7f-8b299da81e40"
+				"spark.autotune.trackingId": "ebe7f48f-78c9-4ae2-8275-0eac7489831c"
 			}
 		},
 		"metadata": {
@@ -263,7 +263,7 @@
 					"from pyspark.sql.types import DecimalType\n",
 					"from pyspark.sql.functions import col, when, coalesce, current_timestamp"
 				],
-				"execution_count": 9
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -279,7 +279,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -343,8 +343,11 @@
 					"        agg_count = aggregated_df.count()\n",
 					"        logger.info(f\"Created aggregated dataframe with {agg_count} rows\")\n",
 					"        \n",
+					"        # Extract directory from path (without using os.path)\n",
+					"        powerbi_dir_path = \"/\".join(powerbi_delta_path.split(\"/\")[:-1])\n",
+					"        \n",
 					"        # Ensure the destination directory exists\n",
-					"        if not mssparkutils.fs.exists(os.path.dirname(powerbi_delta_path)):\n",
+					"        if not mssparkutils.fs.exists(powerbi_dir_path):\n",
 					"            logger.info(f\"Creating directory: {os.path.dirname(powerbi_delta_path)}\")\n",
 					"            mssparkutils.fs.mkdirs(os.path.dirname(powerbi_delta_path))\n",
 					"        \n",
@@ -603,13 +606,6 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None\n",
 					"\n",
-					""
-				],
-				"execution_count": 11
-			},
-			{
-				"cell_type": "code",
-				"source": [
 					"# Update the main execution code to handle the new return format\n",
 					"if __name__ == \"__main__\":\n",
 					"    success, paths = export_voters_to_datalake_with_cdc()\n",
@@ -640,7 +636,7 @@
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -653,7 +649,7 @@
 				"source": [
 					"delta_df.count()"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -667,7 +663,7 @@
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": 15
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -687,7 +683,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -702,7 +698,7 @@
 					"foo_df = delta_df.filter(delta_df.rec_num==249)\n",
 					"foo_df.count()"
 				],
-				"execution_count": 8
+				"execution_count": null
 			}
 		]
 	}

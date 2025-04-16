@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cee1fc17-76db-4b7e-9126-eba316c090b6"
+				"spark.autotune.trackingId": "b11cafcc-f9a6-4112-9d75-18e91235240e"
 			}
 		},
 		"metadata": {
@@ -1633,6 +1633,20 @@
 					"    from pyspark.sql.types import StringType, TimestampType, StructType, StructField\n",
 					"    \n",
 					"    try:\n",
+					"        # process_log_path should be the text file path from main()\n",
+					"        print(f\"Updating process log at {process_log_path}\")\n",
+					"        \n",
+					"        # Read existing log if it exists\n",
+					"        processed_files = []\n",
+					"        if mssparkutils.fs.exists(process_log_path):\n",
+					"            try:\n",
+					"                # Read existing log as text\n",
+					"                content = mssparkutils.fs.read(process_log_path)\n",
+					"                processed_files = [line.strip() for line in content.split(\"\\n\") if line.strip()]\n",
+					"                print(f\"Read {len(processed_files)} entries from existing log\")\n",
+					"            except Exception as e:\n",
+					"                print(f\"Error reading existing log: {str(e)}\")\n",
+					"\n",
 					"        # Define schema for the process log\n",
 					"        log_schema = StructType([\n",
 					"            StructField(\"file_path\", StringType(), False),\n",

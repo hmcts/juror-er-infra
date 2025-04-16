@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d72e4730-ebf6-43ef-aa26-dc4ce22f2ba8"
+				"spark.autotune.trackingId": "982e7127-06b0-4524-a02f-3f68424225db"
 			}
 		},
 		"metadata": {
@@ -762,7 +762,7 @@
 				"cell_type": "code",
 				"source": [
 					"def filter_records_with_empty_fields(df):\n",
-					"    \"\"\"Filter out records where critical fields are empty\"\"\"\n",
+					"    \"\"\"Filter out records where critical fields are empty or contain only special characters\"\"\"\n",
 					"    logging.info(f\"Original record count: {df.count()}\")\n",
 					"\n",
 					"    # Define critical fields that should not be empty\n",
@@ -770,20 +770,28 @@
 					"        \"Elector Number\",\n",
 					"        \"Elector Surname\",\n",
 					"        \"Elector Forename\",\n",
-					"        \"LA_Code\",\n",
+					"        \"PostCode\",\n",
+					"        \"Address1\"\n",
 					"    ]\n",
 					"\n",
-					"    # Filter out rows where critical fields are null or empty string\n",
+					"    # Filter out rows where critical fields are null, empty string, or just special characters\n",
 					"    for field in critical_fields:\n",
 					"        if field in df.columns:\n",
 					"            initial_count = df.count()\n",
-					"            df = df.filter((col(field).isNotNull()) & (length(trim(col(field))) > 0))\n",
+					"            \n",
+					"            # Create a pattern to match strings with only special characters\n",
+					"            # This pattern will match strings that only contain +, -, *, /, etc.\n",
+					"            df = df.filter(\n",
+					"                (col(field).isNotNull()) & \n",
+					"                (length(trim(col(field))) > 0) &\n",
+					"                (~regexp_replace(col(field), \"[^a-zA-Z0-9]\", \"\").eqNullSafe(\"\"))\n",
+					"            )\n",
+					"            \n",
 					"            removed = initial_count - df.count()\n",
-					"            logging.info(f\"Removed {removed} rows with empty {field}\")\n",
+					"            logging.info(f\"Removed {removed} rows with empty or invalid {field}\")\n",
 					"\n",
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
-					"    return df\n",
-					""
+					"    return df"
 				],
 				"execution_count": 45
 			},

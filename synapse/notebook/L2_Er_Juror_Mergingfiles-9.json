@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b593a3fe-8f8e-4e8b-8d73-cda15ca7b168"
+				"spark.autotune.trackingId": "cee1fc17-76db-4b7e-9126-eba316c090b6"
 			}
 		},
 		"metadata": {
@@ -1799,8 +1799,19 @@
 					"    spark = create_spark_session()\n",
 					"    config = load_config()\n",
 					"    storage_account = config[\"storage_account\"]\n",
-					"    process_log_path = f\"{config['output_path']}_process_log\"\n",
+					"    process_log_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/l2_process_logs/l2_processed_files.txt\"\n",
 					"    \n",
+					"    ## CLEAN UP PROBLEMATIC FILES FIRST\n",
+					"    try:\n",
+					"        from notebookutils import mssparkutils\n",
+					"        cleanup_paths = [\n",
+					"            problematic_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation/processed_files_log.json\"\n",
+					"            if mssparkutils.fs.exists(problematic_path):\n",
+					"                print(f\"Removing problematic JSON log: {problematic_path}\")\n",
+					"                mssparkutils.fs.rm(problematic_path, True)\n",
+					"    except Exception as e:\n",
+					"        print(f\"Error cleaning up problematic files: {str(e)}\")\n",
+					"\n",
 					"    # Ensure all required directories exist\n",
 					"    from notebookutils import mssparkutils\n",
 					"    required_paths = [\n",

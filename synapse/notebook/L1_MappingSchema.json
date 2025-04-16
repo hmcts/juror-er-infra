@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "eb158490-4903-43af-9eb1-bf3434e6d549"
+				"spark.autotune.trackingId": "3e52f2ff-d339-4a73-83e1-eed851d7e84f"
 			}
 		},
 		"metadata": {
@@ -1244,6 +1244,7 @@
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
 					"    error_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation_errors\"\n",
 					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
+					"    summary_file_path= f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log\"\n",
 					"\n",
 					"    # Check for inconsistent state (log exists but folder doesn't)\n",
 					"    transform_folder_exists = mssparkutils.fs.exists(transform_folder)\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "78902e5a-1058-4a3b-bd68-c1a97199db76"
+				"spark.autotune.trackingId": "d72e4730-ebf6-43ef-aa26-dc4ce22f2ba8"
 			}
 		},
 		"metadata": {
@@ -1222,7 +1222,7 @@
 					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
 					"    error_folder = f\"{transform_folder}/errors\"\n",
-					"    log_file_path = f\"{transform_folder}/processed_files_log.json\"\n",
+					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
 					"\n",
 					"    # Check for inconsistent state (log exists but folder doesn't)\n",
 					"    transform_folder_exists = mssparkutils.fs.exists(transform_folder)\n",
@@ -1384,7 +1384,7 @@
 					"    \n",
 					"    # Delete log file if forcing a clean run\n",
 					"    if FORCE_CLEAN_RUN:\n",
-					"        log_file_path = \"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/transformation/processed_files_log.json\"\n",
+					"        log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
 					"        if mssparkutils.fs.exists(log_file_path):\n",
 					"            try:\n",
 					"                mssparkutils.fs.rm(log_file_path, True)  # Add recursive=True parameter\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6070bb5c-fe26-4992-bbbd-f3d8390b3a44"
+				"spark.autotune.trackingId": "02c734ee-48da-4fc4-a16d-dccfb6f5252a"
 			}
 		},
 		"metadata": {
@@ -2033,10 +2033,10 @@
 					"        if HASH_SENSITIVE_DATA: \n",
 					"            logger.info(\"Applying hashing to sensitive fields...\")\n",
 					"            hashed_data = apply_hashing_to_voters(hashed_data)\n",
+					"        if hashed_data is None or hashed_data.count() == 0:\n",
+					"            logger.error(\"DataFrame after sensitive data hashing is empty or None\")\n",
+					"            return\n",
 					"            logger.info(f\"Applied sensitive data hashing to {hashed_data.count()} rows\")\n",
-					"\n",
-					"        \n",
-					"       \n",
 					"\n",
 					"        # 9. Apply deduplicate using hash_id to ensure uniqueness\n",
 					"        final_data = hashed_data.dropDuplicates([\"hash_id\"])\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "acda78a6-3fc3-4bff-8942-9dcb14c98ff7"
+				"spark.autotune.trackingId": "8e7b22a5-fc19-42fc-b5de-a6c37598b75c"
 			}
 		},
 		"metadata": {
@@ -2015,11 +2015,19 @@
 					"        # 8. Now apply hashing AFTER the schema transformation\n",
 					"        # This ensures rec_num and other required fields exist\n",
 					"        logger.info(\"Generating hash_id...\")\n",
-					"        hashed_data = apply_hashing_to_voters(transformed_data)\n",
+					"        hashed_data = generate_hash_id(transformed_data)\n",
 					"        if hashed_data is None or hashed_data.count() == 0:\n",
 					"            logger.error(\"Hashed DataFrame is empty or None\")\n",
 					"            return\n",
-					"        logger.info(f\"Applied hash generation to {hashed_data.count()} rows\")\n",
+					"        logger.info(f\"Generated hash_id for {hashed_data.count()} rows\")\n",
+					"\n",
+					"        if HASH_SENSITIVE_DATA: \n",
+					"            logger.info(\"Applying hashing to sensitive fields...\")\n",
+					"            hashed_data = apply_hashing_to_voters(hashed_data)\n",
+					"            logger.info(f\"Applied sensitive data hashing to {hashed_data.count()} rows\")\n",
+					"\n",
+					"        \n",
+					"       \n",
 					"\n",
 					"        # 9. Apply deduplicate using hash_id to ensure uniqueness\n",
 					"        final_data = hashed_data.dropDuplicates([\"hash_id\"])\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7f7d065c-743f-45da-a4bf-b99a9450ccd8"
+				"spark.autotune.trackingId": "d663a93c-a66a-4a4f-96a0-812b52d48bb0"
 			}
 		},
 		"metadata": {
@@ -1852,7 +1852,7 @@
 					"        string_columns = [\"part_no\", \"new_marker\", \"title\", \"lname\", \"fname\", \n",
 					"                          \"flags\", \"address\", \"address2\", \"address3\", \"address4\", \n",
 					"                          \"address5\", \"address6\", \"zip\", \"perm_disqual\", \n",
-					"                          \"source_id\", \"postcode_start\"]\n",
+					"                          \"source_id\", \"postcode_start\", \"hash_id\", \"creation_date\"]\n",
 					"        \n",
 					"        for col_name in string_columns:\n",
 					"            if col_name in pg_data.columns:\n",

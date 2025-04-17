@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "38fbc97f-60b9-4999-aed7-bb3cca6e4108"
+				"spark.autotune.trackingId": "f741dfc5-fa3a-4018-963d-e4e115079565"
 			}
 		},
 		"metadata": {
@@ -334,7 +334,7 @@
 					"    (\"hash_id\", StringType()),\n",
 					"    (\"creation_date\", StringType())\n",
 					"]\n",
-					"HASH_SENSITIVE_DATA = False "
+					"HASH_SENSITIVE_DATA = True "
 				],
 				"execution_count": 5
 			},

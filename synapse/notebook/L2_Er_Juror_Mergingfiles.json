@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f741dfc5-fa3a-4018-963d-e4e115079565"
+				"spark.autotune.trackingId": "339646cb-1e3d-4315-ab22-a0d6619ee9d2"
 			}
 		},
 		"metadata": {
@@ -1322,9 +1322,9 @@
 					"def apply_hashing_to_voters(df):\n",
 					"    \"\"\"\n",
 					"    Apply hashing to sensitive fields only for testing purposes.\n",
-					"    This is separate from hash_id creation.\n",
+					"    This is separate from hash_id creation which should be done first.\n",
 					"    \n",
-					"    Hashes: \n",
+					"    Hashes:\n",
 					"    - fname/Elector Forename\n",
 					"    - lname/Elector Surname\n",
 					"    - dob/Elector DOB\n",
@@ -1335,11 +1335,14 @@
 					"    logger = logging.getLogger()\n",
 					"    logger.info(\"Applying hashing to sensitive fields for testing\")\n",
 					"    \n",
+					"    # Save the original row count for verification\n",
+					"    original_count = df.count()\n",
+					"    \n",
 					"    # Define sensitive fields to hash with their variations\n",
 					"    sensitive_fields = {\n",
 					"        \"names\": [\"fname\", \"lname\", \"Elector Forename\", \"Elector Surname\", \"title\"],\n",
 					"        \"dates\": [\"dob\", \"Elector DOB\"],\n",
-					"        \"addresses\": [\"address\", \"address1\", \"address2\", \"address3\", \"address4\", \n",
+					"        \"addresses\": [\"address\", \"address1\", \"address2\", \"address3\", \"address4\",\n",
 					"                    \"Address1\", \"Address2\", \"Address3\", \"Address4\", \"Address5\"]\n",
 					"    }\n",
 					"    \n",
@@ -1374,6 +1377,11 @@
 					"                             substring(hex(xxhash64(col(field))), 1, 35)\n",
 					"                        ).otherwise(col(field))\n",
 					"                    )\n",
+					"    \n",
+					"    # Verify we have the same number of rows\n",
+					"    final_count = df.count()\n",
+					"    if final_count != original_count:\n",
+					"        logger.warning(f\"Row count changed during sensitive data hashing: {original_count} -> {final_count}\")\n",
 					"    \n",
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"

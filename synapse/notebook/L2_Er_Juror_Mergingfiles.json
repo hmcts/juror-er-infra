@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "339646cb-1e3d-4315-ab22-a0d6619ee9d2"
+				"spark.autotune.trackingId": "6070bb5c-fe26-4992-bbbd-f3d8390b3a44"
 			}
 		},
 		"metadata": {
@@ -2028,7 +2028,7 @@
 					"        if hashed_data is None or hashed_data.count() == 0:\n",
 					"            logger.error(\"Hashed DataFrame is empty or None\")\n",
 					"            return\n",
-					"        logger.info(f\"Generated hash_id for {hashed_data.count()} rows\")\n",
+					"        logger.info(f\"Generated hash_id for {hashed_data.count()} rows with {hashed_data.select('hash_id').distinct().count()} distinct hash values\")\n",
 					"\n",
 					"        if HASH_SENSITIVE_DATA: \n",
 					"            logger.info(\"Applying hashing to sensitive fields...\")\n",

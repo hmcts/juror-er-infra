@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cad60be9-07b6-4b4c-8cb2-752a3d468806"
+				"spark.autotune.trackingId": "12ee60d3-e37c-45fa-9186-949e059a4fe6"
 			}
 		},
 		"metadata": {
@@ -2253,7 +2253,11 @@
 					"                \n",
 					"                # Write PostgreSQL data\n",
 					"                logger.info(f\"Writing {postgresql_data.count()} records to PostgreSQL format\")\n",
-					"                postgresql_data.write.mode(\"overwrite\").parquet(postgresql_path)\n",
+					"                postgresql_data.write \\\n",
+					"                    .format(\"delta\") \\\n",
+					"                    .mode(\"overwrite\") \\\n",
+					"                    .save(postgresql_path)\n",
+					"\n",
 					"                \n",
 					"                logger.info(f\"Successfully wrote PostgreSQL data to {postgresql_path}\")\n",
 					"            except Exception as pg_error:\n",

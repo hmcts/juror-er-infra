@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "06c81d34-1090-451e-8bfe-f94d30781d98"
+				"spark.autotune.trackingId": "abf3fca0-73b6-44c6-add6-73419009e8d7"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 7
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -79,7 +79,7 @@
 					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -105,26 +105,25 @@
 				"source": [
 					"df.count()"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					},
 					"collapsed": false
 				},
 				"source": [
 					"display(df.limit(10))"
 				],
-				"execution_count": 5
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"# Add this function to your L2 notebook for testing NAN values\n",
 					"def check_nan_values(df, sample_size=5):\n",
 					"    \"\"\"\n",
 					"    Check all columns in a DataFrame for \"NAN\", \"NaN\", \"nan\", etc. values\n",
@@ -140,11 +139,14 @@
 					"    import time\n",
 					"    \n",
 					"    start_time = time.time()\n",
-					"    print(f\"Checking for NAN values in DataFrame with {df.count()} rows and {len(df.columns)} columns\")\n",
+					"    \n",
+					"    # First, let's verify we have all columns\n",
+					"    all_columns = df.columns\n",
+					"    print(f\"DataFrame has {len(all_columns)} columns: {all_columns}\")\n",
 					"    \n",
 					"    # Initialize results dictionary\n",
 					"    results = {\n",
-					"        \"columns_checked\": len(df.columns),\n",
+					"        \"columns_checked\": len(all_columns),\n",
 					"        \"columns_with_nan\": [],\n",
 					"        \"details\": {}\n",
 					"    }\n",
@@ -152,8 +154,8 @@
 					"    # List of NAN-like patterns to check\n",
 					"    nan_patterns = [\"NAN\", \"NaN\", \"nan\", \"NAT\", \"NaT\", \"nat\", \"NULL\", \"null\"]\n",
 					"    \n",
-					"    # Check each column\n",
-					"    for column_name in df.columns:\n",
+					"    # Check each column explicitly from the columns list\n",
+					"    for column_name in all_columns:\n",
 					"        print(f\"Checking column: {column_name}\")\n",
 					"        \n",
 					"        # Create a select expression to find NAN-like values\n",
@@ -172,37 +174,40 @@
 					"                combined_condition = combined_condition | condition\n",
 					"        \n",
 					"        # Count rows with NAN-like values\n",
-					"        nan_count_df = df.select(\n",
-					"            count(when(combined_condition, 1)).alias(\"nan_count\")\n",
-					"        )\n",
-					"        \n",
-					"        nan_count = nan_count_df.collect()[0][\"nan_count\"]\n",
-					"        \n",
-					"        # If NAN values found, collect details\n",
-					"        if nan_count > 0:\n",
-					"            print(f\"  Found {nan_count} NAN-like values in column {column_name}\")\n",
-					"            results[\"columns_with_nan\"].append(column_name)\n",
+					"        try:\n",
+					"            nan_count_df = df.select(\n",
+					"                count(when(combined_condition, 1)).alias(\"nan_count\")\n",
+					"            )\n",
 					"            \n",
-					"            # Get examples of NAN values\n",
-					"            examples = df.filter(combined_condition).limit(sample_size)\n",
-					"            example_values = [row[column_name] for row in examples.collect()]\n",
+					"            nan_count = nan_count_df.collect()[0][\"nan_count\"]\n",
 					"            \n",
-					"            # Find which specific patterns are present\n",
-					"            pattern_counts = {}\n",
-					"            for pattern in nan_patterns:\n",
-					"                pattern_count = df.filter(\n",
-					"                    upper(trim(col(column_name).cast(\"string\"))) == pattern\n",
-					"                ).count()\n",
+					"            # If NAN values found, collect details\n",
+					"            if nan_count > 0:\n",
+					"                print(f\"  Found {nan_count} NAN-like values in column {column_name}\")\n",
+					"                results[\"columns_with_nan\"].append(column_name)\n",
 					"                \n",
-					"                if pattern_count > 0:\n",
-					"                    pattern_counts[pattern] = pattern_count\n",
-					"            \n",
-					"            # Add details to results\n",
-					"            results[\"details\"][column_name] = {\n",
-					"                \"nan_count\": nan_count,\n",
-					"                \"example_values\": example_values,\n",
-					"                \"pattern_counts\": pattern_counts\n",
-					"            }\n",
+					"                # Get examples of NAN values\n",
+					"                examples = df.filter(combined_condition).limit(sample_size)\n",
+					"                example_values = [row[column_name] for row in examples.collect()]\n",
+					"                \n",
+					"                # Find which specific patterns are present\n",
+					"                pattern_counts = {}\n",
+					"                for pattern in nan_patterns:\n",
+					"                    pattern_count = df.filter(\n",
+					"                        upper(trim(col(column_name).cast(\"string\"))) == pattern\n",
+					"                    ).count()\n",
+					"                    \n",
+					"                    if pattern_count > 0:\n",
+					"                        pattern_counts[pattern] = pattern_count\n",
+					"                \n",
+					"                # Add details to results\n",
+					"                results[\"details\"][column_name] = {\n",
+					"                    \"nan_count\": nan_count,\n",
+					"                    \"example_values\": example_values,\n",
+					"                    \"pattern_counts\": pattern_counts\n",
+					"                }\n",
+					"        except Exception as e:\n",
+					"            print(f\"  Error checking column {column_name}: {str(e)}\")\n",
 					"    \n",
 					"    # Summarize results\n",
 					"    total_nan_columns = len(results[\"columns_with_nan\"])\n",
@@ -217,6 +222,48 @@
 					"    \n",
 					"    print(f\"Check completed in {time.time() - start_time:.2f} seconds\")\n",
 					"    return results"
+				],
+				"execution_count": 33
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"# Before calling check_nan_values, add these diagnostic lines:\n",
+					"print(\"DataFrame schema:\")\n",
+					"df.printSchema()\n",
+					"print(f\"DataFrame column count: {len(df.columns)}\")\n",
+					"print(f\"DataFrame columns: {df.columns}\")\n",
+					"print(f\"DataFrame row count: {df.count()}\")"
+				],
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Use the full DataFrame instead of a count result\n",
+					"nan_check_results = check_nan_values(df)  # or transformed_data, etc.\n",
+					"\n",
+					"# Now you can access the results\n",
+					"print(f\"Found NAN values in {len(nan_check_results['columns_with_nan'])} columns\")\n",
+					"\n",
+					"# You can also access specific details\n",
+					"for column in nan_check_results['columns_with_nan']:\n",
+					"    details = nan_check_results['details'][column]\n",
+					"    print(f\"Column {column}: {details['nan_count']} NAN values\")\n",
+					"    print(f\"Examples: {details['example_values']}\")"
+				],
+				"execution_count": 35
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
 				],
 				"execution_count": null
 			},
@@ -401,7 +448,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": null
+				"execution_count": 16
 			}
 		]
 	}

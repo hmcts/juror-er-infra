@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "28720c44-3cbc-4ef9-a6dc-af0ed57c7a70"
+				"spark.autotune.trackingId": "06c81d34-1090-451e-8bfe-f94d30781d98"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 1
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -79,14 +79,7 @@
 					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 2
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"df.schema"
-				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -97,9 +90,22 @@
 					}
 				},
 				"source": [
+					"df.schema"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
+				"source": [
 					"df.count()"
 				],
-				"execution_count": 65
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -113,7 +119,106 @@
 				"source": [
 					"display(df.limit(10))"
 				],
-				"execution_count": 66
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Add this function to your L2 notebook for testing NAN values\n",
+					"def check_nan_values(df, sample_size=5):\n",
+					"    \"\"\"\n",
+					"    Check all columns in a DataFrame for \"NAN\", \"NaN\", \"nan\", etc. values\n",
+					"    \n",
+					"    Args:\n",
+					"        df: PySpark DataFrame to check\n",
+					"        sample_size: Number of example rows to return for each problematic column\n",
+					"    \n",
+					"    Returns:\n",
+					"        Dictionary with results of the check\n",
+					"    \"\"\"\n",
+					"    from pyspark.sql.functions import col, upper, trim, count, when, lit\n",
+					"    import time\n",
+					"    \n",
+					"    start_time = time.time()\n",
+					"    print(f\"Checking for NAN values in DataFrame with {df.count()} rows and {len(df.columns)} columns\")\n",
+					"    \n",
+					"    # Initialize results dictionary\n",
+					"    results = {\n",
+					"        \"columns_checked\": len(df.columns),\n",
+					"        \"columns_with_nan\": [],\n",
+					"        \"details\": {}\n",
+					"    }\n",
+					"    \n",
+					"    # List of NAN-like patterns to check\n",
+					"    nan_patterns = [\"NAN\", \"NaN\", \"nan\", \"NAT\", \"NaT\", \"nat\", \"NULL\", \"null\"]\n",
+					"    \n",
+					"    # Check each column\n",
+					"    for column_name in df.columns:\n",
+					"        print(f\"Checking column: {column_name}\")\n",
+					"        \n",
+					"        # Create a select expression to find NAN-like values\n",
+					"        nan_conditions = []\n",
+					"        for pattern in nan_patterns:\n",
+					"            nan_conditions.append(\n",
+					"                (upper(trim(col(column_name).cast(\"string\"))) == pattern)\n",
+					"            )\n",
+					"        \n",
+					"        # Combine all conditions with OR\n",
+					"        combined_condition = None\n",
+					"        for condition in nan_conditions:\n",
+					"            if combined_condition is None:\n",
+					"                combined_condition = condition\n",
+					"            else:\n",
+					"                combined_condition = combined_condition | condition\n",
+					"        \n",
+					"        # Count rows with NAN-like values\n",
+					"        nan_count_df = df.select(\n",
+					"            count(when(combined_condition, 1)).alias(\"nan_count\")\n",
+					"        )\n",
+					"        \n",
+					"        nan_count = nan_count_df.collect()[0][\"nan_count\"]\n",
+					"        \n",
+					"        # If NAN values found, collect details\n",
+					"        if nan_count > 0:\n",
+					"            print(f\"  Found {nan_count} NAN-like values in column {column_name}\")\n",
+					"            results[\"columns_with_nan\"].append(column_name)\n",
+					"            \n",
+					"            # Get examples of NAN values\n",
+					"            examples = df.filter(combined_condition).limit(sample_size)\n",
+					"            example_values = [row[column_name] for row in examples.collect()]\n",
+					"            \n",
+					"            # Find which specific patterns are present\n",
+					"            pattern_counts = {}\n",
+					"            for pattern in nan_patterns:\n",
+					"                pattern_count = df.filter(\n",
+					"                    upper(trim(col(column_name).cast(\"string\"))) == pattern\n",
+					"                ).count()\n",
+					"                \n",
+					"                if pattern_count > 0:\n",
+					"                    pattern_counts[pattern] = pattern_count\n",
+					"            \n",
+					"            # Add details to results\n",
+					"            results[\"details\"][column_name] = {\n",
+					"                \"nan_count\": nan_count,\n",
+					"                \"example_values\": example_values,\n",
+					"                \"pattern_counts\": pattern_counts\n",
+					"            }\n",
+					"    \n",
+					"    # Summarize results\n",
+					"    total_nan_columns = len(results[\"columns_with_nan\"])\n",
+					"    if total_nan_columns > 0:\n",
+					"        print(f\"\\nFound {total_nan_columns} columns with NAN-like values:\")\n",
+					"        for column in results[\"columns_with_nan\"]:\n",
+					"            details = results[\"details\"][column]\n",
+					"            patterns = \", \".join([f\"{p}({c})\" for p, c in details[\"pattern_counts\"].items()])\n",
+					"            print(f\"  - {column}: {details['nan_count']} NAN values ({patterns})\")\n",
+					"    else:\n",
+					"        print(\"\\nNo NAN-like values found in any column\")\n",
+					"    \n",
+					"    print(f\"Check completed in {time.time() - start_time:.2f} seconds\")\n",
+					"    return results"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -281,9 +386,9 @@
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					},
 					"collapsed": false
 				},

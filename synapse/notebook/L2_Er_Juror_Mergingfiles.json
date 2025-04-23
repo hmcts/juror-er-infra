@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "12ee60d3-e37c-45fa-9186-949e059a4fe6"
+				"spark.autotune.trackingId": "24077d23-f561-4792-9110-5cfb18be2aa9"
 			}
 		},
 		"metadata": {
@@ -251,7 +251,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 63
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -271,7 +271,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 64
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 65
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -301,7 +301,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 66
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -338,7 +338,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = True "
 				],
-				"execution_count": 67
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -360,7 +360,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 68
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -521,7 +521,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 69
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -568,7 +568,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 70
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -580,7 +580,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 71
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -660,7 +660,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 72
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -743,7 +743,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 73
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -815,7 +815,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 74
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -865,7 +865,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 75
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -886,7 +886,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 76
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -903,7 +903,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 77
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -971,7 +971,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 78
+				"execution_count": 16
 			},
 			{
 				"cell_type": "markdown",
@@ -1030,7 +1030,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 79
+				"execution_count": 17
 			},
 			{
 				"cell_type": "markdown",
@@ -1097,7 +1097,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 80
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -1134,7 +1134,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 81
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -1192,7 +1192,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 82
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -1245,7 +1245,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 83
+				"execution_count": 21
 			},
 			{
 				"cell_type": "markdown",
@@ -1316,7 +1316,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 84
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1388,7 +1388,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": 85
+				"execution_count": 23
 			},
 			{
 				"cell_type": "markdown",
@@ -1466,7 +1466,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 86
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -1494,7 +1494,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": 87
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -1513,18 +1513,33 @@
 					"    Returns:\n",
 					"        DataFrame with corrected address fields\n",
 					"    \"\"\"\n",
-					"    from pyspark.sql.functions import col, regexp_replace, when, trim, lit, substring, length\n",
+					"    from pyspark.sql.functions import col, regexp_replace, when, trim, lit, substring, length, upper\n",
 					"    \n",
 					"    logger = logging.getLogger()\n",
 					"    logger.info(\"Fixing address fields...\")\n",
 					"    \n",
-					"    # Step 1: Replace special characters in address fields\n",
-					"    address_columns = [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
+					"    # Step 1: First, handle NAN/nan values in all columns\n",
+					"    columns_to_check = [\"new_marker\", \"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
 					"    \n",
-					"    # List of special characters to be replaced (can be extended)\n",
+					"    for col_name in columns_to_check:\n",
+					"        if col_name in df.columns:\n",
+					"            df = df.withColumn(\n",
+					"                col_name,\n",
+					"                when(\n",
+					"                    (col(col_name).isNull()) |\n",
+					"                    (upper(col(col_name)) == \"NAN\") |\n",
+					"                    (upper(col(col_name)) == \"NAT\") |\n",
+					"                    (upper(col(col_name)) == \"NULL\") |\n",
+					"                    (trim(col(col_name)) == \"\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(trim(col(col_name)))\n",
+					"            )\n",
+					"            logger.info(f\"Cleaned NAN/NULL values from {col_name}\")\n",
+					"    \n",
+					"    # Step 2: Replace special characters in address fields\n",
+					"    address_columns = [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
 					"    special_chars_pattern = r'[^\\w\\s,.#\\-\\/()]'\n",
 					"    \n",
-					"    # First pass: Remove special characters from all address fields\n",
 					"    for col_name in address_columns:\n",
 					"        if col_name in df.columns:\n",
 					"            df = df.withColumn(\n",
@@ -1537,8 +1552,7 @@
 					"            # Also trim any extra whitespace\n",
 					"            df = df.withColumn(col_name, trim(col(col_name)))\n",
 					"    \n",
-					"    # Step 2: Remove postcodes from address columns\n",
-					"    # UK postcode pattern\n",
+					"    # Step 3: Remove postcodes from address columns\n",
 					"    postcode_pattern = r'\\b[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}\\b'\n",
 					"    \n",
 					"    for col_name in address_columns:\n",
@@ -1553,12 +1567,28 @@
 					"            # Also trim any resulting trailing spaces\n",
 					"            df = df.withColumn(col_name, trim(col(col_name)))\n",
 					"    \n",
-					"    # Step 3: Set address6 to NULL specifically per Juror Digital requirements\n",
+					"    # Step 4: Set address6 to NULL specifically per Juror Digital requirements\n",
 					"    if \"address6\" in df.columns:\n",
 					"        df = df.withColumn(\"address6\", lit(None))\n",
 					"        logger.info(\"Set address6 to NULL as per requirements\")\n",
 					"    \n",
-					"    # Step 4: Shuffle address fields to ensure address4 is not null\n",
+					"    # Step 5: Address5 is often problematic, so handle it specifically\n",
+					"    # Set any problematic values to NULL\n",
+					"    if \"address5\" in df.columns:\n",
+					"        df = df.withColumn(\n",
+					"            \"address5\",\n",
+					"            when(\n",
+					"                (col(\"address5\").isNull()) |\n",
+					"                (upper(col(\"address5\")) == \"NAN\") |\n",
+					"                (upper(col(\"address5\")) == \"NAT\") |\n",
+					"                (upper(col(\"address5\")) == \"NULL\") |\n",
+					"                (trim(col(\"address5\")) == \"\"),\n",
+					"                lit(None)\n",
+					"            ).otherwise(trim(col(\"address5\")))\n",
+					"        )\n",
+					"        logger.info(\"Cleaned address5 field\")\n",
+					"    \n",
+					"    # Step 6: Shuffle address fields to ensure address4 is not null\n",
 					"    # Only shuffle if address4 is null or empty\n",
 					"    if all(col_name in df.columns for col_name in [\"address4\", \"address3\", \"address2\"]):\n",
 					"        # First check if address4 is null or empty\n",
@@ -1613,14 +1643,19 @@
 					"            .otherwise(col(\"address2\"))\n",
 					"        )\n",
 					"    \n",
-					"    # Make sure all address columns have proper string values\n",
-					"    for col_name in address_columns:\n",
+					"    # Final pass: Make sure all columns have proper values\n",
+					"    all_columns = columns_to_check\n",
+					"    for col_name in all_columns:\n",
 					"        if col_name in df.columns:\n",
 					"            # Check for empty strings and convert to NULL\n",
 					"            df = df.withColumn(\n",
 					"                col_name,\n",
 					"                when(\n",
-					"                    (col(col_name).isNull() | (trim(col(col_name)) == \"\")),\n",
+					"                    (col(col_name).isNull()) | \n",
+					"                    (trim(col(col_name)) == \"\") |\n",
+					"                    (upper(trim(col(col_name))) == \"NAN\") |\n",
+					"                    (upper(trim(col(col_name))) == \"NAT\") |\n",
+					"                    (upper(trim(col(col_name))) == \"NULL\"),\n",
 					"                    lit(None)\n",
 					"                ).otherwise(trim(col(col_name)))\n",
 					"            )\n",
@@ -1628,7 +1663,7 @@
 					"    logger.info(\"Address field corrections completed\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "markdown",
@@ -1765,7 +1800,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": 88
+				"execution_count": 27
 			},
 			{
 				"cell_type": "markdown",
@@ -1815,7 +1850,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 89
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -1853,7 +1888,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 90
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -1908,7 +1943,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 91
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -2020,7 +2055,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": 92
+				"execution_count": 31
 			},
 			{
 				"cell_type": "markdown",
@@ -2289,7 +2324,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 93
+				"execution_count": 32
 			}
 		]
 	}

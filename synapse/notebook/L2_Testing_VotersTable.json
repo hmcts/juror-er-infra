@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0d041248-fd66-4911-bcc8-68974e6c81d7"
+				"spark.autotune.trackingId": "28720c44-3cbc-4ef9-a6dc-af0ed57c7a70"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 63
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -79,10 +79,23 @@
 					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 64
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
+				"source": [
+					"df.schema"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"df.count()"
 				],
@@ -91,6 +104,10 @@
 			{
 				"cell_type": "code",
 				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
 					"collapsed": false
 				},
 				"source": [

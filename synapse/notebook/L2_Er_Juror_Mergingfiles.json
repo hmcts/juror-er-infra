@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b72c92ad-018e-4f25-9209-676c5a61f468"
+				"spark.autotune.trackingId": "a9c60e9e-80b1-4de3-a125-4e6230e17033"
 			}
 		},
 		"metadata": {
@@ -1925,6 +1925,9 @@
 					"    try:\n",
 					"        # Ensure poll_number and register_lett are synchronized\n",
 					"        df = ensure_register_poll_consistency(df)\n",
+					"        \n",
+					"        # NEW: Apply address corrections one more time before final export\n",
+					"        df = fix_address_fields(df)\n",
 					"        \n",
 					"        # 1. Clean timestamp fields first to replace NaT with NULL\n",
 					"        timestamp_columns = [\"date_selected1\", \"date_selected2\", \"date_selected3\"]\n",

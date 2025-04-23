@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "db53a284-bf49-4708-ac91-772e3db7b2da"
+				"spark.autotune.trackingId": "b72c92ad-018e-4f25-9209-676c5a61f468"
 			}
 		},
 		"metadata": {
@@ -1431,6 +1431,9 @@
 					"        \n",
 					"        # Apply the standard process_dataframe function\n",
 					"        transformed_df = process_dataframe(df)\n",
+					"        \n",
+					"        # NEW: Apply address field corrections\n",
+					"        transformed_df = fix_address_fields(transformed_df)\n",
 					"        \n",
 					"        # Restore hash_id if it was present before\n",
 					"        if has_hash_id and hash_id_values is not None:\n",

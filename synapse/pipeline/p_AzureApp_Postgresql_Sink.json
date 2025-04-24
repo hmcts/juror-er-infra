@@ -1,5 +1,5 @@
 {
-	"name": "Pipeline 1",
+	"name": "p_AzureApp_Postgresql_Sink",
 	"properties": {
 		"activities": [
 			{

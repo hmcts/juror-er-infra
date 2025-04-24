@@ -155,3 +155,22 @@ resource "azurerm_synapse_role_assignment" "creduser" {
   principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
   depends_on           = [azurerm_synapse_firewall_rule.allowall]
 }
+
+resource "azurerm_role_assignment" "DLRM_sa" {
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = module.storage.storageaccount_id
+}
+
+resource "azurerm_role_assignment" "synapse_sa" {
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = module.storage.storageaccount_id
+}
+
+resource "azurerm_synapse_role_assignment" "anotherone" {
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Administrator"
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
+  depends_on           = [azurerm_synapse_firewall_rule.allowall]
+}

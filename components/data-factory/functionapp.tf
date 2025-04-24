@@ -26,7 +26,12 @@ resource "azurerm_linux_function_app" "funcapp" {
   identity {
     type = "SystemAssigned"
   }
-
+  app_settings = {
+    "BUILD_FLAGS"                    = "UseExpressBuild"
+    "ENABLE_ORYX_BUILD"              = "true"
+    "SCM_DO_BUILD_DURING_DEPLOYMENT" = "1"
+    "XDG_CACHE_HOME"                 = "/tmp/.cache"
+  }
   tags = module.tags.common_tags
 }
 

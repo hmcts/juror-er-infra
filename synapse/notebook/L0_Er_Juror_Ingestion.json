@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f8e90060-e3c5-460c-a0b2-b09a5edd481c"
+				"spark.autotune.trackingId": "186ba2d7-bcf0-4356-acac-62c103e0d75d"
 			}
 		},
 		"metadata": {
@@ -74,7 +74,7 @@
 					"# L0 ER Juror Ingestion Pipeline\n",
 					"\n",
 					"## Overview\n",
-					"This script implements an ETL pipeline for processing juror-related files stored in Azure Data Lake Storage (ADLS). It handles various file types (CSV, Excel, ZIP), moves files to appropriate folders (e.g., quarantine, metadata, overseas), and converts files to Parquet format for efficient storage and querying.\n",
+					"This notebook implements an ETL pipeline for processing juror-related files stored in Azure Data Lake Storage (ADLS). It handles various file types (CSV, Excel, ZIP), moves files to appropriate folders (e.g., quarantine, metadata, overseas), and converts files to Parquet format for efficient storage and querying.\n",
 					"\n",
 					"## Features\n",
 					"- **File Type Support**: Processes CSV, Excel, and ZIP files.\n",
@@ -84,7 +84,7 @@
 					"- **Metadata and Logging**: Adds metadata columns to processed files and maintains detailed logs.\n",
 					"\n",
 					"## Workflow\n",
-					"1. **Initialisation**:\n",
+					"1. **Initialization**:\n",
 					"   - Configures logging and initializes a Spark session.\n",
 					"2. **File Identification**:\n",
 					"   - Identifies file types (CSV/Excel) and checks for metadata or empty files.\n",

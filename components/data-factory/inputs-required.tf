@@ -84,3 +84,9 @@ variable "hub_subscription_id" {
   description = "The subscription id for the hub"
   type        = string
 }
+
+variable "hub_vnet_name" {
+  description = "The name of the hub vnet"
+  type        = string
+
+}

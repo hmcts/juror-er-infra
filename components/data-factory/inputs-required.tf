@@ -90,3 +90,9 @@ variable "hub_vnet_name" {
   type        = string
 
 }
+
+variable "bootstrap_object_id" {
+  description = "The object id of the bootstrap user"
+  type        = string
+
+}

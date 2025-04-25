@@ -28,8 +28,3 @@ resource "azurerm_resource_group" "adf_juror_rg" {
   location = var.location
   tags     = module.tags.common_tags
 }
-
-import {
-  to = azurerm_resource_group.adf_juror_rg
-  id = "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg"
-}

@@ -4,7 +4,7 @@ vnet_name             = "adf-vnet"
 vnet_address_space    = ["10.1.0.0/27"]
 resource_group_name   = "baubais-data-factory-rg-prod"
 subnet1_name          = "adf-privateendpoints"
-subnet1_address_space = ["10.1.2.0/28"]
+subnet1_address_space = ["10.1.0.0/28"]
 github_configuration = {
   hmcts = {
     account_name       = "hmcts"
@@ -18,10 +18,10 @@ github_configuration = {
 
 subscription_id       = "5ca62022-6aa2-4cee-aaa7-e7536c8d566c" # DTS-SHAREDSERVICES-PROD
 subnet2_name          = "synapse-privateendpoints"
-subnet2_address_space = ["10.1.2.16/29"]
+subnet2_address_space = ["10.1.0.16/29"]
 
 
-subnet_function_space = ["10.1.2.24/29"]
+subnet_function_space = ["10.1.0.24/29"]
 
 routes = {
   ss-prod-vnet = {

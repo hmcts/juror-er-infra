@@ -27,7 +27,7 @@ resource "azurerm_key_vault" "baubais_kv" {
       ]
       }, {
       tenant_id      = data.azurerm_client_config.current.tenant_id
-      object_id      = "9811e238-e068-4802-a13c-f67a5945f03f" # DTS Bootstrap (sub:dts-sharedservices-stg)
+      object_id      = data.azurerm_client_config.current.object_id #"9811e238-e068-4802-a13c-f67a5945f03f" # DTS Bootstrap (sub:dts-sharedservices-stg)
       application_id = null
 
       certificate_permissions = []

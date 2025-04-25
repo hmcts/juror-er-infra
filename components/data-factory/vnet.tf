@@ -36,29 +36,36 @@ resource "azurerm_subnet" "function_subnet3" {
 
 
 resource "azurerm_virtual_network_peering" "juror-to-hub" {
-  count                     = var.env == "stg" ? 1 : 0
-  name                      = "${azurerm_virtual_network.adf_juror_vnet.name}-to-hmcts-hub-nonprodi"
+
+  name                      = "${azurerm_virtual_network.adf_juror_vnet.name}-to-${var.hub_vnet_name}"
   resource_group_name       = var.resource_group_name
   virtual_network_name      = azurerm_virtual_network.adf_juror_vnet.name
-  remote_virtual_network_id = "/subscriptions/fb084706-583f-4c9a-bdab-949aac66ba5c/resourceGroups/hmcts-hub-nonprodi/providers/Microsoft.Network/virtualNetworks/hmcts-hub-nonprodi"
+  remote_virtual_network_id = "/subscriptions/${var.hub_subscription_id}/resourceGroups/${var.hub_vnet_name}/providers/Microsoft.Network/virtualNetworks/${var.hub_vnet_name}"
 
   allow_virtual_network_access = "true"
   allow_forwarded_traffic      = "true"
 }
 
+moved {
+  from = azurerm_virtual_network_peering.juror-to-hub[0]
+  to   = azurerm_virtual_network_peering.juror-to-hub
+}
 resource "azurerm_virtual_network_peering" "hub-to-juror" {
-  count                     = var.env == "stg" ? 1 : 0
-  provider                  = azurerm.HMCTS-HUB-NONPROD-INTSVC
-  name                      = "hmcts-hub-nonprodi-to-${azurerm_virtual_network.adf_juror_vnet.name}"
-  resource_group_name       = "hmcts-hub-nonprodi"
-  virtual_network_name      = "hmcts-hub-nonprodi"
+
+  provider                  = azurerm.hub
+  name                      = "${var.hub_vnet_name}-to-${azurerm_virtual_network.adf_juror_vnet.name}"
+  resource_group_name       = var.hub_vnet_name
+  virtual_network_name      = var.hub_vnet_name
   remote_virtual_network_id = azurerm_virtual_network.adf_juror_vnet.id
 
   allow_virtual_network_access = "true"
   allow_forwarded_traffic      = "true"
 }
 
-
+moved {
+  from = azurerm_virtual_network_peering.hub-to-juror[0]
+  to   = azurerm_virtual_network_peering.hub-to-juror
+}
 resource "azurerm_route_table" "this" {
   name                = "rt-adf-function-${var.env}"
   location            = var.location

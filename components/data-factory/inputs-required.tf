@@ -79,3 +79,8 @@ variable "routes" {
   description = "The routes to add to the route table"
   type        = map(object({ address_prefix = string, next_hop_type = string, next_hop_in_ip_address = string }))
 }
+
+variable "hub_subscription_id" {
+  description = "The subscription id for the hub"
+  type        = string
+}

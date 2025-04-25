@@ -174,3 +174,21 @@ resource "azurerm_synapse_role_assignment" "anotherone" {
   principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
   depends_on           = [azurerm_synapse_firewall_rule.allowall]
 }
+
+
+resource "azurerm_role_assignment" "rg_1" {
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
+  role_definition_name = "Storage Blob Data Reader"
+  scope                = azurerm_resource_group.adf_juror_rg.id
+}
+
+resource "azurerm_role_assignment" "rg_2" {
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
+  role_definition_name = "Contributor"
+  scope                = azurerm_resource_group.adf_juror_rg.id
+}
+resource "azurerm_role_assignment" "rg_3" {
+  principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
+  role_definition_name = "Key Vault Reader"
+  scope                = azurerm_resource_group.adf_juror_rg.id
+}

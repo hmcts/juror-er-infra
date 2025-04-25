@@ -18,7 +18,18 @@ provider "azurerm" {
 }
 
 provider "azurerm" {
-  alias = "HMCTS-HUB-NONPROD-INTSVC"
+  alias = "hub"
   features {}
-  subscription_id = "fb084706-583f-4c9a-bdab-949aac66ba5c"
+  subscription_id = var.hub_subscription_id
+}
+
+resource "azurerm_resource_group" "adf_juror_rg" {
+  name     = var.resource_group_name
+  location = var.location
+  tags     = module.tags.common_tags
+}
+
+import {
+  to = azurerm_resource_group.adf_juror_rg
+  id = "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg"
 }

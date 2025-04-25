@@ -44,6 +44,11 @@ parameters:
         component: "data-factory"
         service_connection: "DTS-SHAREDSERVICES-STG"
         dependsOn: 'Precheck'
+      - deployment: "production"
+        environment: "prod"
+        component: "data-factory"
+        service_connection: "DTS-SHAREDSERVICES-PROD"
+        dependsOn: 'staging'
 
 stages:
   - stage: Precheck

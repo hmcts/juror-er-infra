@@ -30,3 +30,7 @@ routes = {
     next_hop_in_ip_address = "10.11.72.36"
   }
 }
+
+hub_subscription_id = "fb084706-583f-4c9a-bdab-949aac66ba5c" # HMCTS-HUB-NONPROD-INTSVC
+hub_vnet_name       = "hmcts-hub-nonprodi"
+bootstrap_object_id = "9811e238-e068-4802-a13c-f67a5945f03f" # DTS Bootstrap (sub:dts-sharedservices-stg)

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e82a7894-1aef-4505-a117-7eda30039a84"
+				"spark.autotune.trackingId": "382cdec8-2a79-4926-a830-6434ad0e8a16"
 			}
 		},
 		"metadata": {
@@ -271,7 +271,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 99
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 100
 			},
 			{
 				"cell_type": "code",
@@ -301,7 +301,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 101
 			},
 			{
 				"cell_type": "code",
@@ -338,7 +338,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = True "
 				],
-				"execution_count": null
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -360,7 +360,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -522,7 +522,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -569,7 +569,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -581,7 +581,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 106
 			},
 			{
 				"cell_type": "code",
@@ -651,7 +651,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 107
 			},
 			{
 				"cell_type": "markdown",
@@ -734,7 +734,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 76
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -806,7 +806,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 77
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -856,7 +856,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 78
+				"execution_count": 110
 			},
 			{
 				"cell_type": "code",
@@ -877,7 +877,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 79
+				"execution_count": 111
 			},
 			{
 				"cell_type": "code",
@@ -894,7 +894,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 80
+				"execution_count": 112
 			},
 			{
 				"cell_type": "code",
@@ -962,7 +962,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 81
+				"execution_count": 113
 			},
 			{
 				"cell_type": "markdown",
@@ -1021,7 +1021,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 82
+				"execution_count": 114
 			},
 			{
 				"cell_type": "markdown",
@@ -1088,7 +1088,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 83
+				"execution_count": 115
 			},
 			{
 				"cell_type": "markdown",
@@ -1125,7 +1125,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 84
+				"execution_count": 116
 			},
 			{
 				"cell_type": "code",
@@ -1183,7 +1183,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 85
+				"execution_count": 117
 			},
 			{
 				"cell_type": "code",
@@ -1236,7 +1236,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 86
+				"execution_count": 118
 			},
 			{
 				"cell_type": "markdown",
@@ -1307,7 +1307,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 87
+				"execution_count": 119
 			},
 			{
 				"cell_type": "code",
@@ -1379,7 +1379,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": 88
+				"execution_count": 120
 			},
 			{
 				"cell_type": "markdown",
@@ -1393,6 +1393,41 @@
 				"source": [
 					"## Transform to Target Schema"
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def fix_address_fields(df):\n",
+					"    \"\"\"\n",
+					"    Simplified address field correction that assumes basic cleansing is done in L1.\n",
+					"    Now focuses only on cross-file validations and final standardization.\n",
+					"    \"\"\"\n",
+					"    from pyspark.sql.functions import col, when, lit, trim\n",
+					"    \n",
+					"    logger = logging.getLogger()\n",
+					"    logger.info(\"Applying final address field corrections...\")\n",
+					"    \n",
+					"    # Step 1: Final check for NULL/empty address fields\n",
+					"    columns_to_check = [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
+					"    for col_name in columns_to_check:\n",
+					"        if col_name in df.columns:\n",
+					"            df = df.withColumn(\n",
+					"                col_name,\n",
+					"                when(\n",
+					"                    (col(col_name).isNull()) | (trim(col(col_name)) == \"\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(trim(col(col_name)))\n",
+					"            )\n",
+					"    \n",
+					"    # Step 2: Final cleanup for address6 (retained from your L2 logic)\n",
+					"    if \"address6\" in df.columns:\n",
+					"        df = df.withColumn(\"address6\", lit(None))\n",
+					"        logger.info(\"Set address6 to NULL as per requirements\")\n",
+					"    \n",
+					"    logger.info(\"Final address field corrections completed\")\n",
+					"    return df"
+				],
+				"execution_count": 123
 			},
 			{
 				"cell_type": "code",
@@ -1457,7 +1492,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 89
+				"execution_count": 121
 			},
 			{
 				"cell_type": "code",
@@ -1485,42 +1520,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": 90
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"def fix_address_fields(df):\n",
-					"    \"\"\"\n",
-					"    Simplified address field correction that assumes basic cleansing is done in L1.\n",
-					"    Now focuses only on cross-file validations and final standardization.\n",
-					"    \"\"\"\n",
-					"    from pyspark.sql.functions import col, when, lit, trim\n",
-					"    \n",
-					"    logger = logging.getLogger()\n",
-					"    logger.info(\"Applying final address field corrections...\")\n",
-					"    \n",
-					"    # Step 1: Final check for NULL/empty address fields\n",
-					"    columns_to_check = [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
-					"    for col_name in columns_to_check:\n",
-					"        if col_name in df.columns:\n",
-					"            df = df.withColumn(\n",
-					"                col_name,\n",
-					"                when(\n",
-					"                    (col(col_name).isNull()) | (trim(col(col_name)) == \"\"),\n",
-					"                    lit(None)\n",
-					"                ).otherwise(trim(col(col_name)))\n",
-					"            )\n",
-					"    \n",
-					"    # Step 2: Final cleanup for address6 (retained from your L2 logic)\n",
-					"    if \"address6\" in df.columns:\n",
-					"        df = df.withColumn(\"address6\", lit(None))\n",
-					"        logger.info(\"Set address6 to NULL as per requirements\")\n",
-					"    \n",
-					"    logger.info(\"Final address field corrections completed\")\n",
-					"    return df"
-				],
-				"execution_count": 91
+				"execution_count": 122
 			},
 			{
 				"cell_type": "markdown",
@@ -1657,7 +1657,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": 92
+				"execution_count": 124
 			},
 			{
 				"cell_type": "markdown",
@@ -1707,7 +1707,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 93
+				"execution_count": 125
 			},
 			{
 				"cell_type": "code",
@@ -1745,7 +1745,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 94
+				"execution_count": 126
 			},
 			{
 				"cell_type": "code",
@@ -1800,7 +1800,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 95
+				"execution_count": 127
 			},
 			{
 				"cell_type": "code",
@@ -1927,7 +1927,7 @@
 					"        \n",
 					"        return df"
 				],
-				"execution_count": 96
+				"execution_count": 128
 			},
 			{
 				"cell_type": "markdown",
@@ -2196,7 +2196,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 97
+				"execution_count": 129
 			}
 		]
 	}

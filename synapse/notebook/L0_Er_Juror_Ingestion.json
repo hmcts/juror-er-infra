@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cccbf522-6507-4c5f-9b2c-8147973d94ab"
+				"spark.autotune.trackingId": "7196be91-55c5-434f-93c2-b8ca40b19193"
 			}
 		},
 		"metadata": {
@@ -142,7 +142,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 1
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -161,7 +161,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +174,7 @@
 					"    ]\n",
 					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -196,7 +196,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 4
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -277,7 +277,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 5
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -355,7 +355,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -425,7 +425,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -475,7 +475,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 8
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -509,7 +509,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -546,7 +546,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -587,7 +587,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 11
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -606,14 +606,36 @@
 					"        # Destination path for Parquet file (same regardless of source type)\n",
 					"        dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_key}.parquet\"\n",
 					"        \n",
-					"        # Read the source file using Spark based on file type\n",
+					"        # Read the source file using different methods based on file type\n",
 					"        try:\n",
 					"            if file_type == 'excel':\n",
 					"                print(f\"  Reading Excel file: {source_path}\")\n",
-					"                df = spark.read.format(\"com.crealytics.spark.excel\") \\\n",
-					"                    .option(\"header\", \"true\") \\\n",
-					"                    .option(\"inferSchema\", \"true\") \\\n",
-					"                    .load(source_path)\n",
+					"                \n",
+					"                # Use pandas to read Excel\n",
+					"                import pandas as pd\n",
+					"                import tempfile\n",
+					"                import os\n",
+					"                \n",
+					"                # Create a temporary file\n",
+					"                temp_dir = tempfile.mkdtemp()\n",
+					"                temp_file = os.path.join(temp_dir, \"temp_excel.xlsx\")\n",
+					"                \n",
+					"                # Download the file\n",
+					"                mssparkutils.fs.cp(source_path, f\"file://{temp_file}\")\n",
+					"                \n",
+					"                # Read with pandas\n",
+					"                excel_df = pd.read_excel(temp_file)\n",
+					"                \n",
+					"                # Convert to Spark DataFrame\n",
+					"                df = spark.createDataFrame(excel_df)\n",
+					"                \n",
+					"                # Clean up\n",
+					"                try:\n",
+					"                    os.remove(temp_file)\n",
+					"                    os.rmdir(temp_dir)\n",
+					"                except:\n",
+					"                    pass\n",
+					"                \n",
 					"            else:  # csv\n",
 					"                print(f\"  Reading CSV file: {source_path}\")\n",
 					"                df = spark.read \\\n",
@@ -667,7 +689,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 12
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -712,7 +734,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 13
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -777,7 +799,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 14
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -830,7 +852,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 15
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -919,7 +941,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 16
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1051,7 +1073,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 17
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1141,7 +1163,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 18
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1167,7 +1189,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1428,7 +1450,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 20
+				"execution_count": null
 			}
 		]
 	}

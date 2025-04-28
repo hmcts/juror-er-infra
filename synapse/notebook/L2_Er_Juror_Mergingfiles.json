@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a746cdc5-b125-4117-bf0e-5a81336bca3c"
+				"spark.autotune.trackingId": "90d338c3-3ac1-4504-838f-0c4e88ca6d19"
 			}
 		},
 		"metadata": {
@@ -2176,6 +2176,7 @@
 					"                postgresql_data.write \\\n",
 					"                    .format(\"delta\") \\\n",
 					"                    .mode(\"overwrite\") \\\n",
+					"                    .option(\"overwriteSchema\", \"true\") \\\n",
 					"                    .save(postgresql_path)\n",
 					"\n",
 					"                \n",

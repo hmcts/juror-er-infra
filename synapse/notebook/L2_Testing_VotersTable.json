@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e1bfc57a-03ff-43cd-adea-16d091c7bf07"
+				"spark.autotune.trackingId": "2e0c6e4e-9051-4950-afb8-d7d172643a8e"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 36
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -79,20 +79,20 @@
 					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
 					""
 				],
-				"execution_count": 37
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					}
 				},
 				"source": [
 					"df.schema"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -105,7 +105,7 @@
 				"source": [
 					"df.count()"
 				],
-				"execution_count": 38
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -119,7 +119,7 @@
 				"source": [
 					"display(df.limit(10))"
 				],
-				"execution_count": 39
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -223,7 +223,7 @@
 					"    print(f\"Check completed in {time.time() - start_time:.2f} seconds\")\n",
 					"    return results"
 				],
-				"execution_count": 40
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -241,7 +241,7 @@
 					"print(f\"DataFrame columns: {df.columns}\")\n",
 					"print(f\"DataFrame row count: {df.count()}\")"
 				],
-				"execution_count": 24
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -258,7 +258,7 @@
 					"    print(f\"Column {column}: {details['nan_count']} NAN values\")\n",
 					"    print(f\"Examples: {details['example_values']}\")"
 				],
-				"execution_count": 41
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -441,7 +441,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 42
+				"execution_count": 31
 			}
 		]
 	}

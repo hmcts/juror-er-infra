@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ff5e571f-9f93-4707-9caa-9c777807c770"
+				"spark.autotune.trackingId": "0562231a-880a-4f56-ace5-cf4422b25988"
 			}
 		},
 		"metadata": {
@@ -849,7 +849,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"process_filedef process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None):\n",
+					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None):\n",
 					"    \"\"\"Process a source file and transform it to parquet format\"\"\"\n",
 					"    # Print more detailed debugging info\n",
 					"    print(f\"Debug - Starting to process file: {source_path}\")\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ebe7f48f-78c9-4ae2-8275-0eac7489831c"
+				"spark.autotune.trackingId": "f098498a-34f3-4c77-a39a-5f4a4e4c479a"
 			}
 		},
 		"metadata": {
@@ -42,7 +42,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -262,7 +263,7 @@
 					"from pyspark.sql.types import DecimalType\n",
 					"from pyspark.sql.functions import col, when, coalesce, current_timestamp"
 				],
-				"execution_count": 11
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -278,7 +279,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -622,20 +623,20 @@
 					"    else:\n",
 					"        print(\"Data lake export with CDC failed\")"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					}
 				},
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -667,22 +668,22 @@
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					},
 					"collapsed": false
 				},
 				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
-					"final_count = delta_df.groupBy('flags') \\\n",
-					"    .agg(count('flags')) \\\n",
-					"    .orderBy('flags')\n",
+					"final_count = delta_df.groupBy('rec_num','title') \\\n",
+					"    .agg(count('title')) \\\n",
+					"    .orderBy('title')\n",
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",

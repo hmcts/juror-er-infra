@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f098498a-34f3-4c77-a39a-5f4a4e4c479a"
+				"spark.autotune.trackingId": "bdf51144-1234-40b4-9d44-ff48eeb0b3ed"
 			}
 		},
 		"metadata": {
@@ -677,13 +677,13 @@
 				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
-					"final_count = delta_df.groupBy('rec_num','title') \\\n",
-					"    .agg(count('title')) \\\n",
-					"    .orderBy('title')\n",
+					"final_count = delta_df.groupBy('address5','rec_num') \\\n",
+					"    .agg(count('address5')) \\\n",
+					"    .orderBy('rec_num')\n",
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 13
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",

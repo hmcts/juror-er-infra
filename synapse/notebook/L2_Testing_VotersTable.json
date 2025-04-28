@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2e0c6e4e-9051-4950-afb8-d7d172643a8e"
+				"spark.autotune.trackingId": "1233e878-de6e-4c79-a22a-a66d0842fa6b"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 40
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -84,9 +84,9 @@
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": true,
+					"editable": false,
 					"run_control": {
-						"frozen": false
+						"frozen": true
 					}
 				},
 				"source": [
@@ -441,7 +441,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 31
+				"execution_count": null
 			}
 		]
 	}

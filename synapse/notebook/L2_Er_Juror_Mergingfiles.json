@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6bea0cb4-66bc-4cb6-9dfb-384287cbd622"
+				"spark.autotune.trackingId": "3fb304b9-5212-41e6-8285-e5c14c91eec8"
 			}
 		},
 		"metadata": {
@@ -1912,11 +1912,18 @@
 					"        import traceback\n",
 					"        logger.error(traceback.format_exc())\n",
 					"        # Return original dataframe if transformation fails\n",
-					"        \n",
-					"        for col in PROBLEMATIC_COLUMNS:\n",
-					"            if col in df.columns:\n",
-					"                df[col] = df[col].replace(['NAN', 'NaN', 'nan', 'NULL', 'null'], None)\n",
-					"                df[col] = df[col].where(pd.notna(df[col]), None)     \n",
+					"        PROBLEMATIC_COLUMNS = [\"new_marker\", \"address5\"]\n",
+					"        for column in PROBLEMATIC_COLUMNS:\n",
+					"            if column in df.columns:\n",
+					"                df = df.withColumn(\n",
+					"                column,\n",
+					"            when(\n",
+					"                (col(column).isNull()) | \n",
+					"                (col(column).cast(\"string\").isin(\"NAN\", \"NaN\", \"nan\", \"NULL\", \"null\")) | \n",
+					"                (trim(col(column)) == \"\"),\n",
+					"                lit(None)\n",
+					"            ).otherwise(col(column))\n",
+					"        )   \n",
 					"        \n",
 					"        return df"
 				],

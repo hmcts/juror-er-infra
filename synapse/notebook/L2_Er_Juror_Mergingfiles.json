@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a6b20a44-3549-4e88-aa6a-99ca62d5d271"
+				"spark.autotune.trackingId": "200b43bb-216f-4f4b-bf96-5c3d0600d4ce"
 			}
 		},
 		"metadata": {
@@ -1806,8 +1806,7 @@
 				"cell_type": "code",
 				"source": [
 					"def prepare_postgresql_data(df):\n",
-					"from pyspark.sql.functions import substring\n",
-					"from pyspark.sql.functions import col, when, lit, length\n",
+					"    from pyspark.sql.functions import substring, col, when, lit, length, trim\n",
 					"\n",
 					"    \"\"\"\n",
 					"    Prepare data specifically for PostgreSQL loading\n",
@@ -1848,14 +1847,13 @@
 					"        \n",
 					"        # 2. Select only columns needed for PostgreSQL\n",
 					"        pg_columns = [\"part_no\", \"register_lett\", \"poll_number\", \"new_marker\", \n",
-					"                     \"title\", \"lname\", \"fname\", \"dob\", \"flags\", \"address\", \n",
-					"                     \"address2\", \"address3\", \"address4\", \"address5\", \"address6\", \n",
-					"                     \"zip\", \"date_selected1\", \"date_selected2\", \"date_selected3\", \n",
-					"                     \"rec_num\", \"perm_disqual\", \"source_id\", \"postcode_start\",\"hash_id\", \"creation_date\"]\n",
+					"                      \"title\", \"lname\", \"fname\", \"dob\", \"flags\", \"address\", \n",
+					"                      \"address2\", \"address3\", \"address4\", \"address5\", \"address6\", \n",
+					"                      \"zip\", \"date_selected1\", \"date_selected2\", \"date_selected3\", \n",
+					"                      \"rec_num\", \"perm_disqual\", \"source_id\", \"postcode_start\", \"hash_id\", \"creation_date\"]\n",
 					"        \n",
 					"        pg_data = df.select([col(c) for c in pg_columns if c in df.columns])\n",
 					"        \n",
-					"\n",
 					"        # 3. Process flags column for X/F rule\n",
 					"        pg_data = pg_data.withColumn(\n",
 					"            \"flags\",\n",
@@ -1914,6 +1912,11 @@
 					"        import traceback\n",
 					"        logger.error(traceback.format_exc())\n",
 					"        # Return original dataframe if transformation fails\n",
+					"        \n",
+					"        for col in PROBLEMATIC_COLUMNS:\n",
+					"            if col in df.columns:\n",
+					"                df[col] = df[col].where(pd.notna(df[col]), None)      \n",
+					"        \n",
 					"        return df"
 				],
 				"execution_count": null

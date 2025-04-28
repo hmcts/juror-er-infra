@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6e7a8323-c86c-40ac-9710-e101143abe72"
+				"spark.autotune.trackingId": "245eeb4c-3744-4fa0-b2dd-6e7d129baa76"
 			}
 		},
 		"metadata": {
@@ -167,12 +167,29 @@
 				"cell_type": "code",
 				"source": [
 					"def is_metadata_file(file_path):\n",
-					"    \"\"\"Check if file is metadata related\"\"\"\n",
+					"    \"\"\"Check if file is metadata related - enhanced version\"\"\"\n",
 					"    metadata_indicators = [\n",
 					"        'metadata.txt',\n",
-					"        'readme.txt'\n",
+					"        'readme.txt',\n",
+					"        'readme',\n",
+					"        'metadata',\n",
+					"        'notes',\n",
+					"        'information',\n",
+					"        'instructions',\n",
+					"        'guide'\n",
 					"    ]\n",
-					"    return any(indicator in file_path.lower() for indicator in metadata_indicators)"
+					"    \n",
+					"    # Case-insensitive check for indicators in filename\n",
+					"    file_name_lower = os.path.basename(file_path).lower()\n",
+					"    if any(indicator in file_name_lower for indicator in metadata_indicators):\n",
+					"        return True\n",
+					"        \n",
+					"    # Check for files in metadata-like folders\n",
+					"    path_lower = file_path.lower()\n",
+					"    if 'metadata' in path_lower or 'docs' in path_lower or 'documentation' in path_lower:\n",
+					"        return True\n",
+					"        \n",
+					"    return False"
 				],
 				"execution_count": null
 			},

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c6905ad6-9a93-42c5-ae6e-4bad72037d18"
+				"spark.autotune.trackingId": "f7c7332e-80e1-47a8-978e-e0256ddffb8e"
 			}
 		},
 		"metadata": {
@@ -1998,7 +1998,7 @@
 					"    spark = create_spark_session()\n",
 					"    config = load_config()\n",
 					"    storage_account = config[\"storage_account\"]\n",
-					"    process_log_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/l2_process_logs/l2_processed_files.txt\"\n",
+					"    config[\"output_path\"] = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
 					"    \n",
 					"\n",
 					"    # Ensure all required directories exist\n",

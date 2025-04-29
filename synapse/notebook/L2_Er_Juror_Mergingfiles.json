@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3d78023d-1f5f-4635-9375-8eb424bdc2f3"
+				"spark.autotune.trackingId": "c34668d5-e0af-4872-9fc7-fe68e02160af"
 			}
 		},
 		"metadata": {
@@ -251,7 +251,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": null
+				"execution_count": 418
 			},
 			{
 				"cell_type": "code",
@@ -271,7 +271,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 419
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 420
 			},
 			{
 				"cell_type": "code",
@@ -301,7 +301,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 421
 			},
 			{
 				"cell_type": "code",
@@ -323,7 +323,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 422
 			},
 			{
 				"cell_type": "code",
@@ -360,7 +360,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = True "
 				],
-				"execution_count": null
+				"execution_count": 423
 			},
 			{
 				"cell_type": "code",
@@ -382,7 +382,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 424
 			},
 			{
 				"cell_type": "code",
@@ -576,7 +576,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 425
 			},
 			{
 				"cell_type": "code",
@@ -623,7 +623,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 426
 			},
 			{
 				"cell_type": "code",
@@ -635,7 +635,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 427
 			},
 			{
 				"cell_type": "code",
@@ -705,7 +705,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 428
 			},
 			{
 				"cell_type": "markdown",
@@ -788,7 +788,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 429
 			},
 			{
 				"cell_type": "code",
@@ -860,7 +860,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 430
 			},
 			{
 				"cell_type": "code",
@@ -910,7 +910,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 431
 			},
 			{
 				"cell_type": "code",
@@ -931,7 +931,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 432
 			},
 			{
 				"cell_type": "code",
@@ -948,7 +948,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 433
 			},
 			{
 				"cell_type": "code",
@@ -1016,7 +1016,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 434
 			},
 			{
 				"cell_type": "markdown",
@@ -1075,7 +1075,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": null
+				"execution_count": 435
 			},
 			{
 				"cell_type": "code",
@@ -1154,7 +1154,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": null
+				"execution_count": 436
 			},
 			{
 				"cell_type": "markdown",
@@ -1221,7 +1221,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": null
+				"execution_count": 437
 			},
 			{
 				"cell_type": "code",
@@ -1230,50 +1230,42 @@
 					"    \"\"\"Write data to Delta table with proper handling for initial vs incremental writes\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
 					"    from delta.tables import DeltaTable\n",
+					"    from pyspark.sql.utils import AnalysisException\n",
 					"    logger = logging.getLogger()\n",
-					"    \n",
+					"\n",
 					"    try:\n",
-					"        # Check if the Delta table already exists\n",
-					"        delta_exists = mssparkutils.fs.exists(output_path)\n",
-					"        \n",
-					"        if delta_exists:\n",
-					"            logger.info(f\"Delta table already exists at {output_path}. Performing MERGE.\")\n",
-					"            \n",
-					"            # Load existing Delta\n",
+					"        # Try to read existing table to determine if this is a merge\n",
+					"        try:\n",
+					"            delta_table = DeltaTable.forPath(spark, output_path)\n",
 					"            existing_data = spark.read.format(\"delta\").load(output_path)\n",
 					"            existing_count = existing_data.count()\n",
-					"            \n",
-					"            # Perform MERGE using hash_id\n",
-					"            delta_table = DeltaTable.forPath(spark, output_path)\n",
+					"\n",
+					"            logger.info(f\"Delta table already exists at {output_path}. Performing MERGE.\")\n",
 					"            delta_table.alias(\"existing\").merge(\n",
 					"                df.alias(\"updates\"),\n",
 					"                \"existing.hash_id = updates.hash_id\"\n",
 					"            ).whenNotMatchedInsertAll().execute()\n",
-					"            \n",
-					"            # Post-merge stats\n",
+					"\n",
 					"            new_total_count = spark.read.format(\"delta\").load(output_path).count()\n",
 					"            new_records = new_total_count - existing_count\n",
-					"            \n",
+					"\n",
 					"            logger.info(f\"✅ Merge complete: {new_records} new records added.\")\n",
-					"            logger.info(f\"📊 Delta table now contains {new_total_count} total records.\")\n",
 					"            return {\"status\": \"success\", \"new_records\": new_records, \"total_records\": new_total_count}\n",
-					"        \n",
-					"        else:\n",
-					"            logger.info(f\"🆕 Delta table not found. Performing INITIAL LOAD at {output_path}.\")\n",
+					"\n",
+					"        except AnalysisException:\n",
+					"            logger.info(f\"🆕 Delta table not found at {output_path}. Performing INITIAL LOAD.\")\n",
 					"            df.write.format(\"delta\").mode(\"overwrite\").save(output_path)\n",
-					"            \n",
 					"            new_records = df.count()\n",
 					"            logger.info(f\"✅ Initial load complete: {new_records} records written.\")\n",
 					"            return {\"status\": \"success\", \"new_records\": new_records, \"total_records\": new_records}\n",
-					"    \n",
+					"\n",
 					"    except Exception as e:\n",
 					"        logger.error(f\"❌ Error writing to Delta table at {output_path}: {str(e)}\")\n",
 					"        import traceback\n",
 					"        logger.error(traceback.format_exc())\n",
-					"        return {\"status\": \"error\", \"error\": str(e)}\n",
-					""
+					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": null
+				"execution_count": 438
 			},
 			{
 				"cell_type": "markdown",
@@ -1310,7 +1302,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 439
 			},
 			{
 				"cell_type": "code",
@@ -1368,7 +1360,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": null
+				"execution_count": 440
 			},
 			{
 				"cell_type": "code",
@@ -1421,7 +1413,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": null
+				"execution_count": 441
 			},
 			{
 				"cell_type": "markdown",
@@ -1492,7 +1484,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 442
 			},
 			{
 				"cell_type": "code",
@@ -1564,7 +1556,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 443
 			},
 			{
 				"cell_type": "markdown",
@@ -1612,7 +1604,7 @@
 					"    logger.info(\"Final address field corrections completed\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 444
 			},
 			{
 				"cell_type": "code",
@@ -1677,7 +1669,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": null
+				"execution_count": 445
 			},
 			{
 				"cell_type": "code",
@@ -1705,7 +1697,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 446
 			},
 			{
 				"cell_type": "markdown",
@@ -1842,7 +1834,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": null
+				"execution_count": 447
 			},
 			{
 				"cell_type": "markdown",
@@ -1892,7 +1884,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 448
 			},
 			{
 				"cell_type": "code",
@@ -1930,7 +1922,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 449
 			},
 			{
 				"cell_type": "code",
@@ -1979,7 +1971,7 @@
 					"    return True\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 450
 			},
 			{
 				"cell_type": "code",
@@ -2113,7 +2105,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 451
 			},
 			{
 				"cell_type": "markdown",
@@ -2202,6 +2194,7 @@
 					"        from pyspark.sql.utils import AnalysisException\n",
 					"\n",
 					"        # Now prepare the PostgreSQL-specific data from the entire transformed dataset\n",
+					"        output_path = config[\"output_path\"]\n",
 					"        try:\n",
 					"            transformed_data = spark.read.format(\"delta\").load(output_path)\n",
 					"        except AnalysisException as e:\n",
@@ -2258,7 +2251,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 452
 			}
 		]
 	}

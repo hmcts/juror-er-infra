@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8974d7c4-4d36-4127-87b9-72994e6f0723"
+				"spark.autotune.trackingId": "d94a88ba-4dad-4f75-b4ae-8354b56b31b1"
 			}
 		},
 		"metadata": {
@@ -1834,13 +1834,7 @@
 					"                df = df.withColumn(\n",
 					"                    col_name,\n",
 					"                    when(\n",
-					"                        (col(col_name).isNull()) | \n",
-					"                        (col(col_name).cast(\"string\") == \"NaT\") | \n",
-					"                        (col(col_name).cast(\"string\") == \"nat\") |\n",
-					"                        (col(col_name).cast(\"string\") == \"NaN\") |\n",
-					"                        (col(col_name).cast(\"string\") == \"nan\") |\n",
-					"                        (col(col_name).cast(\"string\") == \"None\") |\n",
-					"                        (col(col_name).cast(\"string\") == \"\"),\n",
+					"                        trim(lower(col(col_name))).isin(\"\", \"nat\", \"nan\", \"none\"),\n",
 					"                        lit(None)\n",
 					"                    ).otherwise(col(col_name))\n",
 					"                )\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1277603f-0f6f-438d-9eda-8da56afc0c3a"
+				"spark.autotune.trackingId": "3935b50a-8a5a-4aef-bc2d-9348f2710c7c"
 			}
 		},
 		"metadata": {
@@ -207,6 +207,14 @@
 					"    main()"
 				],
 				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_csv = spark.read.option(\"header\", \"true\").csv(https://baubaisadfsastg.blob.core.windows.net/juror-etl/analysis/l3_data_export_20250429_125609_combined/l3_data_export_20250429_125609.csv/part-00000-5576a7cb-5c26-48de-8bff-4f7e38a70831-c000.csv)\n",
+					"print(len(df_csv.columns))"
+				],
+				"execution_count": 10
 			}
 		]
 	}

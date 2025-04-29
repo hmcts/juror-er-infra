@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c0b23913-c2f3-47d6-9b84-01f600274aaa"
+				"spark.autotune.trackingId": "70179161-6a5c-4dfa-a840-db1f34414868"
 			}
 		},
 		"metadata": {
@@ -2201,16 +2201,17 @@
 					"        if total_new_records > 0 or len(new_file_paths) > 0:\n",
 					"            logger.info(\"Preparing PostgreSQL-specific data...\")\n",
 					"            \n",
+					"            output_path = config[\"output_path\"]\n",
+					"            \n",
 					"            # Read the entire transformed dataset\n",
 					"        if not mssparkutils.fs.exists(output_path):\n",
 					"            # Table/folder doesn't exist yet -> Initial load\n",
-					"            print(f\"Delta table at {output_path} does not exist. Creating new Delta table.\")\n",
-					"            final_data.write.format(\"delta\").mode(\"overwrite\").save(output_path)\n",
+					"            logger.warning(f\"Delta table does not exist at {output_path}. Skipping PostgreSQL preparation.\")\n",
+					"            \n",
 					"        else:\n",
 					"            # Table already exists -> Merge or append\n",
-					"            print(f\"Delta table at {output_path} exists. Proceeding with merge.\")\n",
-					"            transformed_data = spark.read.format(\"delta\").load(config[\"output_path\"])\n",
-					"            \n",
+					"            transformed_data = spark.read.format(\"delta\").load(output_path)\n",
+					"                    \n",
 					"            # Apply PostgreSQL-specific transformations\n",
 					"            postgresql_data = prepare_postgresql_data(transformed_data)\n",
 					"            \n",

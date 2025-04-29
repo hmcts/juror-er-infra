@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7b3606aa-d174-46c2-ae3b-ac63320208b4"
+				"spark.autotune.trackingId": "8783d466-6903-4f5f-90b1-07729668547d"
 			}
 		},
 		"metadata": {
@@ -251,7 +251,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": null
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -271,7 +271,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -301,7 +301,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -338,7 +338,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = True "
 				],
-				"execution_count": null
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -349,17 +349,18 @@
 					"    config = {\n",
 					"        \"storage_account\": storage_account,\n",
 					"        \"input_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\",\n",
-					"        \"config_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
+					"        \"config_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\",\n",
+					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\",\n",
 					"    }\n",
 					"    \n",
 					"    # Normalize all paths\n",
-					"    #config[\"output_path\"] = normalize_storage_path(config[\"output_path\"])\n",
+					"    config[\"output_path\"] = normalize_storage_path(config[\"output_path\"])\n",
 					"    config[\"input_path\"] = normalize_storage_path(config[\"input_path\"])\n",
 					"    config[\"config_path\"] = normalize_storage_path(config[\"config_path\"])\n",
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -553,7 +554,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -600,7 +601,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -612,7 +613,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -682,7 +683,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 42
 			},
 			{
 				"cell_type": "markdown",
@@ -765,7 +766,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -837,7 +838,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -887,7 +888,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -908,7 +909,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -925,7 +926,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -993,7 +994,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 48
 			},
 			{
 				"cell_type": "markdown",
@@ -1052,7 +1053,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": null
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -1128,7 +1129,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": null
+				"execution_count": 50
 			},
 			{
 				"cell_type": "markdown",
@@ -1195,7 +1196,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": null
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -1257,7 +1258,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": null
+				"execution_count": 52
 			},
 			{
 				"cell_type": "markdown",
@@ -1294,7 +1295,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -1352,7 +1353,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": null
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -1405,7 +1406,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": null
+				"execution_count": 55
 			},
 			{
 				"cell_type": "markdown",
@@ -1476,7 +1477,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -1548,7 +1549,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 57
 			},
 			{
 				"cell_type": "markdown",
@@ -1596,7 +1597,7 @@
 					"    logger.info(\"Final address field corrections completed\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -1661,7 +1662,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": null
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -1689,7 +1690,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 60
 			},
 			{
 				"cell_type": "markdown",
@@ -1826,7 +1827,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": null
+				"execution_count": 61
 			},
 			{
 				"cell_type": "markdown",
@@ -1876,7 +1877,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -1914,7 +1915,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -1948,7 +1949,7 @@
 					"    mssparkutils.fs.write(log_path, updated_content, overwrite=True)\n",
 					"    return True"
 				],
-				"execution_count": null
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -2082,7 +2083,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 65
 			},
 			{
 				"cell_type": "markdown",
@@ -2190,11 +2191,6 @@
 					"        else:\n",
 					"            logger.info(\"No new data processed, skipping PostgreSQL data preparation\")\n",
 					"\n",
-					"    except Exception as e:\n",
-					"        logger.error(f\"Error in incremental load process: {str(e)}\")\n",
-					"        import traceback\n",
-					"        logger.error(traceback.format_exc())\n",
-					"        raise\n",
 					"        # Optimize the Delta table if we processed files\n",
 					"        if total_new_records > 0:\n",
 					"            try:\n",
@@ -2204,19 +2200,26 @@
 					"                delta_table = DeltaTable.forPath(spark, config[\"output_path\"])\n",
 					"                # Optimize (compaction)\n",
 					"                delta_table.optimize().executeCompaction()\n",
-					"                 # Z-order by frequently queried columns\n",
+					"                # Z-order by frequently queried columns\n",
 					"                delta_table.optimize().executeZOrderBy(\"hash_id\")\n",
 					"                # Vacuum (remove old files, retain 7 days history)\n",
 					"                delta_table.vacuum(168)  # 7 days in hours\n",
 					"\n",
 					"                logger.info(\"Delta table optimization complete\")\n",
-					"     except Exception as e:\n",
-					"        logger.warning(f\"Delta table optimization failed: {str(e)}\")\n",
-					"        \n",
+					"            except Exception as e:\n",
+					"                logger.warning(f\"Delta table optimization failed: {str(e)}\")\n",
+					"\n",
+					"    except Exception as e:\n",
+					"        logger.error(f\"Error in incremental load process: {str(e)}\")\n",
+					"        import traceback\n",
+					"        logger.error(traceback.format_exc())\n",
+					"        raise\n",
+					"\n",
+					"\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 67
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0cf436ef-b5eb-44ee-855f-d9ae10bef63c"
+				"spark.autotune.trackingId": "8cef7290-3c72-4fda-8bd4-15046dcd9eb1"
 			}
 		},
 		"metadata": {
@@ -1436,7 +1436,14 @@
 					"    # Update the log of processed files\n",
 					"    if not debug_mode:  # Don't update log in debug mode\n",
 					"        try:\n",
-					"            new_processed_files = [file_info[\"path\"] for file_info in new_files]\n",
+					"            new_processed_files = (\n",
+					"                [file_info[\"path\"] for file_info in new_files]\n",
+					"                + moved_files.get(\"metadata_success\", [])\n",
+					"                + moved_files.get(\"empty\", [])\n",
+					"                + moved_files.get(\"quarantine\", [])\n",
+					"                + moved_files.get(\"overseas\", [])\n",
+					"            )\n",
+					"                \n",
 					"            new_processed_files_log = spark.createDataFrame([(file,) for file in new_processed_files], [\"file\"])\n",
 					"            \n",
 					"            if processed_files_log:\n",

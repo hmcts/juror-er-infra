@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3935b50a-8a5a-4aef-bc2d-9348f2710c7c"
+				"spark.autotune.trackingId": "f3fba8c4-bef0-43f8-9b89-42fcbf54c615"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"import os\n",
 					"from datetime import datetime"
 				],
-				"execution_count": 4
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -76,7 +76,7 @@
 					"        .getOrCreate()\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"    \n",
 					"    # Storage account and paths\n",
 					"    storage_account = \"baubaisadfsastg\"\n",
-					"    source_path = f\"abfss://djuror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"    source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"    timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
 					"    output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/analysis/data_export_{timestamp}\"\n",
 					"    \n",
@@ -206,15 +206,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 6
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"df_csv = spark.read.option(\"header\", \"true\").csv(https://baubaisadfsastg.blob.core.windows.net/juror-etl/analysis/l3_data_export_20250429_125609_combined/l3_data_export_20250429_125609.csv/part-00000-5576a7cb-5c26-48de-8bff-4f7e38a70831-c000.csv)\n",
-					"print(len(df_csv.columns))"
-				],
-				"execution_count": 10
+				"execution_count": 17
 			}
 		]
 	}

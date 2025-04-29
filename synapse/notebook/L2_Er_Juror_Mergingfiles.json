@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fea82858-ddbe-4d7d-842e-07f5e9f5d95f"
+				"spark.autotune.trackingId": "0e622b74-60fb-40c7-8969-1658f529e86e"
 			}
 		},
 		"metadata": {
@@ -1253,6 +1253,8 @@
 					"    logger = logging.getLogger()\n",
 					"\n",
 					"    try:\n",
+					"        # Enforce schema before any write\n",
+					"        df = cast_to_target_schema(df)\n",
 					"        # Try to read existing table to determine if this is a merge\n",
 					"        try:\n",
 					"            delta_table = DeltaTable.forPath(spark, output_path)\n",

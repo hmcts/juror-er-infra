@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6fe9c1b1-0fb1-417b-b9d1-9739dea65d44"
+				"spark.autotune.trackingId": "7b3606aa-d174-46c2-ae3b-ac63320208b4"
 			}
 		},
 		"metadata": {
@@ -349,12 +349,11 @@
 					"    config = {\n",
 					"        \"storage_account\": storage_account,\n",
 					"        \"input_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\",\n",
-					"        \"config_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\",\n",
-					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
+					"        \"config_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
 					"    }\n",
 					"    \n",
 					"    # Normalize all paths\n",
-					"    config[\"output_path\"] = normalize_storage_path(config[\"output_path\"])\n",
+					"    #config[\"output_path\"] = normalize_storage_path(config[\"output_path\"])\n",
 					"    config[\"input_path\"] = normalize_storage_path(config[\"input_path\"])\n",
 					"    config[\"config_path\"] = normalize_storage_path(config[\"config_path\"])\n",
 					"    \n",

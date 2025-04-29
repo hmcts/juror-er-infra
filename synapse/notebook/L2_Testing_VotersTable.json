@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1233e878-de6e-4c79-a22a-a66d0842fa6b"
+				"spark.autotune.trackingId": "6f12ae47-23af-44ad-bfb7-0f9c09a849d5"
 			}
 		},
 		"metadata": {
@@ -58,7 +58,7 @@
 					"from pyspark.sql.functions import *\n",
 					"import logging"
 				],
-				"execution_count": 1
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -435,9 +435,9 @@
 				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
-					"final_count = df.groupBy('creation_date','rec_num') \\\n",
-					"    .agg(count('rec_num')) \\\n",
-					"    .orderBy('creation_date')\n",
+					"final_count = df.groupBy('address','rec_num') \\\n",
+					"    .agg(count('address')) \\\n",
+					"    .orderBy('rec_num')\n",
 					"\n",
 					"display(final_count)"
 				],

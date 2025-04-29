@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "753bce0a-7883-4701-b338-73b666ea21bb"
+				"spark.autotune.trackingId": "a6ddf443-a140-4f69-a13d-1766fe56f10b"
 			}
 		},
 		"metadata": {
@@ -263,7 +263,7 @@
 					"from pyspark.sql.types import DecimalType\n",
 					"from pyspark.sql.functions import col, when, coalesce, current_timestamp"
 				],
-				"execution_count": 5
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -279,7 +279,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -623,20 +623,20 @@
 					"    else:\n",
 					"        print(\"Data lake export with CDC failed\")"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": true,
+					"editable": false,
 					"run_control": {
-						"frozen": false
+						"frozen": true
 					}
 				},
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -683,7 +683,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 15
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

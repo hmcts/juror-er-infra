@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0fd092f0-1cf7-4c25-9c31-e75799e51b79"
+				"spark.autotune.trackingId": "2004a9d2-4959-4cf8-bd7f-316c0d120eaf"
 			}
 		},
 		"metadata": {
@@ -2354,7 +2354,7 @@
 					"        df = ensure_register_poll_consistency(df)\n",
 					"        \n",
 					"        # NEW: Apply address corrections one more time before final export\n",
-					"        #df = fix_address_fields(df)\n",
+					"        df = fix_address_fields(df)\n",
 					"        # Then apply comprehensive validation with config\n",
 					"        df = comprehensive_address_validation(df, config_dict)\n",
 					"        \n",

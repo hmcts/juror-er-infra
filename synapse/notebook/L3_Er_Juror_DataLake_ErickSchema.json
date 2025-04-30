@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "519706a6-fb38-496b-9699-adc319b6ea59"
+				"spark.autotune.trackingId": "edf29fd3-68b9-4357-8d2e-e8f48de86d78"
 			}
 		},
 		"metadata": {
@@ -265,7 +265,7 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -281,7 +281,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -408,7 +408,7 @@
 					"        if distinct_count != source_df.count():\n",
 					"            logger.warning(f\"Found {source_df.count() - distinct_count} duplicate hash_ids in source data\")\n",
 					"            # Remove duplicates, keeping first occurrence\n",
-					"            window_spec = Window.partitionBy(\"hash_id\").orderBy(lit(1))\n",
+					"            window_spec = Window.partitionBy(\"hash_id\").orderBy(desc(\"creation_date\"))\n",
 					"            source_df = source_df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
 					"                                .filter(col(\"row_num\") == 1) \\\n",
 					"                                .drop(\"row_num\")\n",
@@ -625,47 +625,47 @@
 					"    else:\n",
 					"        print(\"Data lake export with CDC failed\")"
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					}
 				},
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					}
 				},
 				"source": [
 					"delta_df.count()"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					},
 					"collapsed": false
 				},
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -685,7 +685,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",

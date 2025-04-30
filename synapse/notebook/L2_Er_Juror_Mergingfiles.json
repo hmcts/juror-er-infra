@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9a2a9ae9-c23f-4bb7-883b-74066bb3b58c"
+				"spark.autotune.trackingId": "bc1ea161-ef79-4316-b949-e256feaf6ee8"
 			}
 		},
 		"metadata": {
@@ -1433,7 +1433,8 @@
 					"    # Map of field types to possible column names (in priority order)\n",
 					"    field_mapping = {\n",
 					"        \"register\": [\"register_lett\", \"poll_number\", \"Elector Number\"],\n",
-					"        \"name\": [\"fname\", \"lname\", \"Elector Forename\", \"Elector Surname\"],\n",
+					"        \"forename\": [\"fname\", \"Elector Forename\"],\n",
+					"        \"surname\": [\"lname\", \"Elector Surname\"],\n",
 					"        \"rec_num\": [\"rec_num\", \"LA_Code\"]\n",
 					"    }\n",
 					"    \n",
@@ -1455,7 +1456,8 @@
 					"        xxhash64(concat_ws(\n",
 					"            \"||\",\n",
 					"            coalesce(trim(field_values.get(\"register\", lit(\"\"))), lit(\"\")),\n",
-					"            coalesce(upper(trim(field_values.get(\"name\", lit(\"\")))), lit(\"\")),\n",
+					"            coalesce(upper(trim(field_values.get(\"forename\", lit(\"\")))), lit(\"\")),\n",
+					"            coalesce(upper(trim(field_values.get(\"surname\", lit(\"\")))), lit(\"\")),\n",
 					"            coalesce(trim(field_values.get(\"rec_num\", lit(\"\"))), lit(\"\"))\n",
 					"        ))\n",
 					"    )\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "edf29fd3-68b9-4357-8d2e-e8f48de86d78"
+				"spark.autotune.trackingId": "2eb8b505-f8be-44b7-a336-780de2e9282e"
 			}
 		},
 		"metadata": {
@@ -265,7 +265,7 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": 9
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -281,7 +281,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 10
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -625,7 +625,7 @@
 					"    else:\n",
 					"        print(\"Data lake export with CDC failed\")"
 				],
-				"execution_count": 11
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -638,7 +638,7 @@
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 13
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -651,7 +651,7 @@
 				"source": [
 					"delta_df.count()"
 				],
-				"execution_count": 14
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -665,7 +665,7 @@
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": 15
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -679,13 +679,13 @@
 				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
-					"final_count = delta_df.groupBy('address5','rec_num') \\\n",
-					"    .agg(count('address5')) \\\n",
+					"final_count = delta_df.groupBy('address6','rec_num') \\\n",
+					"    .agg(count('address6')) \\\n",
 					"    .orderBy('rec_num')\n",
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 12
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b6c69451-ccc6-4d8a-a0b6-b86ef0345346"
+				"spark.autotune.trackingId": "e10ed070-dbf6-4a66-9baa-db0582752241"
 			}
 		},
 		"metadata": {
@@ -1401,6 +1401,7 @@
 					"\n",
 					"# Execute the main function\n",
 					"if __name__ == \"__main__\":\n",
+					"    # Enable only for initail load\n",
 					"    FORCE_CLEAN_RUN = True\n",
 					"\n",
 					"    if FORCE_CLEAN_RUN:\n",

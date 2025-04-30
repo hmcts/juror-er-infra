@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 6",
+	"properties": {
+		"content": {
+			"query": "SELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere address6 is not null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere fname is null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere lname is null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere fname is null and lname is null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere address is null \nand address2 is null \nand address3 is null \n--and address4 is null \n;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "baubais_synapse_sql_stg",
+				"poolName": "baubais_synapse_sql_stg"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

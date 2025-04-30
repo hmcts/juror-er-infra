@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a6ddf443-a140-4f69-a13d-1766fe56f10b"
+				"spark.autotune.trackingId": "5ccc2ce9-05e9-453a-8325-ab1621b1388f"
 			}
 		},
 		"metadata": {
@@ -380,9 +380,14 @@
 					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
 					"        delta_table_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
 					"        \n",
-					"        # Read source data\n",
+					"        # Step 1: Read source data\n",
 					"        logger.info(f\"Reading voter data from {source_path}\")\n",
-					"        source_df = spark.read.parquet(source_path)\n",
+					"        source_df = spark.read.format(\"delta\").load(source_path)\n",
+					"        # Step 2: Use window function to get the latest version per hash_id\n",
+					"        window_spec = Window.partitionBy(\"hash_id\").orderBy(desc(\"creation_date\"))\n",
+					"        latest_df = source_df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
+					"                             .filter(col(\"row_num\") == 1) \\\n",
+					"                             .drop(\"row_num\")\n",
 					"        \n",
 					"        # Get a list of numeric columns\n",
 					"        numeric_cols = [field.name for field in source_df.schema.fields \n",

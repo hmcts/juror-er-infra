@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f29eeb35-57e1-4c86-b5be-32de3162d8ab"
+				"spark.autotune.trackingId": "0fd092f0-1cf7-4c25-9c31-e75799e51b79"
 			}
 		},
 		"metadata": {
@@ -251,7 +251,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 38
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -271,7 +271,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 39
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 40
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -301,7 +301,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 41
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -323,7 +323,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 42
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -360,7 +360,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = True "
 				],
-				"execution_count": 43
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -382,7 +382,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 44
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -399,7 +399,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 45
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -593,7 +593,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 46
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -640,7 +640,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 47
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -652,7 +652,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 48
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -722,7 +722,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 49
+				"execution_count": 86
 			},
 			{
 				"cell_type": "markdown",
@@ -805,7 +805,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 50
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -845,7 +845,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 51
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -895,7 +895,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 52
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -916,7 +916,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 53
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -933,7 +933,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 54
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
@@ -1001,7 +1001,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 55
+				"execution_count": 92
 			},
 			{
 				"cell_type": "markdown",
@@ -1060,7 +1060,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 56
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -1140,7 +1140,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": 57
+				"execution_count": 94
 			},
 			{
 				"cell_type": "markdown",
@@ -1207,7 +1207,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 58
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -1253,7 +1253,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": 59
+				"execution_count": 96
 			},
 			{
 				"cell_type": "markdown",
@@ -1290,7 +1290,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 60
+				"execution_count": 97
 			},
 			{
 				"cell_type": "code",
@@ -1348,7 +1348,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 61
+				"execution_count": 98
 			},
 			{
 				"cell_type": "code",
@@ -1401,7 +1401,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 62
+				"execution_count": 99
 			},
 			{
 				"cell_type": "markdown",
@@ -1478,7 +1478,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 63
+				"execution_count": 100
 			},
 			{
 				"cell_type": "code",
@@ -1550,7 +1550,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": 64
+				"execution_count": 101
 			},
 			{
 				"cell_type": "markdown",
@@ -1570,15 +1570,17 @@
 				"source": [
 					"def fix_address_fields(df):\n",
 					"    \"\"\"\n",
-					"    Simplified address field correction that assumes basic cleansing is done in L1.\n",
-					"    Now focuses only on cross-file validations and final standardization.\n",
+					"    Enhanced address field correction with intelligent address shuffling:\n",
+					"    - Moves address3 to address4 if address4 is null and address3 isn't null\n",
+					"    - Moves address2 to address4 if both address3 and address4 are null\n",
+					"    - Avoids moving fields that start with a number (likely house numbers)\n",
 					"    \"\"\"\n",
-					"    from pyspark.sql.functions import col, when, lit, trim\n",
+					"    from pyspark.sql.functions import col, when, lit, trim, regexp_like\n",
 					"    \n",
 					"    logger = logging.getLogger()\n",
-					"    logger.info(\"Applying final address field corrections...\")\n",
+					"    logger.info(\"Applying enhanced address field corrections with intelligent shuffling...\")\n",
 					"    \n",
-					"    # Step 1: Final check for NULL/empty address fields\n",
+					"    # Step 1: First check for NULL/empty address fields and trim them\n",
 					"    columns_to_check = [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
 					"    for col_name in columns_to_check:\n",
 					"        if col_name in df.columns:\n",
@@ -1590,15 +1592,110 @@
 					"                ).otherwise(trim(col(col_name)))\n",
 					"            )\n",
 					"    \n",
-					"    # Step 2: Final cleanup for address6 (retained from your L2 logic)\n",
+					"    # Step 2: Intelligent address field shuffling\n",
+					"    # Check if we have the needed columns for shuffling\n",
+					"    required_fields = [\"address4\"]\n",
+					"    optional_fields = [\"address2\", \"address3\", \"address5\"]\n",
+					"    \n",
+					"    if all(f in df.columns for f in required_fields):\n",
+					"        # Count empty address4 before shuffling\n",
+					"        empty_addr4_count = df.filter(col(\"address4\").isNull()).count()\n",
+					"        logger.info(f\"Found {empty_addr4_count} records with empty address4 before shuffling\")\n",
+					"        \n",
+					"        # RULE 1: If address4 is null and address3 is not null, move address3 to address4\n",
+					"        # But don't move if address3 starts with a number\n",
+					"        if \"address3\" in df.columns:\n",
+					"            df = df.withColumn(\n",
+					"                \"address4\",\n",
+					"                when(\n",
+					"                    col(\"address4\").isNull() &  # address4 is empty\n",
+					"                    col(\"address3\").isNotNull() &  # address3 has content\n",
+					"                    ~regexp_like(col(\"address3\"), \"^[0-9]\"),  # doesn't start with number\n",
+					"                    col(\"address3\")\n",
+					"                ).otherwise(col(\"address4\"))\n",
+					"            )\n",
+					"            \n",
+					"            # Clear address3 if it was moved to address4\n",
+					"            df = df.withColumn(\n",
+					"                \"address3\",\n",
+					"                when(\n",
+					"                    col(\"address4\") == col(\"address3\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(col(\"address3\"))\n",
+					"            )\n",
+					"        \n",
+					"        # RULE 2: If address4 and address3 are both null, move address2 to address4\n",
+					"        # But don't move if address2 starts with a number\n",
+					"        if \"address2\" in df.columns and \"address3\" in df.columns:\n",
+					"            df = df.withColumn(\n",
+					"                \"address4\",\n",
+					"                when(\n",
+					"                    col(\"address4\").isNull() &  # address4 is still empty\n",
+					"                    (col(\"address3\").isNull() | (trim(col(\"address3\")) == \"\")) &  # address3 is empty\n",
+					"                    col(\"address2\").isNotNull() &  # address2 has content\n",
+					"                    ~regexp_like(col(\"address2\"), \"^[0-9]\"),  # doesn't start with number\n",
+					"                    col(\"address2\")\n",
+					"                ).otherwise(col(\"address4\"))\n",
+					"            )\n",
+					"            \n",
+					"            # Clear address2 if it was moved to address4\n",
+					"            df = df.withColumn(\n",
+					"                \"address2\",\n",
+					"                when(\n",
+					"                    col(\"address4\") == col(\"address2\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(col(\"address2\"))\n",
+					"            )\n",
+					"        \n",
+					"        # RULE 3: If address4 is still null, try address5\n",
+					"        if \"address5\" in df.columns:\n",
+					"            df = df.withColumn(\n",
+					"                \"address4\",\n",
+					"                when(\n",
+					"                    col(\"address4\").isNull() &  # address4 is still empty\n",
+					"                    col(\"address5\").isNotNull() &  # address5 has content\n",
+					"                    ~regexp_like(col(\"address5\"), \"^[0-9]\"),  # doesn't start with number\n",
+					"                    col(\"address5\")\n",
+					"                ).otherwise(col(\"address4\"))\n",
+					"            )\n",
+					"            \n",
+					"            # Clear address5 if it was moved to address4\n",
+					"            df = df.withColumn(\n",
+					"                \"address5\",\n",
+					"                when(\n",
+					"                    col(\"address4\") == col(\"address5\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(col(\"address5\"))\n",
+					"            )\n",
+					"        \n",
+					"        # Count empty address4 after shuffling\n",
+					"        empty_addr4_after = df.filter(col(\"address4\").isNull()).count()\n",
+					"        fixed_count = empty_addr4_count - empty_addr4_after\n",
+					"        logger.info(f\"Fixed {fixed_count} of {empty_addr4_count} empty address4 fields through shuffling\")\n",
+					"    \n",
+					"    # Step 3: Final cleanup\n",
+					"    # Set address6 to NULL per requirements\n",
 					"    if \"address6\" in df.columns:\n",
 					"        df = df.withColumn(\"address6\", lit(None))\n",
 					"        logger.info(\"Set address6 to NULL as per requirements\")\n",
 					"    \n",
-					"    logger.info(\"Final address field corrections completed\")\n",
+					"    # Remove duplicate postcode in address fields if it appears in zip column\n",
+					"    if \"zip\" in df.columns:\n",
+					"        for addr_col in columns_to_check:\n",
+					"            if addr_col in df.columns:\n",
+					"                df = df.withColumn(\n",
+					"                    addr_col,\n",
+					"                    when(\n",
+					"                        col(\"zip\").isNotNull() & \n",
+					"                        (trim(upper(col(addr_col))) == trim(upper(col(\"zip\")))),\n",
+					"                        lit(None)\n",
+					"                    ).otherwise(col(addr_col))\n",
+					"                )\n",
+					"    \n",
+					"    logger.info(\"Enhanced address field corrections completed\")\n",
 					"    return df"
 				],
-				"execution_count": 65
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -1866,7 +1963,7 @@
 					"    # Drop temporary columns and return\n",
 					"    return df_filtered.drop(\"_remove_record\", \"_removal_reason\")"
 				],
-				"execution_count": 66
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -1931,7 +2028,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 67
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -1959,7 +2056,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": 68
+				"execution_count": 105
 			},
 			{
 				"cell_type": "markdown",
@@ -2096,7 +2193,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": 69
+				"execution_count": 106
 			},
 			{
 				"cell_type": "markdown",
@@ -2146,7 +2243,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 70
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -2184,7 +2281,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 71
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -2233,7 +2330,7 @@
 					"    return True\n",
 					""
 				],
-				"execution_count": 72
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -2257,7 +2354,7 @@
 					"        df = ensure_register_poll_consistency(df)\n",
 					"        \n",
 					"        # NEW: Apply address corrections one more time before final export\n",
-					"        df = fix_address_fields(df)\n",
+					"        #df = fix_address_fields(df)\n",
 					"        # Then apply comprehensive validation with config\n",
 					"        df = comprehensive_address_validation(df, config_dict)\n",
 					"        \n",
@@ -2369,7 +2466,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": 73
+				"execution_count": 110
 			},
 			{
 				"cell_type": "markdown",
@@ -2515,7 +2612,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 74
+				"execution_count": 111
 			}
 		]
 	}

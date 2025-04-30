@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fda1acfb-c942-4804-afc6-44819afb799c"
+				"spark.autotune.trackingId": "519706a6-fb38-496b-9699-adc319b6ea59"
 			}
 		},
 		"metadata": {
@@ -385,11 +385,6 @@
 					"        # Step 1: Read source data\n",
 					"        logger.info(f\"Reading voter data from {source_path}\")\n",
 					"        source_df = spark.read.format(\"delta\").load(source_path)\n",
-					"        # Step 2: Use window function to get the latest version per hash_id\n",
-					"        window_spec = Window.partitionBy(\"hash_id\").orderBy(desc(\"creation_date\"))\n",
-					"        latest_df = source_df.withColumn(\"row_num\", row_number().over(window_spec)) \\\n",
-					"                             .filter(col(\"row_num\") == 1) \\\n",
-					"                             .drop(\"row_num\")\n",
 					"        \n",
 					"        # Get a list of numeric columns\n",
 					"        numeric_cols = [field.name for field in source_df.schema.fields \n",
@@ -398,7 +393,7 @@
 					"        # Clean NaN values in source data - replace with nulls\n",
 					"        logger.info(\"Cleaning NaN values from source data\")\n",
 					"        for col_name in numeric_cols:\n",
-					"            source_df = source_df.withColumn(\n",
+					"            source_df= source_df.withColumn(\n",
 					"                col_name,\n",
 					"                when(isnan(col(col_name)) | (col(col_name).isNull()), lit(None).cast(source_df.schema[col_name].dataType))\n",
 					"                .otherwise(col(col_name))\n",

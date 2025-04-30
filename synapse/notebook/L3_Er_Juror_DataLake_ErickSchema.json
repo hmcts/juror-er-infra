@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5ccc2ce9-05e9-453a-8325-ab1621b1388f"
+				"spark.autotune.trackingId": "fda1acfb-c942-4804-afc6-44819afb799c"
 			}
 		},
 		"metadata": {
@@ -261,7 +261,9 @@
 					"import logging\n",
 					"from datetime import datetime\n",
 					"from pyspark.sql.types import DecimalType\n",
-					"from pyspark.sql.functions import col, when, coalesce, current_timestamp"
+					"from pyspark.sql.functions import col, when, coalesce, current_timestamp\n",
+					"from pyspark.sql.window import Window\n",
+					"from pyspark.sql.functions import row_number, col, desc"
 				],
 				"execution_count": null
 			},

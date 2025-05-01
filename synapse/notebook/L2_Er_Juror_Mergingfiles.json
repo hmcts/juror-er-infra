@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "79fc6839-cf6c-44a9-8ca5-b777b8c28f06"
+				"spark.autotune.trackingId": "ed245f63-25e3-41ca-96ac-a0d19f8b92a0"
 			}
 		},
 		"metadata": {
@@ -1906,7 +1906,22 @@
 					"    \n",
 					"    # Rule 4: Empty zip code\n",
 					"    if completeness_rules.get(\"remove_empty_zip\", True) and \"zip\" in df.columns:\n",
-					"        empty_zip_cond = (col(\"zip\").isNull() | (trim(col(\"zip\")) == \"\"))\n",
+					"         # Check if address fields are present\n",
+					"        address_fields = [\"address\", \"address2\", \"address3\", \"address4\", \"address5\"]\n",
+					"        present_address_fields = [field for field in address_fields if field in df.columns]\n",
+					"        \n",
+					"        if present_address_fields:\n",
+					"            # Create condition for all address fields being empty\n",
+					"            all_addresses_empty = None\n",
+					"            for addr_field in present_address_fields:\n",
+					"                if all_addresses_empty is None:\n",
+					"                    all_addresses_empty = (col(addr_field).isNull() | (trim(col(addr_field)) == \"\"))\n",
+					"                else:\n",
+					"                    all_addresses_empty = all_addresses_empty & (col(addr_field).isNull()\n",
+					"            \n",
+					"            # Modified condition: remove only if BOTH zip is empty AND all addresses are empty    \n",
+					"            empty_zip_cond = (col(\"zip\").isNull() | (trim(col(\"zip\")) == \"\")) & all_addresses_empty\n",
+					"\n",
 					"        \n",
 					"        # Apply the rule\n",
 					"        df = df.withColumn(\n",

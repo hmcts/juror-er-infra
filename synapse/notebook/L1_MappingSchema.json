@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e10ed070-dbf6-4a66-9baa-db0582752241"
+				"spark.autotune.trackingId": "8f564a6c-02ef-4b69-9f96-758510bb5b9c"
 			}
 		},
 		"metadata": {
@@ -1402,7 +1402,7 @@
 					"# Execute the main function\n",
 					"if __name__ == \"__main__\":\n",
 					"    # Enable only for initail load\n",
-					"    FORCE_CLEAN_RUN = True\n",
+					"    FORCE_CLEAN_RUN = False\n",
 					"\n",
 					"    if FORCE_CLEAN_RUN:\n",
 					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",

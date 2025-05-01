@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d4b5ef6b-1268-4698-aa8e-8f5e2b9064e3"
+				"spark.autotune.trackingId": "0f8be362-9749-4e67-9230-6443bc2e75a5"
 			}
 		},
 		"metadata": {
@@ -142,7 +142,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 1
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -161,7 +161,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -191,7 +191,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 3
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -213,7 +213,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 4
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -294,7 +294,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 5
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -372,7 +372,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 6
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -442,7 +442,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 7
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -498,7 +498,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 8
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -532,7 +532,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 9
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -569,7 +569,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 10
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -610,7 +610,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 11
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -712,7 +712,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 12
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -757,7 +757,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 13
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -822,7 +822,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 14
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -875,7 +875,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 15
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -964,7 +964,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 16
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -1096,7 +1096,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 17
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -1166,7 +1166,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 18
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -1192,7 +1192,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 19
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -1460,7 +1460,6 @@
 					"            new_processed_files_log = spark.createDataFrame([(file,) for file in new_processed_files], [\"file\"])\n",
 					"            \n",
 					"            if processed_files_log:\n",
-					"                existing_log_df = spark.createDataFrame([(file,) for file in processed_files_log], [\"file\"])\n",
 					"                updated_log_df = existing_log_df.union(new_processed_files_log).distinct()\n",
 					"            else:\n",
 					"                updated_log_df = new_processed_files_log\n",
@@ -1478,9 +1477,16 @@
 					"        # Convert operations log to DataFrame\n",
 					"        if operations_log:\n",
 					"            # Create a proper schema for the operations log\n",
-					"            from pyspark.sql.types import StructType, StructField, StringType, MapType\n",
-					"            \n",
+					"            from pyspark.sql.types import StructType, StructField, StringType\n",
 					"            schema = StructType([\n",
+					"                StructField(\"timestamp\", StringType(), True),\n",
+					"                StructField(\"operation\", StringType(), True),\n",
+					"                StructField(\"file_path\", StringType(), True),\n",
+					"                StructField(\"status\", StringType(), True)\n",
+					"            ])\n",
+					"            from pyspark.sql import Row\n",
+					"\n",
+					"            log_rows = [\n",
 					"                Row(\n",
 					"                    timestamp=log[\"timestamp\"],\n",
 					"                    operation=log[\"operation\"],\n",
@@ -1488,18 +1494,16 @@
 					"                    status=log[\"status\"]\n",
 					"                )\n",
 					"                for log in operations_log\n",
+					"            ]\n",
 					"\n",
-					"                ]\n",
-					"            \n",
-					"                operations_log_df = spark.createDataFrame(log_rows, schema)\n",
-					"                log_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/logs/operations_{time.strftime('%Y%m%d%H%M%S')}.parquet\"\n",
-					"                operations_log_df.write.mode(\"overwrite\").parquet(log_path)\n",
-					"                print(f\"Saved detailed operations log to: {log_path}\")\n",
+					"            operations_log_df = spark.createDataFrame(log_rows, schema)\n",
+					"            log_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/logs/operations_{time.strftime('%Y%m%d%H%M%S')}.parquet\"\n",
+					"            operations_log_df.write.mode(\"overwrite\").parquet(log_path)\n",
+					"            print(f\"Saved detailed operations log to: {log_path}\")\n",
 					"    except Exception as e:\n",
-					"        \n",
 					"        print(f\"Error saving operations log: {str(e)}\")\n",
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
-					"    \n",
+					"\n",
 					"    print(\"\\nSummary totals:\")\n",
 					"    print(f\"Files processed: {len(new_files)}\")\n",
 					"    print(f\"Data files successfully moved: {len(moved_files['data_success'])}\")\n",
@@ -1508,10 +1512,12 @@
 					"    print(f\"Overseas files moved: {len(moved_files.get('overseas', []))}\")\n",
 					"    print(f\"Files quarantined: {len(moved_files['quarantine'])}\")\n",
 					"    print(f\"Files failed: {len(moved_files['failed'])}\")\n",
+					"\n",
 					"if __name__ == \"__main__\":\n",
-					"    main()"
+					"    main()\n",
+					""
 				],
-				"execution_count": 20
+				"execution_count": 45
 			}
 		]
 	}

@@ -2,7 +2,7 @@
 	"name": "Data_Quality_Checks_Postgresql",
 	"properties": {
 		"content": {
-			"query": "SELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere address6 is not null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere fname is null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere lname is null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere fname is null and lname is null;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere address is null \nand address2 is null \nand address3 is null \n--and address4 is null \n;\n\nSELECT *\n FROM [dbo].[er_juror_postgresql]\nwhere zip is null;\n",
+			"query": "SELECT count(*)\n FROM [dbo].[er_juror_postgresql]\nwhere address6 is not null;\n\nSELECT count(*)\n FROM [dbo].[er_juror_postgresql]\nwhere fname is null;\n\nSELECT COUNT(*)\n FROM [dbo].[er_juror_postgresql]\nwhere lname is null;\n\nSELECT count(*)\n FROM [dbo].[er_juror_postgresql]\nwhere fname is null and lname is null;\n\nSELECT count(*)\n FROM [dbo].[er_juror_postgresql]\nwhere address is null \nand address2 is null \nand address3 is null \n--and address4 is null \n;\n\nSELECT count(*)\n FROM [dbo].[er_juror_postgresql]\nwhere zip is null;\n",
 			"metadata": {
 				"language": "sql"
 			},

@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "21afe92d-68e8-4098-8216-2b4c609a92de"
+				"spark.autotune.trackingId": "82770442-ed74-4fb6-9690-bc74ba3cc437"
 			}
 		},
 		"metadata": {
@@ -282,7 +282,7 @@
 					"    \"\"\"\n",
 					"    try:\n",
 					"        # Define the output path for the Power BI delta table\n",
-					"        storage_account = \"baubaisadfsastg\"\n",
+					"        storage_account = \"baubaisadfsaprod\"\n",
 					"        powerbi_delta_path = f\"abfss://dl-juror-eric-power-bi@{storage_account}.dfs.core.windows.net/er_juror_report\"\n",
 					"        \n",
 					"        logger.info(f\"Creating aggregated view for Power BI from {delta_table_path}\")\n",
@@ -362,7 +362,7 @@
 					"    \"\"\"\n",
 					"    try:\n",
 					"        # Original code remains the same...\n",
-					"        storage_account = \"baubaisadfsastg\"\n",
+					"        storage_account = \"baubaisadfsaprod\"\n",
 					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
 					"        delta_table_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
 					"        \n",
@@ -620,7 +620,7 @@
 					}
 				},
 				"source": [
-					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\")"
+					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
 				"execution_count": null
 			},

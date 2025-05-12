@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4335cde2-ea0c-4875-816e-44dad5f444e5"
+				"spark.autotune.trackingId": "01673e89-b349-4ff3-9f87-e33ceb5da551"
 			}
 		},
 		"metadata": {
@@ -1298,7 +1298,7 @@
 					"    spark = create_spark_session()\n",
 					"\n",
 					"    # Define paths\n",
-					"    storage_account = \"baubaisadfsastg\"\n",
+					"    storage_account = \"baubaisadfsaprod\"\n",
 					"    files_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
 					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
@@ -1389,9 +1389,9 @@
 					"    FORCE_CLEAN_RUN = False\n",
 					"\n",
 					"    if FORCE_CLEAN_RUN:\n",
-					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
+					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
 					"            try:\n",
-					"                mssparkutils.fs.rm(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
+					"                mssparkutils.fs.rm(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
 					"                print(\"Deleted existing log to force fresh processing\")\n",
 					"            except Exception as e:\n",
 					"                print(f\"Error deleting log file: {str(e)}\")\n",

@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkprod",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "16972190-fb64-4c0e-940e-07ddb760701d"
+				"spark.autotune.trackingId": "8a4df092-25b4-4268-93e7-811d4aa7138c"
 			}
 		},
 		"metadata": {
@@ -28,6 +32,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
+				"name": "sparkprod",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -384,6 +403,25 @@
 					"    return df"
 				],
 				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def regexp_escape(column):\n",
+					"    \"\"\"Escape special characters in a column for use in a regular expression\"\"\"\n",
+					"    # List of characters that need escaping in regex\n",
+					"    special_chars = [\"\\\\\", \".\", \"^\", \"$\", \"*\", \"+\", \"?\", \"(\", \")\", \"[\", \"]\", \"{\", \"}\", \"|\"]\n",
+					"    \n",
+					"    # Start with the original column\n",
+					"    escaped = column\n",
+					"    \n",
+					"    # Escape each special character\n",
+					"    for char in special_chars:\n",
+					"        escaped = regexp_replace(escaped, lit(char), concat(lit(\"\\\\\"), lit(char)))\n",
+					"        \n",
+					"    return escaped"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

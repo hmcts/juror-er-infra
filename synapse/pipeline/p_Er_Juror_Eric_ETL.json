@@ -143,6 +143,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"pipeline": {
+						"referenceName": "p_AzureApp_Postgresql_Sink",
+						"type": "PipelineReference"
+					},
 					"waitOnCompletion": true
 				}
 			}

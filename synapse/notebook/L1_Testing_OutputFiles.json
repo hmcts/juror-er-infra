@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0987c97e-fdfb-4d71-8da7-355745c630f5"
+				"spark.autotune.trackingId": "92f33784-f15c-42d3-b147-4796e0e1ef6d"
 			}
 		},
 		"metadata": {
@@ -99,14 +99,56 @@
 					"    return df\n",
 					"\n",
 					"# Example usage for specific file\n",
-					"file_path = f\"{base_path}/20241213_053-MedwayTowns.parquet\"\n",
+					"file_path = f\"{base_path}/20241213_229-Colchester.parquet\"\n",
 					"df = analyze_parquet(file_path)\n",
 					"\n",
 					"# Optional: Save sample to CSV for easier viewing\n",
 					"\n",
 					"df.count()"
 				],
-				"execution_count": null
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(df.limit(20))"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import count\n",
+					"\n",
+					"final_count = df.groupBy('Elector Markers') \\\n",
+					"    .agg(count('Elector Markers')) \n",
+					"    #.orderBy('rec_num')\n",
+					"\n",
+					"display(final_count)"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import count\n",
+					"\n",
+					"final_count = df.groupBy('Flags/Markers') \\\n",
+					"    .agg(count('Flags/Markers')) \n",
+					"    #.orderBy('rec_num')\n",
+					"\n",
+					"display(final_count)"
+				],
+				"execution_count": 16
 			}
 		]
 	}

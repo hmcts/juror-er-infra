@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "45f839e4-51f9-4787-8f61-3cdd46b1e25a"
+				"spark.autotune.trackingId": "3a54f482-3384-426e-ace4-25f40373433e"
 			}
 		},
 		"metadata": {
@@ -723,6 +723,25 @@
 					"    return df"
 				],
 				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def regexp_escape(column):\n",
+					"    \"\"\"Escape special characters in a column for use in a regular expression\"\"\"\n",
+					"    # List of characters that need escaping in regex\n",
+					"    special_chars = [\"\\\\\", \".\", \"^\", \"$\", \"*\", \"+\", \"?\", \"(\", \")\", \"[\", \"]\", \"{\", \"}\", \"|\"]\n",
+					"    \n",
+					"    # Start with the original column\n",
+					"    escaped = column\n",
+					"    \n",
+					"    # Escape each special character\n",
+					"    for char in special_chars:\n",
+					"        escaped = regexp_replace(escaped, lit(char), concat(lit(\"\\\\\"), lit(char)))\n",
+					"        \n",
+					"    return escaped"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",

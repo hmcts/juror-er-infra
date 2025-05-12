@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2b757834-112b-4f85-ae56-895f7a8856b8"
+				"spark.autotune.trackingId": "b9b8bf4f-3452-4148-9da9-11e3c12e50cf"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 21
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 22
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 23
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 24
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +297,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 25
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -375,7 +375,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 26
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -398,7 +398,7 @@
 					"            \n",
 					"        # Get column names and check if overseas columns exist\n",
 					"        columns = df.columns\n",
-					"        has_overseas_columns = any(col in columns for col in ['Overseas Address', 'UK Qualifying Address'])\n",
+					"        has_overseas_columns = any(col in columns for col in ['Overseas Address','OverseasAddress1','QualifyingAddress1','UK Qualifying Address'])\n",
 					"        \n",
 					"        if has_overseas_columns:\n",
 					"            print(f\"  Found overseas address columns in file: {file_path}\")\n",
@@ -445,7 +445,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 27
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +501,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 28
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -535,7 +535,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 29
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -572,7 +572,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 30
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -613,7 +613,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 31
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -715,7 +715,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 32
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -760,7 +760,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 33
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -825,7 +825,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 34
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -878,7 +878,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 35
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -967,7 +967,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": 36
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -1099,7 +1099,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 37
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -1169,7 +1169,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 38
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -1195,7 +1195,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 39
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -1520,7 +1520,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 40
+				"execution_count": 60
 			}
 		]
 	}

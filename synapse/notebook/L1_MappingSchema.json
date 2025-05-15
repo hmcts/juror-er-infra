@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ae3b371d-5c28-46c3-9ff6-86a7b231bb59"
+				"spark.autotune.trackingId": "db6ddf15-d45e-49e9-8db0-af8aac227e83"
 			}
 		},
 		"metadata": {
@@ -1137,7 +1137,7 @@
 					"\n",
 					"        # Standardize column names using mapping\n",
 					"        if reverse_mapping:\n",
-					"            df = standardize_column_names(df, reverse_mapping)\n",
+					"            df = standardize_column_names(df, reverse_mapping, column_mapping)\n",
 					"        else:\n",
 					"            logging.warning(\n",
 					"                \"No reverse mapping available - skipping column standardization\"\n",

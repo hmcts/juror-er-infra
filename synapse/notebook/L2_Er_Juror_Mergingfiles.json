@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "92a33952-65d8-4b52-904d-f36c3e381cf6"
+				"spark.autotune.trackingId": "b6767dfa-9e21-4a3a-b6d5-1003414beb72"
 			}
 		},
 		"metadata": {
@@ -1593,8 +1593,8 @@
 					"def fix_address_fields(df):\n",
 					"    \"\"\"\n",
 					"    Fixes address fields:\n",
-					"    - Moves address3 to address4 if address4 is null and address3 is not null and doesn't start with number\n",
-					"    - Moves address2 to address4 if both address3 and address4 are null and address2 doesn't start with number\n",
+					"    - Moves address3 to address4 if address4 is null and address3 is not null and doesn't start with a number\n",
+					"    - Moves address2 to address4 if both address3 and address4 are null and address2 doesn't start with a number\n",
 					"    - If address4 is still null, tries to use address5\n",
 					"    - Removes ZIP/postcode from end of any address field\n",
 					"    - Sets address6 to NULL\n",
@@ -1632,8 +1632,8 @@
 					"                    addr_col,\n",
 					"                    when(\n",
 					"                        col(addr_col).isNotNull() & zip_col.isNotNull() &\n",
-					"                        upper(col(addr_col)).rlike(f\".*[,\\\\s-]*{regexp_escape(zip_col)}$\"),\n",
-					"                        regexp_replace(col(addr_col), f\"[,\\\\s-]*{regexp_escape(zip_col)}$\", \"\")\n",
+					"                        upper(col(addr_col)).rlike(f\".*[,\\\\s-]*{zip_col}$\"),\n",
+					"                        regexp_replace(col(addr_col), f\"[,\\\\s-]*{zip_col}$\", \"\")\n",
 					"                    ).otherwise(col(addr_col))\n",
 					"                )\n",
 					"\n",

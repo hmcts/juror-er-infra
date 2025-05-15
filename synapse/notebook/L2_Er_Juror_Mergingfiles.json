@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3e9855be-16b0-4df9-8874-753d12b4abcb"
+				"spark.autotune.trackingId": "92a33952-65d8-4b52-904d-f36c3e381cf6"
 			}
 		},
 		"metadata": {
@@ -1730,6 +1730,7 @@
 					"                \"fix_empty_address4\": True,\n",
 					"                \"remove_empty_address4\": False,\n",
 					"                \"remove_duplicate_postcodes\": True,\n",
+					"                \"remove_other_electors\": True,  #rule for removing OTHER ELECTORS\n",
 					"                \"address_fields\": [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
 					"            },\n",
 					"            \"name_validation\": {\n",

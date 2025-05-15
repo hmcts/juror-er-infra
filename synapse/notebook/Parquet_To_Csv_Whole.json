@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5a25de9a-204b-4086-9cae-dd7ab55c314e"
+				"spark.autotune.trackingId": "7a568518-d514-46bf-9afe-409b4c8cce2d"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"logger = logging.getLogger()"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -123,8 +123,7 @@
 					"        return {\n",
 					"            \"status\": \"success\", \n",
 					"            \"total_records\": initial_count,\n",
-					"            \"exported_records\": filtered_count, \n",
-					"            \"removed_records\": removed_count,\n",
+					"            \"exported_records\": df, \n",
 					"            \"export_path\": export_path\n",
 					"        }\n",
 					"        \n",

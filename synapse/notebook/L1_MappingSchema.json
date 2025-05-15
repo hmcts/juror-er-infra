@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e6990885-bfe4-43ff-aa12-3d1e3b857b42"
+				"spark.autotune.trackingId": "10718f46-c798-4750-864b-be07cd37154c"
 			}
 		},
 		"metadata": {
@@ -118,7 +118,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 88
+				"execution_count": 119
 			},
 			{
 				"cell_type": "code",
@@ -128,7 +128,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": 89
+				"execution_count": 120
 			},
 			{
 				"cell_type": "code",
@@ -142,7 +142,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 90
+				"execution_count": 121
 			},
 			{
 				"cell_type": "code",
@@ -160,7 +160,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 91
+				"execution_count": 122
 			},
 			{
 				"cell_type": "code",
@@ -200,7 +200,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 92
+				"execution_count": 123
 			},
 			{
 				"cell_type": "code",
@@ -225,7 +225,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 93
+				"execution_count": 124
 			},
 			{
 				"cell_type": "code",
@@ -242,7 +242,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 94
+				"execution_count": 125
 			},
 			{
 				"cell_type": "code",
@@ -272,7 +272,7 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": 95
+				"execution_count": 126
 			},
 			{
 				"cell_type": "code",
@@ -290,7 +290,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": 96
+				"execution_count": 127
 			},
 			{
 				"cell_type": "code",
@@ -323,7 +323,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 97
+				"execution_count": 128
 			},
 			{
 				"cell_type": "code",
@@ -355,7 +355,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 98
+				"execution_count": 129
 			},
 			{
 				"cell_type": "code",
@@ -441,7 +441,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 99
+				"execution_count": 130
 			},
 			{
 				"cell_type": "code",
@@ -498,7 +498,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 100
+				"execution_count": 131
 			},
 			{
 				"cell_type": "code",
@@ -520,7 +520,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 101
+				"execution_count": 132
 			},
 			{
 				"cell_type": "code",
@@ -610,7 +610,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 102
+				"execution_count": 133
 			},
 			{
 				"cell_type": "code",
@@ -747,7 +747,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 103
+				"execution_count": 134
 			},
 			{
 				"cell_type": "code",
@@ -804,7 +804,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 104
+				"execution_count": 135
 			},
 			{
 				"cell_type": "code",
@@ -831,7 +831,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 105
+				"execution_count": 136
 			},
 			{
 				"cell_type": "code",
@@ -866,7 +866,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 106
+				"execution_count": 137
 			},
 			{
 				"cell_type": "code",
@@ -916,7 +916,7 @@
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
 					"    return df"
 				],
-				"execution_count": 107
+				"execution_count": 138
 			},
 			{
 				"cell_type": "code",
@@ -961,7 +961,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 108
+				"execution_count": 139
 			},
 			{
 				"cell_type": "code",
@@ -991,7 +991,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 109
+				"execution_count": 140
 			},
 			{
 				"cell_type": "code",
@@ -1025,17 +1025,14 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 110
+				"execution_count": 141
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"from notebookutils import mssparkutils\n",
-					"import time\n",
-					"\n",
 					"def move_to_quarantine(source_path, quarantine_folder, reason=\"error\"):\n",
 					"    \"\"\"\n",
-					"    Move a file to the L1_quarantine folder with a reason tag.\n",
+					"    Copy a file to the L1_quarantine folder with a reason tag, but don't delete the original.\n",
 					"    \"\"\"\n",
 					"    try:\n",
 					"        if not mssparkutils.fs.exists(quarantine_folder):\n",
@@ -1045,16 +1042,15 @@
 					"        timestamp = time.strftime(\"%Y%m%d%H%M%S\")\n",
 					"        quarantined_file = f\"{quarantine_folder}/{timestamp}_{reason}_{file_name}\"\n",
 					"        \n",
+					"        # Copy but don't delete\n",
 					"        mssparkutils.fs.cp(source_path, quarantined_file, True)\n",
-					"        mssparkutils.fs.rm(source_path, True)\n",
-					"        logging.info(f\"Moved file to quarantine: {quarantined_file}\")\n",
+					"        logging.info(f\"Copied file to quarantine (original preserved): {quarantined_file}\")\n",
 					"        return quarantined_file\n",
 					"    except Exception as e:\n",
-					"        logging.error(f\"Failed to move file to quarantine: {str(e)}\")\n",
-					"        return None\n",
-					""
+					"        logging.error(f\"Failed to copy file to quarantine: {str(e)}\")\n",
+					"        return None"
 				],
-				"execution_count": 111
+				"execution_count": 142
 			},
 			{
 				"cell_type": "code",
@@ -1178,7 +1174,7 @@
 					"        move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"        return result"
 				],
-				"execution_count": 112
+				"execution_count": 143
 			},
 			{
 				"cell_type": "code",
@@ -1204,7 +1200,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 113
+				"execution_count": 144
 			},
 			{
 				"cell_type": "code",
@@ -1241,7 +1237,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 114
+				"execution_count": 145
 			},
 			{
 				"cell_type": "code",
@@ -1295,7 +1291,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 115
+				"execution_count": 146
 			},
 			{
 				"cell_type": "code",
@@ -1348,7 +1344,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 116
+				"execution_count": 147
 			},
 			{
 				"cell_type": "code",
@@ -1379,7 +1375,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 117
+				"execution_count": 148
 			},
 			{
 				"cell_type": "code",
@@ -1497,7 +1493,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 118
+				"execution_count": 149
 			}
 		]
 	}

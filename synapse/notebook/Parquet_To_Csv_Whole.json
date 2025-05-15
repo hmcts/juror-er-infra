@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a0534cc5-b9f5-4d20-9617-acc5e74fba0d"
+				"spark.autotune.trackingId": "5a25de9a-204b-4086-9cae-dd7ab55c314e"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"logger = logging.getLogger()"
 				],
-				"execution_count": 1
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -93,16 +93,16 @@
 					"        logger.info(f\"Read {initial_count} records from source\")\n",
 					"        \n",
 					"        # Filter out rows with null or empty zip values\n",
-					"        df_filtered = df.filter(\n",
-					"            (col(\"zip\").isNotNull()) & \n",
-					"            (col(\"zip\") != \"\") & \n",
-					"            (~col(\"zip\").isin(\"NULL\", \"null\", \"NaN\", \"nan\", \"None\", \"none\"))\n",
-					"        )\n",
+					"        #df_filtered = df.filter(\n",
+					"        #    (col(\"zip\").isNotNull()) & \n",
+					"        #    (col(\"zip\") != \"\") & \n",
+					"        #    (~col(\"zip\").isin(\"NULL\", \"null\", \"NaN\", \"nan\", \"None\", \"none\"))\n",
+					"        #)\n",
 					"        \n",
-					"        filtered_count = df_filtered.count()\n",
-					"        removed_count = initial_count - filtered_count\n",
-					"        logger.info(f\"Filtered out {removed_count} rows with empty zip values\")\n",
-					"        logger.info(f\"Keeping {filtered_count} rows\")\n",
+					"        #filtered_count = df_filtered.count()\n",
+					"        #removed_count = initial_count - filtered_count\n",
+					"        #logger.info(f\"Filtered out {removed_count} rows with empty zip values\")\n",
+					"        #logger.info(f\"Keeping {filtered_count} rows\")\n",
 					"        \n",
 					"        # Make sure export directory exists\n",
 					"        export_dir = \"/\".join(export_path.split(\"/\")[:-1])\n",
@@ -112,7 +112,7 @@
 					"        \n",
 					"        # Write to CSV with header\n",
 					"        logger.info(f\"Writing data to CSV: {export_path}\")\n",
-					"        df_filtered.coalesce(1).write \\\n",
+					"        df.coalesce(1).write \\\n",
 					"            .option(\"header\", \"true\") \\\n",
 					"            .option(\"delimiter\", \",\") \\\n",
 					"            .option(\"quoteAll\", \"true\") \\\n",
@@ -138,7 +138,7 @@
 					"result = export_data_to_csv()\n",
 					"print(f\"Export result: {result}\")"
 				],
-				"execution_count": 2
+				"execution_count": null
 			}
 		]
 	}

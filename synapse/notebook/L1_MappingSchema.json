@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "db6ddf15-d45e-49e9-8db0-af8aac227e83"
+				"spark.autotune.trackingId": "f7044782-df5d-4b93-a1a9-094a9eac7f01"
 			}
 		},
 		"metadata": {
@@ -1130,6 +1130,7 @@
 					"            logging.info(\n",
 					"                f\"Successfully read file with {df.count()} rows and {len(df.columns)} columns\"\n",
 					"            )\n",
+					"             df = resolve_marker_columns(df)\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error reading file: {str(e)}\"\n",
 					"            move_to_quarantine(source_path, \"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
@@ -1137,14 +1138,11 @@
 					"\n",
 					"        # Standardize column names using mapping\n",
 					"        if reverse_mapping:\n",
-					"            df = standardize_column_names(df, reverse_mapping, column_mapping)\n",
+					"            df = standardize_column_names(df, reverse_mapping)\n",
 					"        else:\n",
 					"            logging.warning(\n",
 					"                \"No reverse mapping available - skipping column standardization\"\n",
 					"            )\n",
-					"        # Resolve Elector Marker vs New Marker logic\n",
-					"        df = resolve_marker_columns(df)\n",
-					"\n",
 					"\n",
 					"        # Transform data\n",
 					"        try:\n",

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bcaa0447-4ca0-4448-9656-d934779d02f3"
+				"spark.autotune.trackingId": "2bc62cb9-ab13-4573-bf10-87802df18e31"
 			}
 		},
 		"metadata": {
@@ -254,7 +254,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit, monotonically_increasing_id"
 				],
-				"execution_count": 191
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -274,7 +274,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 192
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -287,7 +287,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 193
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 194
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -326,7 +326,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 195
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -363,7 +363,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = False "
 				],
-				"execution_count": 196
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -385,7 +385,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 197
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -402,7 +402,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 198
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -421,7 +421,7 @@
 					"        \n",
 					"    return escaped"
 				],
-				"execution_count": 199
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -615,7 +615,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 200
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -662,7 +662,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 201
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -674,7 +674,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 202
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -744,7 +744,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 203
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -827,7 +827,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 204
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -867,7 +867,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 205
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -917,7 +917,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 206
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -938,7 +938,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 207
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -955,7 +955,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 208
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1023,7 +1023,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 209
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1082,7 +1082,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 210
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1162,7 +1162,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": 211
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1229,7 +1229,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 212
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1275,7 +1275,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": 213
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1312,7 +1312,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 214
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1370,7 +1370,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 215
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1423,7 +1423,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 216
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1500,7 +1500,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 217
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1572,7 +1572,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": 218
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1592,15 +1592,21 @@
 				"source": [
 					"def fix_address_fields(df):\n",
 					"    \"\"\"\n",
-					"    Fixes address fields:\n",
+					"    Improved function to fix address fields:\n",
 					"    - Moves address3 to address4 if address4 is null and address3 is not null and doesn't start with a number\n",
 					"    - Moves address2 to address4 if both address3 and address4 are null and address2 doesn't start with a number\n",
 					"    - If address4 is still null, tries to use address5\n",
-					"    - Removes ZIP/postcode from end of any address field\n",
+					"    - If address4 is still null, tries to use address1 (address)\n",
+					"    - As a last resort, sets address4 to the town/city name from another field or \"UNKNOWN\"\n",
 					"    - Sets address6 to NULL\n",
 					"    \"\"\"\n",
-					"    from pyspark.sql.functions import col, when, lit, trim, upper, regexp_replace, concat, expr\n",
-					"\n",
+					"    from pyspark.sql.functions import col, when, lit, trim, upper, coalesce\n",
+					"    \n",
+					"    # Log initial state\n",
+					"    print(f\"Starting address field fix - DataFrame has {df.count()} rows\")\n",
+					"    empty_address4_count = df.filter(col(\"address4\").isNull()).count()\n",
+					"    print(f\"Initial empty address4 count: {empty_address4_count}\")\n",
+					"    \n",
 					"    address_cols = [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]\n",
 					"\n",
 					"    # Step 1: Trim and nullify empty strings\n",
@@ -1614,24 +1620,7 @@
 					"                ).otherwise(trim(col(col_name)))\n",
 					"            )\n",
 					"\n",
-					"    # Step 2: Remove ZIP from address fields - simplified approach\n",
-					"    if \"zip\" in df.columns:\n",
-					"        for addr_col in address_cols:\n",
-					"            if addr_col in df.columns:\n",
-					"                # Remove exact ZIP matches \n",
-					"                df = df.withColumn(\n",
-					"                    addr_col,\n",
-					"                    when(\n",
-					"                        col(addr_col).isNotNull() & col(\"zip\").isNotNull() &\n",
-					"                        (upper(trim(col(addr_col))) === upper(trim(col(\"zip\")))),\n",
-					"                        lit(None)\n",
-					"                    ).otherwise(col(addr_col))\n",
-					"                )\n",
-					"                \n",
-					"                # Skip the complex regex pattern matching for now\n",
-					"                # This is the part that was causing issues\n",
-					"    \n",
-					"    # Step 3: Address field shuffling according to requirements\n",
+					"    # Step 2: Address field shuffling according to requirements\n",
 					"    if \"address4\" in df.columns:\n",
 					"        # Move address3 to address4 if address4 is null and address3 doesn't start with a number\n",
 					"        if \"address3\" in df.columns:\n",
@@ -1648,7 +1637,7 @@
 					"            df = df.withColumn(\n",
 					"                \"address3\",\n",
 					"                when(\n",
-					"                    col(\"address4\") === col(\"address3\"),\n",
+					"                    col(\"address4\") == col(\"address3\"),\n",
 					"                    lit(None)\n",
 					"                ).otherwise(col(\"address3\"))\n",
 					"            )\n",
@@ -1659,7 +1648,7 @@
 					"                \"address4\",\n",
 					"                when(\n",
 					"                    col(\"address4\").isNull() &\n",
-					"                    (col(\"address3\").isNull() | (trim(col(\"address3\")) === \"\")) &\n",
+					"                    (col(\"address3\").isNull() | (trim(col(\"address3\")) == \"\")) &\n",
 					"                    col(\"address2\").isNotNull() &\n",
 					"                    ~col(\"address2\").rlike(\"^[0-9]\"),\n",
 					"                    col(\"address2\")\n",
@@ -1669,7 +1658,7 @@
 					"            df = df.withColumn(\n",
 					"                \"address2\",\n",
 					"                when(\n",
-					"                    col(\"address4\") === col(\"address2\"),\n",
+					"                    col(\"address4\") == col(\"address2\"),\n",
 					"                    lit(None)\n",
 					"                ).otherwise(col(\"address2\"))\n",
 					"            )\n",
@@ -1688,18 +1677,58 @@
 					"            df = df.withColumn(\n",
 					"                \"address5\",\n",
 					"                when(\n",
-					"                    col(\"address4\") === col(\"address5\"),\n",
+					"                    col(\"address4\") == col(\"address5\"),\n",
 					"                    lit(None)\n",
 					"                ).otherwise(col(\"address5\"))\n",
 					"            )\n",
+					"            \n",
+					"        # Also try address1 (main address) if address4 is still null\n",
+					"        df = df.withColumn(\n",
+					"            \"address4\",\n",
+					"            when(\n",
+					"                col(\"address4\").isNull() &\n",
+					"                col(\"address\").isNotNull(),\n",
+					"                col(\"address\")\n",
+					"            ).otherwise(col(\"address4\"))\n",
+					"        )\n",
+					"        \n",
+					"        # As a last resort, set address4 to a default value\n",
+					"        # Try to use the ZIP code's first part as a town/city name if possible\n",
+					"        if \"zip\" in df.columns:\n",
+					"            df = df.withColumn(\n",
+					"                \"address4\",\n",
+					"                when(\n",
+					"                    col(\"address4\").isNull(),\n",
+					"                    coalesce(\n",
+					"                        # Try to extract town name from ZIP code (first part)\n",
+					"                        regexp_extract(col(\"zip\"), \"^([A-Za-z]+)\", 1),\n",
+					"                        # Otherwise use a default value\n",
+					"                        lit(\"UNKNOWN\")\n",
+					"                    )\n",
+					"                ).otherwise(col(\"address4\"))\n",
+					"            )\n",
+					"        else:\n",
+					"            # If no ZIP code column, just use \"UNKNOWN\"\n",
+					"            df = df.withColumn(\n",
+					"                \"address4\",\n",
+					"                when(\n",
+					"                    col(\"address4\").isNull(),\n",
+					"                    lit(\"UNKNOWN\")\n",
+					"                ).otherwise(col(\"address4\"))\n",
+					"            )\n",
 					"\n",
-					"    # Step 4: Nullify address6\n",
+					"    # Step 3: Nullify address6\n",
 					"    if \"address6\" in df.columns:\n",
 					"        df = df.withColumn(\"address6\", lit(None))\n",
+					"        \n",
+					"    # Log final state\n",
+					"    empty_address4_count_after = df.filter(col(\"address4\").isNull()).count()\n",
+					"    print(f\"Final empty address4 count: {empty_address4_count_after}\")\n",
+					"    print(f\"Fixed {empty_address4_count - empty_address4_count_after} records with empty address4\")\n",
 					"\n",
 					"    return df"
 				],
-				"execution_count": 229
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

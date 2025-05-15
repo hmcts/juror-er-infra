@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "be432e8b-8311-4116-8b0d-92e8a766411f"
+				"spark.autotune.trackingId": "86feab77-304c-48aa-99c3-926248bfecac"
 			}
 		},
 		"metadata": {
@@ -1099,6 +1099,7 @@
 					"            )\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error reading file: {str(e)}\"\n",
+					"            move_to_quarantine(source_path, \"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"        # Standardize column names using mapping\n",
@@ -1142,6 +1143,7 @@
 					"                )\n",
 					"\n",
 					"            logging.info(f\"Successfully transformed data with {df.count()} rows\")\n",
+					"        \n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error transforming data: {str(e)}\"\n",
 					"            move_to_quarantine(source_path, \"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
@@ -1168,10 +1170,12 @@
 					"            return result\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error writing output file: {str(e)}\"\n",
+					"            move_to_quarantine(source_path, \"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"    except Exception as e:\n",
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
+					"        move_to_quarantine(source_path, \"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"        return result"
 				],
 				"execution_count": 81

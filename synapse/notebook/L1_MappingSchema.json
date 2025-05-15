@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "050a7731-cb21-4962-899c-34e0c40e3b0d"
+				"spark.autotune.trackingId": "5f44863a-3441-4944-8961-953be9fac05c"
 			}
 		},
 		"metadata": {
@@ -1153,8 +1153,7 @@
 					"                \"No reverse mapping available - skipping column standardization\"\n",
 					"            )\n",
 					"        # Resolve Elector Marker vs New Marker logic\n",
-					"        df = normalize_marker_columns(df)\n",
-					"        df = resolve_marker_column_conflict(df)\n",
+					"        df = resolve_marker_columns(df)\n",
 					"\n",
 					"\n",
 					"        # Transform data\n",

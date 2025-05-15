@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8b005c5d-cd8c-4dc9-a1d7-b2863e247a8a"
+				"spark.autotune.trackingId": "be432e8b-8311-4116-8b0d-92e8a766411f"
 			}
 		},
 		"metadata": {
@@ -1030,6 +1030,35 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"from notebookutils import mssparkutils\n",
+					"import time\n",
+					"\n",
+					"def move_to_quarantine(source_path, quarantine_folder, reason=\"error\"):\n",
+					"    \"\"\"\n",
+					"    Move a file to the L1_quarantine folder with a reason tag.\n",
+					"    \"\"\"\n",
+					"    try:\n",
+					"        if not mssparkutils.fs.exists(quarantine_folder):\n",
+					"            mssparkutils.fs.mkdirs(quarantine_folder)\n",
+					"        \n",
+					"        file_name = os.path.basename(source_path)\n",
+					"        timestamp = time.strftime(\"%Y%m%d%H%M%S\")\n",
+					"        quarantined_file = f\"{quarantine_folder}/{timestamp}_{reason}_{file_name}\"\n",
+					"        \n",
+					"        mssparkutils.fs.cp(source_path, quarantined_file, True)\n",
+					"        mssparkutils.fs.rm(source_path, True)\n",
+					"        logging.info(f\"Moved file to quarantine: {quarantined_file}\")\n",
+					"        return quarantined_file\n",
+					"    except Exception as e:\n",
+					"        logging.error(f\"Failed to move file to quarantine: {str(e)}\")\n",
+					"        return None\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None):\n",
 					"    \"\"\"Process a source file and transform it to parquet format\"\"\"\n",
 					"    # Print more detailed debugging info\n",
@@ -1082,7 +1111,7 @@
 					"        # Resolve Elector Marker vs New Marker logic\n",
 					"        df = normalize_marker_columns(df)\n",
 					"        df = resolve_marker_column_conflict(df)\n",
-					"        \n",
+					"\n",
 					"\n",
 					"        # Transform data\n",
 					"        try:\n",
@@ -1115,6 +1144,7 @@
 					"            logging.info(f\"Successfully transformed data with {df.count()} rows\")\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error transforming data: {str(e)}\"\n",
+					"            move_to_quarantine(source_path, \"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"        logging.info(\n",

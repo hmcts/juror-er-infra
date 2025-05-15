@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "07537958-91c7-40cf-b4f7-dba33946e625"
+				"spark.autotune.trackingId": "8b005c5d-cd8c-4dc9-a1d7-b2863e247a8a"
 			}
 		},
 		"metadata": {
@@ -324,40 +324,6 @@
 					"    return df"
 				],
 				"execution_count": 68
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"from pyspark.sql.functions import col, lit\n",
-					"\n",
-					"def normalize_marker_columns(df):\n",
-					"    \"\"\"\n",
-					"    Ensure all marker-related columns are present, even if null.\n",
-					"    \"\"\"\n",
-					"    for col_name in [\"New Marker\", \"Elector Markers\", \"Flags/Markers\"]:\n",
-					"        if col_name not in df.columns:\n",
-					"            df = df.withColumn(col_name, lit(None).cast(\"string\"))\n",
-					"    return df\n",
-					"\n",
-					"def resolve_marker_column_conflict(df):\n",
-					"    \"\"\"\n",
-					"    Rename 'Elector Markers' to 'Flags/Markers' if 'New Marker' is present,\n",
-					"    or if Elector Markers is early in the DataFrame.\n",
-					"    \"\"\"\n",
-					"    columns = df.columns\n",
-					"    has_new_marker = \"New Marker\" in columns\n",
-					"    has_elector_markers = \"Elector Markers\" in columns\n",
-					"\n",
-					"    if has_new_marker and has_elector_markers:\n",
-					"        df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
-					"    elif has_elector_markers and not has_new_marker:\n",
-					"        index = columns.index(\"Elector Markers\")\n",
-					"        if index <= 3:\n",
-					"            df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
-					"    return df\n",
-					""
-				],
-				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1026,6 +992,40 @@
 					""
 				],
 				"execution_count": 80
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col, lit\n",
+					"\n",
+					"def normalize_marker_columns(df):\n",
+					"    \"\"\"\n",
+					"    Ensure all marker-related columns are present, even if null.\n",
+					"    \"\"\"\n",
+					"    for col_name in [\"New Marker\", \"Elector Markers\", \"Flags/Markers\"]:\n",
+					"        if col_name not in df.columns:\n",
+					"            df = df.withColumn(col_name, lit(None).cast(\"string\"))\n",
+					"    return df\n",
+					"\n",
+					"def resolve_marker_column_conflict(df):\n",
+					"    \"\"\"\n",
+					"    Rename 'Elector Markers' to 'Flags/Markers' if 'New Marker' is present,\n",
+					"    or if Elector Markers is early in the DataFrame.\n",
+					"    \"\"\"\n",
+					"    columns = df.columns\n",
+					"    has_new_marker = \"New Marker\" in columns\n",
+					"    has_elector_markers = \"Elector Markers\" in columns\n",
+					"\n",
+					"    if has_new_marker and has_elector_markers:\n",
+					"        df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
+					"    elif has_elector_markers and not has_new_marker:\n",
+					"        index = columns.index(\"Elector Markers\")\n",
+					"        if index <= 3:\n",
+					"            df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
+					"    return df\n",
+					""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

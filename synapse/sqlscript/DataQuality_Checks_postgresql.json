@@ -1,0 +1,17 @@
+{
+	"name": "DataQuality_Checks_postgresql",
+	"properties": {
+		"content": {
+			"query": "--check empty lname and fname if empty count empty rows with lname and fname\n\nSELECT \nsum ( case when fname is null then 1 else 0 end ) fname_empty_cnt,\nsum ( case when lname is null then 1 else 0 end ) lname_empty_cnt\n FROM [dbo].[er_juror_postgresql]\n;\n\nSELECT count(*)\n FROM [dbo].[er_juror_postgresql]\nwhere fname is null and lname is null;\n\n--check if adderesses and zip are empty cout empty rows\nSELECT \nsum ( case when address is null then 1 else 0 end ) add1_empty_cnt,\nsum ( case when address2 is null then 1 else 0 end ) add2_empty_cnt,\nsum ( case when address3 is null then 1 else 0 end ) add3_empty_cnt,\nsum ( case when address4 is null then 1 else 0 end ) add4_empty_cnt,\nsum ( case when address6 is null then 1 else 0 end ) add6_empty_cnt,\nsum ( case when zip is null then 1 else 0 end ) zip_empty_cnt\nFROM [dbo].[er_juror_postgresql]\n \n;\n\nSELECT *\nFROM [dbo].[er_juror_postgresql]\nwhere zip is null and rec_num ='306';\n\nSELECT hash_id, count(*)\n FROM [dbo].[er_juror_postgresql]\nwhere address4 is null \ngroup by hash_id\nhaving count(*)>1;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

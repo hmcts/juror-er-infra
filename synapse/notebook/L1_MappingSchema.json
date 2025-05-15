@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkprod",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "01673e89-b349-4ff3-9f87-e33ceb5da551"
+				"spark.autotune.trackingId": "07537958-91c7-40cf-b4f7-dba33946e625"
 			}
 		},
 		"metadata": {
@@ -28,6 +32,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
+				"name": "sparkprod",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -99,7 +118,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 1
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -109,7 +128,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": 2
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -123,7 +142,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 3
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -141,7 +160,14 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 4
+				"execution_count": 62
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +200,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 5
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -199,7 +225,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 6
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +242,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 7
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -246,7 +272,7 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": 8
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -264,7 +290,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": 9
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +323,41 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 10
+				"execution_count": 68
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col, lit\n",
+					"\n",
+					"def normalize_marker_columns(df):\n",
+					"    \"\"\"\n",
+					"    Ensure all marker-related columns are present, even if null.\n",
+					"    \"\"\"\n",
+					"    for col_name in [\"New Marker\", \"Elector Markers\", \"Flags/Markers\"]:\n",
+					"        if col_name not in df.columns:\n",
+					"            df = df.withColumn(col_name, lit(None).cast(\"string\"))\n",
+					"    return df\n",
+					"\n",
+					"def resolve_marker_column_conflict(df):\n",
+					"    \"\"\"\n",
+					"    Rename 'Elector Markers' to 'Flags/Markers' if 'New Marker' is present,\n",
+					"    or if Elector Markers is early in the DataFrame.\n",
+					"    \"\"\"\n",
+					"    columns = df.columns\n",
+					"    has_new_marker = \"New Marker\" in columns\n",
+					"    has_elector_markers = \"Elector Markers\" in columns\n",
+					"\n",
+					"    if has_new_marker and has_elector_markers:\n",
+					"        df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
+					"    elif has_elector_markers and not has_new_marker:\n",
+					"        index = columns.index(\"Elector Markers\")\n",
+					"        if index <= 3:\n",
+					"            df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
+					"    return df\n",
+					""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -329,7 +389,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 11
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
@@ -415,7 +475,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 12
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -472,7 +532,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 13
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -494,7 +554,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 14
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -584,7 +644,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 15
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -721,7 +781,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 16
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -778,7 +838,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 17
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -805,7 +865,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 18
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -840,7 +900,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 19
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -890,7 +950,7 @@
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
 					"    return df"
 				],
-				"execution_count": 20
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -935,7 +995,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 21
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -965,7 +1025,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 22
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -1019,6 +1079,10 @@
 					"            logging.warning(\n",
 					"                \"No reverse mapping available - skipping column standardization\"\n",
 					"            )\n",
+					"        # Resolve Elector Marker vs New Marker logic\n",
+					"        df = normalize_marker_columns(df)\n",
+					"        df = resolve_marker_column_conflict(df)\n",
+					"        \n",
 					"\n",
 					"        # Transform data\n",
 					"        try:\n",
@@ -1080,7 +1144,7 @@
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
 					"        return result"
 				],
-				"execution_count": 23
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -1106,7 +1170,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 24
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -1143,7 +1207,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 25
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -1197,7 +1261,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 26
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -1250,7 +1314,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 27
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -1281,7 +1345,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 28
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -1399,7 +1463,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 29
+				"execution_count": 87
 			}
 		]
 	}

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "827b66b6-9018-4f0f-a7f3-338c96e328ab"
+				"spark.autotune.trackingId": "327e5d63-57c6-47ee-a47b-0ce53836939b"
 			}
 		},
 		"metadata": {
@@ -254,7 +254,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit, monotonically_increasing_id"
 				],
-				"execution_count": 83
+				"execution_count": 159
 			},
 			{
 				"cell_type": "code",
@@ -274,7 +274,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 84
+				"execution_count": 160
 			},
 			{
 				"cell_type": "code",
@@ -287,7 +287,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 85
+				"execution_count": 161
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 86
+				"execution_count": 162
 			},
 			{
 				"cell_type": "code",
@@ -326,7 +326,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 87
+				"execution_count": 163
 			},
 			{
 				"cell_type": "code",
@@ -363,7 +363,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = False "
 				],
-				"execution_count": 88
+				"execution_count": 164
 			},
 			{
 				"cell_type": "code",
@@ -385,7 +385,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 89
+				"execution_count": 165
 			},
 			{
 				"cell_type": "code",
@@ -402,7 +402,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 90
+				"execution_count": 166
 			},
 			{
 				"cell_type": "code",
@@ -421,7 +421,7 @@
 					"        \n",
 					"    return escaped"
 				],
-				"execution_count": 91
+				"execution_count": 167
 			},
 			{
 				"cell_type": "code",
@@ -631,7 +631,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 92
+				"execution_count": 168
 			},
 			{
 				"cell_type": "code",
@@ -678,7 +678,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 93
+				"execution_count": 169
 			},
 			{
 				"cell_type": "code",
@@ -690,7 +690,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 94
+				"execution_count": 170
 			},
 			{
 				"cell_type": "code",
@@ -760,7 +760,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 95
+				"execution_count": 171
 			},
 			{
 				"cell_type": "markdown",
@@ -843,23 +843,39 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 96
+				"execution_count": 172
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def standardize_columns(df, column_mapping):\n",
 					"    \"\"\"\n",
-					"    Standardize column names based on mapping\n",
-					"    \n",
-					"    Args:\n",
-					"        df: Input DataFrame\n",
-					"        column_mapping: Dictionary mapping standard names to variations\n",
-					"        \n",
-					"    Returns:\n",
-					"        DataFrame with standardized column names\n",
+					"    Standardize column names with special handling for register_lett and poll_number\n",
 					"    \"\"\"\n",
-					"    # Get current columns\n",
+					"    # First, track what we have before standardization\n",
+					"    debug_fields(df, \"Before Standardization\")\n",
+					"    \n",
+					"    # Special handling for our critical fields\n",
+					"    elector_prefix_found = \"Elector Number Prefix\" in df.columns\n",
+					"    elector_number_found = \"Elector Number\" in df.columns\n",
+					"    \n",
+					"    # Save the values from these columns before any transformation\n",
+					"    prefix_values = None\n",
+					"    number_values = None\n",
+					"    \n",
+					"    if elector_prefix_found:\n",
+					"        # Create a temporary column with a DataFrame ID for joining later\n",
+					"        df = df.withColumn(\"_temp_row_id\", monotonically_increasing_id())\n",
+					"        prefix_values = df.select(\"_temp_row_id\", \"Elector Number Prefix\")\n",
+					"        print(f\"Saved {prefix_values.count()} prefix values\")\n",
+					"    \n",
+					"    if elector_number_found:\n",
+					"        if \"_temp_row_id\" not in df.columns:\n",
+					"            df = df.withColumn(\"_temp_row_id\", monotonically_increasing_id())\n",
+					"        number_values = df.select(\"_temp_row_id\", \"Elector Number\")\n",
+					"        print(f\"Saved {number_values.count()} number values\")\n",
+					"    \n",
+					"    # Apply standard column mapping\n",
 					"    current_columns = df.columns\n",
 					"    \n",
 					"    # Create a reverse mapping (from variations to standard names)\n",
@@ -869,8 +885,11 @@
 					"        reverse_mapping[standard_name.lower()] = standard_name\n",
 					"        \n",
 					"        # Add all variations\n",
-					"        for variation in variations:\n",
-					"            reverse_mapping[variation.lower()] = standard_name\n",
+					"        if isinstance(variations, str):\n",
+					"            reverse_mapping[variations.lower()] = standard_name\n",
+					"        elif isinstance(variations, list):\n",
+					"            for variation in variations:\n",
+					"                reverse_mapping[variation.lower()] = standard_name\n",
 					"    \n",
 					"    # Apply renaming\n",
 					"    for col in current_columns:\n",
@@ -879,11 +898,54 @@
 					"        if std_name and col != std_name:\n",
 					"            df = df.withColumnRenamed(col, std_name)\n",
 					"    \n",
-					"    return df\n",
-					"\n",
-					""
+					"    # Verify standardization worked properly\n",
+					"    debug_fields(df, \"After Standard Mapping\")\n",
+					"    \n",
+					"    # Now restore our critical values if they were saved and the target columns exist\n",
+					"    if prefix_values is not None and \"register_lett\" in df.columns:\n",
+					"        # Join back the original values\n",
+					"        df = df.join(\n",
+					"            prefix_values.withColumnRenamed(\"Elector Number Prefix\", \"original_prefix\"),\n",
+					"            on=\"_temp_row_id\", \n",
+					"            how=\"left\"\n",
+					"        )\n",
+					"        # Use original values if current ones are null\n",
+					"        df = df.withColumn(\n",
+					"            \"register_lett\",\n",
+					"            when(col(\"register_lett\").isNull(), col(\"original_prefix\"))\n",
+					"            .otherwise(col(\"register_lett\"))\n",
+					"        )\n",
+					"        # Clean up\n",
+					"        df = df.drop(\"original_prefix\")\n",
+					"        print(\"Restored register_lett values\")\n",
+					"    \n",
+					"    if number_values is not None and \"poll_number\" in df.columns:\n",
+					"        # Join back the original values\n",
+					"        df = df.join(\n",
+					"            number_values.withColumnRenamed(\"Elector Number\", \"original_number\"),\n",
+					"            on=\"_temp_row_id\", \n",
+					"            how=\"left\"\n",
+					"        )\n",
+					"        # Use original values if current ones are null\n",
+					"        df = df.withColumn(\n",
+					"            \"poll_number\",\n",
+					"            when(col(\"poll_number\").isNull(), col(\"original_number\"))\n",
+					"            .otherwise(col(\"poll_number\"))\n",
+					"        )\n",
+					"        # Clean up\n",
+					"        df = df.drop(\"original_number\")\n",
+					"        print(\"Restored poll_number values\")\n",
+					"    \n",
+					"    # Remove temp ID column\n",
+					"    if \"_temp_row_id\" in df.columns:\n",
+					"        df = df.drop(\"_temp_row_id\")\n",
+					"    \n",
+					"    # Final check\n",
+					"    debug_fields(df, \"After Restoration\")\n",
+					"    \n",
+					"    return df"
 				],
-				"execution_count": 97
+				"execution_count": 173
 			},
 			{
 				"cell_type": "code",
@@ -908,7 +970,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 98
+				"execution_count": 174
 			},
 			{
 				"cell_type": "code",
@@ -929,7 +991,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 99
+				"execution_count": 175
 			},
 			{
 				"cell_type": "code",
@@ -946,7 +1008,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 100
+				"execution_count": 176
 			},
 			{
 				"cell_type": "code",
@@ -1014,7 +1076,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 101
+				"execution_count": 177
 			},
 			{
 				"cell_type": "markdown",
@@ -1068,7 +1130,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 102
+				"execution_count": 178
 			},
 			{
 				"cell_type": "code",
@@ -1148,7 +1210,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": 103
+				"execution_count": 179
 			},
 			{
 				"cell_type": "markdown",
@@ -1215,7 +1277,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 104
+				"execution_count": 180
 			},
 			{
 				"cell_type": "code",
@@ -1261,7 +1323,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": 105
+				"execution_count": 181
 			},
 			{
 				"cell_type": "markdown",
@@ -1298,7 +1360,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 106
+				"execution_count": 182
 			},
 			{
 				"cell_type": "code",
@@ -1356,7 +1418,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 107
+				"execution_count": 183
 			},
 			{
 				"cell_type": "code",
@@ -1409,7 +1471,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 108
+				"execution_count": 184
 			},
 			{
 				"cell_type": "markdown",
@@ -1486,7 +1548,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 109
+				"execution_count": 185
 			},
 			{
 				"cell_type": "code",
@@ -1558,7 +1620,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": 110
+				"execution_count": 186
 			},
 			{
 				"cell_type": "markdown",
@@ -1717,7 +1779,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 111
+				"execution_count": 187
 			},
 			{
 				"cell_type": "code",
@@ -2020,7 +2082,7 @@
 					"    # Drop temporary columns and return\n",
 					"    return df_filtered.drop(\"_remove_record\", \"_removal_reason\")"
 				],
-				"execution_count": 112
+				"execution_count": 188
 			},
 			{
 				"cell_type": "code",
@@ -2085,7 +2147,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 113
+				"execution_count": 189
 			},
 			{
 				"cell_type": "code",
@@ -2113,7 +2175,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": 114
+				"execution_count": 190
 			},
 			{
 				"cell_type": "markdown",
@@ -2250,7 +2312,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": 115
+				"execution_count": 191
 			},
 			{
 				"cell_type": "markdown",
@@ -2300,7 +2362,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 116
+				"execution_count": 192
 			},
 			{
 				"cell_type": "code",
@@ -2338,7 +2400,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 117
+				"execution_count": 193
 			},
 			{
 				"cell_type": "code",
@@ -2387,7 +2449,7 @@
 					"    return True\n",
 					""
 				],
-				"execution_count": 118
+				"execution_count": 194
 			},
 			{
 				"cell_type": "code",
@@ -2578,7 +2640,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": 119
+				"execution_count": 195
 			},
 			{
 				"cell_type": "markdown",
@@ -2757,7 +2819,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 120
+				"execution_count": 196
 			}
 		]
 	}

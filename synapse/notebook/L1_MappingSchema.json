@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f7044782-df5d-4b93-a1a9-094a9eac7f01"
+				"spark.autotune.trackingId": "15a3292a-0a22-4549-946f-29af3013d0b0"
 			}
 		},
 		"metadata": {
@@ -118,7 +118,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 119
+				"execution_count": 219
 			},
 			{
 				"cell_type": "code",
@@ -128,7 +128,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": 120
+				"execution_count": 220
 			},
 			{
 				"cell_type": "code",
@@ -142,7 +142,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 121
+				"execution_count": 221
 			},
 			{
 				"cell_type": "code",
@@ -160,7 +160,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 122
+				"execution_count": 222
 			},
 			{
 				"cell_type": "code",
@@ -200,7 +200,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 123
+				"execution_count": 223
 			},
 			{
 				"cell_type": "code",
@@ -225,7 +225,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 124
+				"execution_count": 224
 			},
 			{
 				"cell_type": "code",
@@ -242,7 +242,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 125
+				"execution_count": 225
 			},
 			{
 				"cell_type": "code",
@@ -272,7 +272,7 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": 126
+				"execution_count": 226
 			},
 			{
 				"cell_type": "code",
@@ -290,24 +290,24 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": 127
+				"execution_count": 227
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def standardize_column_names(df, reverse_mapping, column_mapping):\n",
+					"def standardize_column_names(df, reverse_mapping, column_mapping=None):\n",
 					"    \"\"\"Standardize column names using the mapping\"\"\"\n",
 					"    if not reverse_mapping:\n",
 					"        logging.warning(\"Empty reverse mapping provided - cannot standardize columns\")\n",
 					"        return df\n",
 					"    \n",
-					"    # Keep track of columns we've already mapped to avoid duplicates\n",
-					"    already_mapped_to = set()\n",
+					"    # Initialize column_mapping if None\n",
+					"    if column_mapping is None:\n",
+					"        column_mapping = {}  # Empty dict, will use standard names directly\n",
+					"    \n",
 					"    renamed_columns = []\n",
-					"    \n",
-					"    # Get all the target column names from column_mapping\n",
-					"    target_columns = set(column_mapping.values())\n",
-					"    \n",
+					"    already_mapped_to = set()\n",
+					"\n",
 					"    for col in df.columns:\n",
 					"        std_name = reverse_mapping.get(col.lower())\n",
 					"        if std_name:\n",
@@ -326,16 +326,23 @@
 					"                df = df.withColumnRenamed(col, target_col)\n",
 					"                renamed_columns.append(f\"{col} -> {target_col}\")\n",
 					"                already_mapped_to.add(target_col)\n",
-					"    \n",
-					"    # Log the renames\n",
+					"\n",
+					"    # Check if Flags/Markers exists after standardization, add if missing\n",
+					"    flags_field = column_mapping.get(\"Flags/Markers\", \"Flags/Markers\")\n",
+					"    if flags_field not in df.columns:\n",
+					"        logging.info(f\"Adding missing '{flags_field}' column after standardization\")\n",
+					"        df = df.withColumn(flags_field, lit(None).cast(StringType()))\n",
+					"\n",
 					"    if renamed_columns:\n",
-					"        logging.info(f\"Renamed {len(renamed_columns)} columns: {', '.join(renamed_columns[:5])}...\")\n",
+					"        logging.info(\n",
+					"            f\"Renamed {len(renamed_columns)} columns: {', '.join(renamed_columns[:5])}...\"\n",
+					"        )\n",
 					"    else:\n",
 					"        logging.warning(\"No columns were renamed - check your mapping configuration\")\n",
-					"    \n",
+					"\n",
 					"    return df"
 				],
-				"execution_count": 128
+				"execution_count": 228
 			},
 			{
 				"cell_type": "code",
@@ -367,7 +374,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 129
+				"execution_count": 229
 			},
 			{
 				"cell_type": "code",
@@ -453,7 +460,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 130
+				"execution_count": 230
 			},
 			{
 				"cell_type": "code",
@@ -510,7 +517,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 131
+				"execution_count": 231
 			},
 			{
 				"cell_type": "code",
@@ -532,7 +539,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 132
+				"execution_count": 232
 			},
 			{
 				"cell_type": "code",
@@ -622,7 +629,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 133
+				"execution_count": 233
 			},
 			{
 				"cell_type": "code",
@@ -759,7 +766,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 134
+				"execution_count": 234
 			},
 			{
 				"cell_type": "code",
@@ -816,7 +823,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 135
+				"execution_count": 235
 			},
 			{
 				"cell_type": "code",
@@ -843,7 +850,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 136
+				"execution_count": 236
 			},
 			{
 				"cell_type": "code",
@@ -878,7 +885,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 137
+				"execution_count": 237
 			},
 			{
 				"cell_type": "code",
@@ -928,7 +935,7 @@
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
 					"    return df"
 				],
-				"execution_count": 138
+				"execution_count": 238
 			},
 			{
 				"cell_type": "code",
@@ -973,7 +980,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 139
+				"execution_count": 239
 			},
 			{
 				"cell_type": "code",
@@ -1003,7 +1010,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 140
+				"execution_count": 240
 			},
 			{
 				"cell_type": "code",
@@ -1062,7 +1069,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 141
+				"execution_count": 241
 			},
 			{
 				"cell_type": "code",
@@ -1087,7 +1094,7 @@
 					"        logging.error(f\"Failed to copy file to quarantine: {str(e)}\")\n",
 					"        return None"
 				],
-				"execution_count": 142
+				"execution_count": 242
 			},
 			{
 				"cell_type": "code",
@@ -1130,7 +1137,7 @@
 					"            logging.info(\n",
 					"                f\"Successfully read file with {df.count()} rows and {len(df.columns)} columns\"\n",
 					"            )\n",
-					"             df = resolve_marker_columns(df)\n",
+					"            df = resolve_marker_columns(df)\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error reading file: {str(e)}\"\n",
 					"            move_to_quarantine(source_path, \"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
@@ -1208,7 +1215,7 @@
 					"        move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"        return result"
 				],
-				"execution_count": 143
+				"execution_count": 243
 			},
 			{
 				"cell_type": "code",
@@ -1234,7 +1241,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 144
+				"execution_count": 244
 			},
 			{
 				"cell_type": "code",
@@ -1271,7 +1278,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 145
+				"execution_count": 245
 			},
 			{
 				"cell_type": "code",
@@ -1325,7 +1332,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 146
+				"execution_count": 246
 			},
 			{
 				"cell_type": "code",
@@ -1378,7 +1385,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 147
+				"execution_count": 247
 			},
 			{
 				"cell_type": "code",
@@ -1409,7 +1416,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 148
+				"execution_count": 248
 			},
 			{
 				"cell_type": "code",
@@ -1514,7 +1521,7 @@
 					"# Execute the main function\n",
 					"if __name__ == \"__main__\":\n",
 					"    # Enable only for initail load\n",
-					"    FORCE_CLEAN_RUN = False\n",
+					"    FORCE_CLEAN_RUN = True\n",
 					"\n",
 					"    if FORCE_CLEAN_RUN:\n",
 					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
@@ -1527,7 +1534,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 149
+				"execution_count": 249
 			}
 		]
 	}

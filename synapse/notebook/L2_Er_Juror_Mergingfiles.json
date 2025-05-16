@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c6d398f2-a488-4dfc-9acb-51aa6bb8c211"
+				"spark.autotune.trackingId": "157f21ee-8f36-4eca-a842-50e5962a5946"
 			}
 		},
 		"metadata": {
@@ -254,7 +254,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit, monotonically_increasing_id"
 				],
-				"execution_count": 159
+				"execution_count": 197
 			},
 			{
 				"cell_type": "code",
@@ -274,7 +274,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 160
+				"execution_count": 198
 			},
 			{
 				"cell_type": "code",
@@ -287,7 +287,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 161
+				"execution_count": 199
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 162
+				"execution_count": 200
 			},
 			{
 				"cell_type": "code",
@@ -326,7 +326,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 163
+				"execution_count": 201
 			},
 			{
 				"cell_type": "code",
@@ -363,7 +363,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = False "
 				],
-				"execution_count": 164
+				"execution_count": 202
 			},
 			{
 				"cell_type": "code",
@@ -385,7 +385,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 165
+				"execution_count": 203
 			},
 			{
 				"cell_type": "code",
@@ -402,7 +402,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 166
+				"execution_count": 204
 			},
 			{
 				"cell_type": "code",
@@ -421,7 +421,7 @@
 					"        \n",
 					"    return escaped"
 				],
-				"execution_count": 167
+				"execution_count": 205
 			},
 			{
 				"cell_type": "code",
@@ -631,7 +631,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 168
+				"execution_count": 206
 			},
 			{
 				"cell_type": "code",
@@ -678,7 +678,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 169
+				"execution_count": 207
 			},
 			{
 				"cell_type": "code",
@@ -690,7 +690,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 170
+				"execution_count": 208
 			},
 			{
 				"cell_type": "code",
@@ -760,7 +760,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 171
+				"execution_count": 209
 			},
 			{
 				"cell_type": "markdown",
@@ -843,7 +843,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 172
+				"execution_count": 210
 			},
 			{
 				"cell_type": "code",
@@ -945,7 +945,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 173
+				"execution_count": 211
 			},
 			{
 				"cell_type": "code",
@@ -988,7 +988,7 @@
 					"    debug_fields(df, \"After Consistency Check\")\n",
 					"    return df"
 				],
-				"execution_count": 174
+				"execution_count": 212
 			},
 			{
 				"cell_type": "code",
@@ -1009,7 +1009,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 175
+				"execution_count": 213
 			},
 			{
 				"cell_type": "code",
@@ -1026,7 +1026,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 176
+				"execution_count": 214
 			},
 			{
 				"cell_type": "code",
@@ -1094,7 +1094,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 177
+				"execution_count": 215
 			},
 			{
 				"cell_type": "markdown",
@@ -1148,7 +1148,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 178
+				"execution_count": 216
 			},
 			{
 				"cell_type": "code",
@@ -1181,7 +1181,7 @@
 					"    debug_fields(df, \"After Type Fixing\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 217
 			},
 			{
 				"cell_type": "code",
@@ -1316,7 +1316,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": 179
+				"execution_count": 218
 			},
 			{
 				"cell_type": "markdown",
@@ -1383,7 +1383,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 180
+				"execution_count": 219
 			},
 			{
 				"cell_type": "code",
@@ -1477,7 +1477,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": 181
+				"execution_count": 220
 			},
 			{
 				"cell_type": "markdown",
@@ -1514,7 +1514,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 182
+				"execution_count": 221
 			},
 			{
 				"cell_type": "code",
@@ -1572,7 +1572,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 183
+				"execution_count": 222
 			},
 			{
 				"cell_type": "code",
@@ -1625,7 +1625,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": 184
+				"execution_count": 223
 			},
 			{
 				"cell_type": "markdown",
@@ -1702,7 +1702,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": 185
+				"execution_count": 224
 			},
 			{
 				"cell_type": "code",
@@ -1774,7 +1774,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": 186
+				"execution_count": 225
 			},
 			{
 				"cell_type": "markdown",
@@ -1933,7 +1933,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 187
+				"execution_count": 226
 			},
 			{
 				"cell_type": "code",
@@ -2236,7 +2236,7 @@
 					"    # Drop temporary columns and return\n",
 					"    return df_filtered.drop(\"_remove_record\", \"_removal_reason\")"
 				],
-				"execution_count": 188
+				"execution_count": 227
 			},
 			{
 				"cell_type": "code",
@@ -2453,7 +2453,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": 189
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2481,7 +2481,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": 190
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -2618,7 +2618,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": 191
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -2668,7 +2668,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 192
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2706,7 +2706,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 193
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2755,7 +2755,7 @@
 					"    return True\n",
 					""
 				],
-				"execution_count": 194
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2946,7 +2946,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": 195
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -2965,7 +2965,7 @@
 				"cell_type": "code",
 				"source": [
 					"def main():\n",
-					"    \"\"\"Main function with enhanced processing logic\"\"\"\n",
+					"    \"\"\"Main function with enhanced processing logic to preserve register_lett and poll_number\"\"\"\n",
 					"    # Initialize\n",
 					"    print(\"Starting electoral data ETL process\")\n",
 					"    print(f\"Current time: {datetime.now()}\")\n",
@@ -3011,14 +3011,43 @@
 					"\n",
 					"        logger.info(f\"Found {len(new_file_paths)} new files to process\")\n",
 					"\n",
+					"        # Debug column mapping to verify it's correct\n",
+					"        logger.info(f\"Column mapping for critical fields:\")\n",
+					"        for std_name, variations in column_mapping.items():\n",
+					"            if std_name in [\"register_lett\", \"poll_number\"]:\n",
+					"                logger.info(f\"  {std_name} mapped from: {variations}\")\n",
+					"\n",
 					"        # Process each new file with enhanced tracking\n",
 					"        total_new_records = 0\n",
 					"        successful_files = 0\n",
 					"        failed_files = 0\n",
 					"        no_contribution_files = 0\n",
 					"        \n",
+					"        # Track field preservation stats across all files\n",
+					"        register_lett_preservation = {\"before\": 0, \"after\": 0}\n",
+					"        poll_number_preservation = {\"before\": 0, \"after\": 0}\n",
+					"        \n",
 					"        for file_path in new_file_paths:\n",
 					"            logger.info(f\"Processing file: {file_path}\")\n",
+					"            \n",
+					"            # Add debug for initial file content\n",
+					"            try:\n",
+					"                df = spark.read.parquet(file_path)\n",
+					"                for field in [\"register_lett\", \"poll_number\", \"Elector Number Prefix\", \"Elector Number\"]:\n",
+					"                    if field in df.columns:\n",
+					"                        non_null = df.filter(col(field).isNotNull()).count()\n",
+					"                        total = df.count()\n",
+					"                        logger.info(f\"  Initial {field}: {non_null}/{total} non-null values\")\n",
+					"                        \n",
+					"                        # Capture stats for later comparison\n",
+					"                        if field == \"register_lett\" or field == \"Elector Number Prefix\":\n",
+					"                            register_lett_preservation[\"before\"] += non_null\n",
+					"                        elif field == \"poll_number\" or field == \"Elector Number\":\n",
+					"                            poll_number_preservation[\"before\"] += non_null\n",
+					"            except Exception as e:\n",
+					"                logger.warning(f\"  Could not read initial file for debugging: {str(e)}\")\n",
+					"            \n",
+					"            # Process the file with our enhanced tracking\n",
 					"            success, new_records = process_input_file_with_tracking(spark, file_path, column_mapping, config)\n",
 					"            \n",
 					"            if success:\n",
@@ -3034,14 +3063,43 @@
 					"        logger.info(f\"{no_contribution_files} files processed but added no new records\")\n",
 					"        from pyspark.sql.utils import AnalysisException\n",
 					"\n",
+					"        # Now check field preservation in the final output\n",
+					"        try:\n",
+					"            output_path = config[\"output_path\"]\n",
+					"            full_transformed_data = spark.read.format(\"delta\").load(output_path)\n",
+					"            \n",
+					"            # Check register_lett and poll_number preservation\n",
+					"            for field in [\"register_lett\", \"poll_number\"]:\n",
+					"                if field in full_transformed_data.columns:\n",
+					"                    non_null = full_transformed_data.filter(col(field).isNotNull()).count()\n",
+					"                    total = full_transformed_data.count()\n",
+					"                    logger.info(f\"  Final {field}: {non_null}/{total} non-null values\")\n",
+					"                    \n",
+					"                    # Update preservation stats\n",
+					"                    if field == \"register_lett\":\n",
+					"                        register_lett_preservation[\"after\"] += non_null\n",
+					"                    elif field == \"poll_number\":\n",
+					"                        poll_number_preservation[\"after\"] += non_null\n",
+					"                else:\n",
+					"                    logger.warning(f\"  Field {field} missing from final output!\")\n",
+					"            \n",
+					"            # Report on preservation success\n",
+					"            logger.info(f\"Field preservation results:\")\n",
+					"            logger.info(f\"  register_lett: {register_lett_preservation['before']} before → {register_lett_preservation['after']} after\")\n",
+					"            logger.info(f\"  poll_number: {poll_number_preservation['before']} before → {poll_number_preservation['after']} after\")\n",
+					"            \n",
+					"        except AnalysisException as e:\n",
+					"            logger.warning(f\"Delta table not available yet at {output_path} (likely first load or no successful writes).\")\n",
+					"            logger.warning(\"Skipping final field preservation check.\")\n",
+					"\n",
 					"        # Now prepare the PostgreSQL-specific data from the entire transformed dataset\n",
-					"        output_path = config[\"output_path\"]\n",
 					"        try:\n",
 					"            transformed_data = spark.read.format(\"delta\").load(output_path)\n",
 					"        except AnalysisException as e:\n",
 					"            logger.warning(f\"Delta table not available yet at {output_path} (likely first load or no successful writes).\")\n",
 					"            logger.warning(\"Skipping PostgreSQL snapshot generation.\")\n",
 					"            return\n",
+					"            \n",
 					"        # Check if we have new files to process\n",
 					"        if len(new_file_paths) > 0:\n",
 					"            processed_dates = set()\n",
@@ -3066,8 +3124,27 @@
 					"                    new_count = new_data.count()\n",
 					"\n",
 					"                    if new_count > 0:\n",
+					"                        # Debug critical fields in new_data before PostgreSQL transformation\n",
+					"                        for field in [\"register_lett\", \"poll_number\"]:\n",
+					"                            if field in new_data.columns:\n",
+					"                                non_null = new_data.filter(col(field).isNotNull()).count()\n",
+					"                                logger.info(f\"  Pre-PostgreSQL {field}: {non_null}/{new_count} non-null values\")\n",
+					"                                \n",
+					"                                # Show a few sample values\n",
+					"                                if non_null > 0:\n",
+					"                                    samples = new_data.select(field).filter(col(field).isNotNull()).limit(3).collect()\n",
+					"                                    logger.info(f\"  Sample {field} values: {[str(row[0]) for row in samples]}\")\n",
+					"                        \n",
 					"                        # Apply PostgreSQL-specific transformations\n",
 					"                        postgresql_data = prepare_postgresql_data(new_data)\n",
+					"                        \n",
+					"                        # Debug critical fields after transformation\n",
+					"                        for field in [\"register_lett\", \"poll_number\"]:\n",
+					"                            if field in postgresql_data.columns:\n",
+					"                                non_null = postgresql_data.filter(col(field).isNotNull()).count()\n",
+					"                                total = postgresql_data.count()\n",
+					"                                logger.info(f\"  Post-PostgreSQL {field}: {non_null}/{total} non-null values\")\n",
+					"                        \n",
 					"                        # Write to PostgreSQL output using append mode and partitioning\n",
 					"                        postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"                     # Ensure creation_date is suitable for partitioning (no slashes, etc.)\n",
@@ -3121,11 +3198,10 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        raise\n",
 					"\n",
-					"\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 196
+				"execution_count": null
 			}
 		]
 	}

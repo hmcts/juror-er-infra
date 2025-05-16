@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8475d422-7ab5-47ac-986c-9bc2492bedd8"
+				"spark.autotune.trackingId": "26e69fc0-3c70-4faa-a9f7-b83510f9a167"
 			}
 		},
 		"metadata": {
@@ -256,7 +256,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 1
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

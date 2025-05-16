@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d08d8521-42e0-4d19-bae5-787e63ec5dfc"
+				"spark.autotune.trackingId": "eb3287b2-d03d-402e-a722-7418c83ba8fe"
 			}
 		},
 		"metadata": {
@@ -1149,6 +1149,39 @@
 					"    return processed_dfs"
 				],
 				"execution_count": 178
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def fix_register_poll_types(df):\n",
+					"    \"\"\"Fix data types to ensure register_lett and poll_number maintain values\"\"\"\n",
+					"    \n",
+					"    # Check types of current columns\n",
+					"    if \"register_lett\" in df.columns:\n",
+					"        current_type = str(df.schema[\"register_lett\"].dataType)\n",
+					"        print(f\"Current register_lett type: {current_type}\")\n",
+					"        \n",
+					"        # Make sure it's a string\n",
+					"        df = df.withColumn(\n",
+					"            \"register_lett\", \n",
+					"            col(\"register_lett\").cast(\"string\")\n",
+					"        )\n",
+					"        \n",
+					"    if \"poll_number\" in df.columns:\n",
+					"        current_type = str(df.schema[\"poll_number\"].dataType)\n",
+					"        print(f\"Current poll_number type: {current_type}\")\n",
+					"        \n",
+					"        # poll_number should be string to prevent numerical issues\n",
+					"        df = df.withColumn(\n",
+					"            \"poll_number\", \n",
+					"            col(\"poll_number\").cast(\"string\")\n",
+					"        )\n",
+					"    \n",
+					"    # Count non-null values after type fixing\n",
+					"    debug_fields(df, \"After Type Fixing\")\n",
+					"    return df"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

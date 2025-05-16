@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "92f33784-f15c-42d3-b147-4796e0e1ef6d"
+				"spark.autotune.trackingId": "bf8468ae-24a6-4135-b787-d36076a40b57"
 			}
 		},
 		"metadata": {
@@ -106,7 +106,7 @@
 					"\n",
 					"df.count()"
 				],
-				"execution_count": 14
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -116,7 +116,7 @@
 				"source": [
 					"display(df.limit(20))"
 				],
-				"execution_count": 15
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -126,13 +126,13 @@
 				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
-					"final_count = df.groupBy('Elector Markers') \\\n",
-					"    .agg(count('Elector Markers')) \n",
+					"final_count = df.groupBy('New Marker') \\\n",
+					"    .agg(count('New Marker')) \n",
 					"    #.orderBy('rec_num')\n",
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 17
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -148,7 +148,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 16
+				"execution_count": null
 			}
 		]
 	}

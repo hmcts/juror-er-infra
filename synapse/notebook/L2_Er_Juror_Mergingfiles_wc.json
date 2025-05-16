@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4f0a6a13-946a-430e-8c9f-6253d7a249b1"
+				"spark.autotune.trackingId": "6ce0e90a-6484-4f99-920d-5843f47caf2a"
 			}
 		},
 		"metadata": {
@@ -256,7 +256,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": 75
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -276,7 +276,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 76
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -289,7 +289,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 77
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -306,7 +306,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 78
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -328,7 +328,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 79
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -365,7 +365,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = False "
 				],
-				"execution_count": 80
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -387,7 +387,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": 81
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -404,7 +404,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 82
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -423,7 +423,7 @@
 					"        \n",
 					"    return escaped"
 				],
-				"execution_count": 83
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -617,7 +617,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": 84
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -664,7 +664,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": 85
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -676,7 +676,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": 86
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -746,7 +746,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": 87
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -815,7 +815,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 88
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -899,7 +899,7 @@
 					"    # CRITICAL: Do NOT make them identical - they should remain distinct\n",
 					"    return df"
 				],
-				"execution_count": 89
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -920,7 +920,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 90
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -937,7 +937,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": 91
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -947,7 +947,15 @@
 					"    from notebookutils import mssparkutils\n",
 					"    \n",
 					"    # Override process_log_path to use our specific L2 text log file\n",
-					"    l2_log_path = f\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/l2_process_logs/processed_files_log.json\"\n",
+					"    storage_account = \"baubaisadfsaprod\"\n",
+					"    log_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/l2_process_logs/processed_files_log.json\"\n",
+					"    # Ensure directory exists\n",
+					"    log_dir = os.path.dirname(log_path)\n",
+					"    if not mssparkutils.fs.exists(log_dir):\n",
+					"        print(f\"Creating log directory: {log_dir}\")\n",
+					"        mssparkutils.fs.mkdirs(log_dir)\n",
+					"    # Add debug logging to verify directory creation\n",
+					"    print(f\"Log directory exists: {mssparkutils.fs.exists(log_dir)}\")\n",
 					"    \n",
 					"    # Get all files in the input directory\n",
 					"    all_files = []\n",
@@ -1005,7 +1013,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 92
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1051,7 +1059,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": 93
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1131,7 +1139,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": 94
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1191,7 +1199,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": 95
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1237,7 +1245,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": 96
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1267,7 +1275,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": 97
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1325,7 +1333,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": 98
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2533,6 +2541,9 @@
 					"    config = load_config()\n",
 					"    storage_account = config[\"storage_account\"]\n",
 					"    process_log_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/l2_process_logs/processed_files_log.json\"\n",
+					"     # Verify the path is correctly formatted\n",
+					"    print(f\"Using process log path: {process_log_path}\")\n",
+					"\n",
 					"    \n",
 					"    # Ensure all required directories exist\n",
 					"    required_paths = [\n",

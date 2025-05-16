@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3f7e73ab-0d1a-407c-8d8f-54878fcdfa50"
+				"spark.autotune.trackingId": "b305960b-5c4d-42df-9830-a94c3a04f202"
 			}
 		},
 		"metadata": {
@@ -338,8 +338,8 @@
 					"# Define global schema\n",
 					"TARGET_SCHEMA = [\n",
 					"    (\"part_no\", StringType()),\n",
-					"    (\"register_lett\", IntegerType()),\n",
-					"    (\"poll_number\", IntegerType()),\n",
+					"    (\"register_lett\", StringType()),\n",
+					"    (\"poll_number\", StringType()),\n",
 					"    (\"new_marker\", StringType()),\n",
 					"    (\"title\", StringType()),\n",
 					"    (\"lname\", StringType()),\n",

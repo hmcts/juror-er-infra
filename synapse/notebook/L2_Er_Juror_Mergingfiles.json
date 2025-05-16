@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e55afff2-8e1c-46b8-a28d-835b996550c2"
+				"spark.autotune.trackingId": "827b66b6-9018-4f0f-a7f3-338c96e328ab"
 			}
 		},
 		"metadata": {
@@ -1055,11 +1055,6 @@
 					"                elif \"Elector Number\" in standardized_df.columns:\n",
 					"                    poll_number_col = \"Elector Number\"\n",
 					"                \n",
-					"                # Add reg_lett as a copy of poll_number if it exists\n",
-					"                if poll_number_col:\n",
-					"                    print(f\"Adding register_lett as copy of {poll_number_col} for file {file_path}\")\n",
-					"                    standardized_df = standardized_df.withColumn(\"register_lett\", col(poll_number_col))\n",
-					"            \n",
 					"            # Add source metadata\n",
 					"            standardized_df = standardized_df.withColumn(\"source_file\", lit(file_path))\n",
 					"            standardized_df = standardized_df.withColumn(\"process_timestamp\", current_timestamp())\n",

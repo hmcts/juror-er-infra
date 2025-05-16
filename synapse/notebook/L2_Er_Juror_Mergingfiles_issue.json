@@ -1,5 +1,5 @@
 {
-	"name": "L2_Er_Juror_Mergingfiles",
+	"name": "L2_Er_Juror_Mergingfiles_issue",
 	"properties": {
 		"folder": {
 			"name": "crime"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b3951d6e-8e8c-4482-a5cb-33cca34150c7"
+				"spark.autotune.trackingId": "ed4f97a3-9346-4893-a3c0-e533a092e842"
 			}
 		},
 		"metadata": {
@@ -254,7 +254,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit, monotonically_increasing_id"
 				],
-				"execution_count": 277
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -274,7 +274,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": 278
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -287,7 +287,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 279
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": 280
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -326,7 +326,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 281
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2515,7 +2515,7 @@
 					"    # If register_lett doesn't exist but poll_number does, create register_lett from poll_number\n",
 					"    if \"poll_number\" in df.columns:\n",
 					"        print(\"Creating register_lett from poll_number\")\n",
-					"        df = df.withColumn(\"register_lett\", col(\"poll_number\"))\n",
+					"        #df = df.withColumn(\"register_lett\", col(\"poll_number\"))\n",
 					"        return df\n",
 					"    \n",
 					"    # If neither exists but Elector Number does, create both from Elector Number\n",

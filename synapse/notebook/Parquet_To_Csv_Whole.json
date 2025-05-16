@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f7db18fc-0f8f-4201-a80e-f16ed364e6c4"
+				"spark.autotune.trackingId": "58438c8d-cafd-4414-8ad7-a0b2b06a5ce5"
 			}
 		},
 		"metadata": {
@@ -53,6 +53,12 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
 				"source": [
 					"import datetime\n",
 					"import time\n",
@@ -67,67 +73,48 @@
 					"storage_account = \"baubaisadfsaprod\"\n",
 					"input_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"output_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/exports\"\n",
-					""
-				],
-				"execution_count": 5
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": true,
-					"run_control": {
-						"frozen": false
-					}
-				},
-				"source": [
 					"\n",
 					"# Ensure output directory exists\n",
 					"if not mssparkutils.fs.exists(output_dir):\n",
 					"    mssparkutils.fs.mkdirs(output_dir)\n",
 					"\n",
-					"# List all Parquet files in input directory\n",
-					"all_files = mssparkutils.fs.ls(input_dir)\n",
-					"parquet_files = [f.path for f in all_files if f.path.endswith(\".parquet\")]\n",
-					"\n",
-					"# Process each Parquet file\n",
-					"for file_path in parquet_files:\n",
-					"    try:\n",
-					"        file_name = os.path.basename(file_path)\n",
-					"        print(f\"🔄 Processing {file_name}\")\n",
-					"\n",
-					"        # Read the Parquet file\n",
-					"        df = spark.read.parquet(file_path)\n",
-					"        record_count = df.count()\n",
-					"        print(f\"   ✅ Read {record_count} records\")\n",
-					"\n",
-					"        # Set a temp output path\n",
-					"        timestamp = datetime.datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
-					"        temp_output_dir = f\"{output_dir}/tmp_{file_name.replace('.parquet', '')}_{timestamp}\"\n",
-					"\n",
-					"        # Write to temporary CSV folder\n",
-					"        df.coalesce(1).write \\\n",
-					"            .option(\"header\", \"true\") \\\n",
-					"            .option(\"quoteAll\", \"true\") \\\n",
-					"            .mode(\"overwrite\") \\\n",
-					"            .csv(temp_output_dir)\n",
-					"\n",
-					"        # Locate and rename the .csv file\n",
-					"        files_written = mssparkutils.fs.ls(temp_output_dir)\n",
-					"        for f in files_written:\n",
-					"            if f.path.endswith(\".csv\") and \"part-\" in f.path:\n",
-					"                final_csv_path = f\"{output_dir}/{file_name.replace('.parquet', '.csv')}\"\n",
-					"                mssparkutils.fs.cp(f.path, final_csv_path)\n",
-					"                print(f\"   📄 Exported to: {final_csv_path}\")\n",
-					"                break\n",
-					"\n",
-					"        # Clean up temp folder\n",
-					"        mssparkutils.fs.rm(temp_output_dir, recurse=True)\n",
-					"\n",
-					"    except Exception as e:\n",
-					"        print(f\"❌ Failed to process {file_path}: {str(e)}\")\n",
-					""
+					"try:\n",
+					"    print(f\"🔄 Processing all partitioned parquet data in {input_dir}\")\n",
+					"    \n",
+					"    # Read all parquet data from the directory (including partitions)\n",
+					"    df = spark.read.parquet(input_dir)\n",
+					"    record_count = df.count()\n",
+					"    print(f\"   ✅ Read {record_count} records from all partitions\")\n",
+					"    \n",
+					"    # Generate a single CSV export\n",
+					"    timestamp = datetime.datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
+					"    temp_output_dir = f\"{output_dir}/temp_{timestamp}\"\n",
+					"    \n",
+					"    # Write to temporary CSV folder\n",
+					"    df.coalesce(1).write \\\n",
+					"        .option(\"header\", \"true\") \\\n",
+					"        .option(\"quoteAll\", \"true\") \\\n",
+					"        .mode(\"overwrite\") \\\n",
+					"        .csv(temp_output_dir)\n",
+					"    \n",
+					"    # Locate and rename the .csv file\n",
+					"    files_written = mssparkutils.fs.ls(temp_output_dir)\n",
+					"    for f in files_written:\n",
+					"        if f.path.endswith(\".csv\") and \"part-\" in f.path:\n",
+					"            final_csv_path = f\"{output_dir}/voters_export_{timestamp}.csv\"\n",
+					"            mssparkutils.fs.cp(f.path, final_csv_path)\n",
+					"            print(f\"   📄 Exported to: {final_csv_path}\")\n",
+					"            break\n",
+					"    \n",
+					"    # Clean up temp folder\n",
+					"    mssparkutils.fs.rm(temp_output_dir, recurse=True)\n",
+					"    \n",
+					"except Exception as e:\n",
+					"    print(f\"❌ Failed to process: {str(e)}\")\n",
+					"    import traceback\n",
+					"    print(traceback.format_exc())"
 				],
-				"execution_count": 6
+				"execution_count": 11
 			}
 		]
 	}

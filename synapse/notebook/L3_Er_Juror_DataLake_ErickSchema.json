@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "95891c0e-0651-4b6f-a67f-7d22efbb24e0"
+				"spark.autotune.trackingId": "10a35404-6a28-4433-89da-083d5006954e"
 			}
 		},
 		"metadata": {
@@ -268,7 +268,7 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": null
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -631,7 +631,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -712,20 +712,20 @@
 					"        print(f\"\\n❌ CRITICAL ERROR: {str(e)}\")\n",
 					"        print(\"Check the logs for detailed stack trace\")"
 				],
-				"execution_count": null
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": true,
+					"editable": false,
 					"run_control": {
-						"frozen": false
+						"frozen": true
 					}
 				},
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -738,7 +738,7 @@
 				"source": [
 					"delta_df.count()"
 				],
-				"execution_count": null
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -752,7 +752,7 @@
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": null
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6ce0e90a-6484-4f99-920d-5843f47caf2a"
+				"spark.autotune.trackingId": "5e266789-2fe2-47f5-8a57-cc2a9aa7b6b4"
 			}
 		},
 		"metadata": {
@@ -255,6 +255,15 @@
 					"import re\n",
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Define constants\n",
+					"STORAGE_ACCOUNT = \"baubaisadfsaprod\"\n",
+					"L2_LOG_PATH = f\"abfss://juror-etl@{STORAGE_ACCOUNT}.dfs.core.windows.net/l2_process_logs/processed_files_log.txt\""
 				],
 				"execution_count": null
 			},

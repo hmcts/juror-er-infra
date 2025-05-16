@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7a568518-d514-46bf-9afe-409b4c8cce2d"
+				"spark.autotune.trackingId": "2fdd3090-79a8-456a-b816-42825d5cd793"
 			}
 		},
 		"metadata": {
@@ -64,7 +64,7 @@
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"logger = logging.getLogger()"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -77,40 +77,34 @@
 				"source": [
 					"def export_data_to_csv():\n",
 					"    try:\n",
-					"        # Get storage account from environment\n",
+					"        # Get storage account\n",
 					"        storage_account = \"baubaisadfsaprod\"\n",
 					"        \n",
-					"        # Define source and destination paths\n",
+					"        # Define paths\n",
 					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"        timestamp = datetime.datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
 					"        export_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/exports/voters_export_{timestamp}.csv\"\n",
 					"        \n",
 					"        logger.info(f\"Reading data from: {source_path}\")\n",
 					"        \n",
-					"        # Read source data\n",
+					"        # Read data\n",
 					"        df = spark.read.parquet(source_path)\n",
 					"        initial_count = df.count()\n",
 					"        logger.info(f\"Read {initial_count} records from source\")\n",
-					"        \n",
-					"        # Filter out rows with null or empty zip values\n",
-					"        #df_filtered = df.filter(\n",
-					"        #    (col(\"zip\").isNotNull()) & \n",
-					"        #    (col(\"zip\") != \"\") & \n",
-					"        #    (~col(\"zip\").isin(\"NULL\", \"null\", \"NaN\", \"nan\", \"None\", \"none\"))\n",
-					"        #)\n",
-					"        \n",
-					"        #filtered_count = df_filtered.count()\n",
-					"        #removed_count = initial_count - filtered_count\n",
-					"        #logger.info(f\"Filtered out {removed_count} rows with empty zip values\")\n",
-					"        #logger.info(f\"Keeping {filtered_count} rows\")\n",
-					"        \n",
-					"        # Make sure export directory exists\n",
+					"\n",
+					"        # ✅ Remove last column\n",
+					"        if df.columns:\n",
+					"            last_col = df.columns[-1]\n",
+					"            df = df.drop(last_col)\n",
+					"            logger.info(f\"Dropped last column: {last_col}\")\n",
+					"       \n",
+					"        # Ensure export directory exists\n",
 					"        export_dir = \"/\".join(export_path.split(\"/\")[:-1])\n",
 					"        if not mssparkutils.fs.exists(export_dir):\n",
 					"            logger.info(f\"Creating export directory: {export_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(export_dir)\n",
 					"        \n",
-					"        # Write to CSV with header\n",
+					"        # Write to CSV\n",
 					"        logger.info(f\"Writing data to CSV: {export_path}\")\n",
 					"        df.coalesce(1).write \\\n",
 					"            .option(\"header\", \"true\") \\\n",
@@ -123,7 +117,7 @@
 					"        return {\n",
 					"            \"status\": \"success\", \n",
 					"            \"total_records\": initial_count,\n",
-					"            \"exported_records\": df, \n",
+					"            \"exported_records\": df.count(), \n",
 					"            \"export_path\": export_path\n",
 					"        }\n",
 					"        \n",
@@ -132,12 +126,9 @@
 					"        import traceback\n",
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"message\": str(e)}\n",
-					"\n",
-					"# Execute the export function\n",
-					"result = export_data_to_csv()\n",
-					"print(f\"Export result: {result}\")"
+					""
 				],
-				"execution_count": null
+				"execution_count": 2
 			}
 		]
 	}

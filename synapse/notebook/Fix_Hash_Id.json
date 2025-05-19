@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e051552d-f1bc-4010-a13d-6a075a5ff5e6"
+				"spark.autotune.trackingId": "28549c89-464a-4f28-b648-c157cf4c9846"
 			}
 		},
 		"metadata": {
@@ -76,7 +76,7 @@
 					"delta_table = DeltaTable.forPath(spark, delta_path)\n",
 					"full_df = delta_table.toDF()"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -1346,7 +1346,7 @@
 					"\"-6489746663896073692_365\",\n",
 					"\"7608664595657916038_763\"]"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -1428,7 +1428,7 @@
 					"    import traceback\n",
 					"    print(traceback.format_exc())"
 				],
-				"execution_count": null
+				"execution_count": 4
 			}
 		]
 	}

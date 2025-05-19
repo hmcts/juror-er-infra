@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6997079d-1c2b-4ef9-8ce8-0de4aa87c2e4"
+				"spark.autotune.trackingId": "8cfd5120-8afa-4152-8929-31e4fe798885"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 41
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1207,7 +1207,7 @@
 					"    log_file_path = f\"abfss://juror-ingestion@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
 					"    \n",
 					"    # Add debug mode to process all files and ignore log\n",
-					"    debug_mode = True  # Set to True to force process all files\n",
+					"    debug_mode = False  # Set to True to force process all files\n",
 					"    \n",
 					"    # Add a detailed log of all operations\n",
 					"    operations_log = []\n",

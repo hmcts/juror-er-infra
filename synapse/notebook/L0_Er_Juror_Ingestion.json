@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b3c78946-81bd-4e5d-831d-7fe9567e1066"
+				"spark.autotune.trackingId": "07add9e6-49e5-428a-bc57-e4f7b2deed93"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +297,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -375,7 +375,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -445,7 +445,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +501,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -536,7 +536,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -573,7 +573,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -614,7 +614,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -716,7 +716,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -761,7 +761,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -826,7 +826,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -879,7 +879,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -1011,6 +1011,225 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def read_processed_files_log(storage_account):\n",
+					"    \"\"\"Read the processed files log from the correct location with direct access\"\"\"\n",
+					"    processed_files = set()\n",
+					"    \n",
+					"    # Use the correct log file path with https URL\n",
+					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
+					"    def read_processed_files_log(storage_account):\n",
+					"    \"\"\"Read the processed files log from the correct location with direct access\"\"\"\n",
+					"    processed_files = set()\n",
+					"    \n",
+					"    # Use the correct log file path with https URL\n",
+					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
+					"    blob_log_path = f\"https://{storage_account}.blob.core.windows.net/juror-etl/processed_files_log.json\"\n",
+					"    \n",
+					"    print(f\"Reading processed files log from: {log_file_path}\")\n",
+					"    print(f\"Alternative URL: {blob_log_path}\")\n",
+					"    \n",
+					"    try:\n",
+					"        # First check if the file exists\n",
+					"        if not mssparkutils.fs.exists(log_file_path):\n",
+					"            print(f\"Log file doesn't exist at {log_file_path}\")\n",
+					"            return processed_files\n",
+					"            \n",
+					"        # Read file content directly\n",
+					"        log_content = mssparkutils.fs.read(log_file_path)\n",
+					"        print(f\"Read log file, size: {len(log_content)} bytes\")\n",
+					"        \n",
+					"        # Try to parse as JSON in various formats\n",
+					"        try:\n",
+					"            import json\n",
+					"            \n",
+					"            # Attempt 1: Parse as a JSON array of objects with 'file' property\n",
+					"            try:\n",
+					"                log_data = json.loads(log_content)\n",
+					"                \n",
+					"                if isinstance(log_data, list):\n",
+					"                    # Process array of records\n",
+					"                    for item in log_data:\n",
+					"                        if isinstance(item, dict) and 'file' in item:\n",
+					"                            file_path = item['file']\n",
+					"                            # Store both original and normalized versions\n",
+					"                            processed_files.add(file_path.lower())\n",
+					"                            processed_files.add(normalize_file_path(file_path))\n",
+					"                elif isinstance(log_data, dict) and 'file' in log_data:\n",
+					"                    # Single object with 'file' property\n",
+					"                    file_path = log_data['file']\n",
+					"                    processed_files.add(file_path.lower())\n",
+					"                    processed_files.add(normalize_file_path(file_path))\n",
+					"                    \n",
+					"                print(f\"Parsed {len(processed_files)} entries from JSON\")\n",
+					"            except json.JSONDecodeError:\n",
+					"                # Attempt 2: Try line-by-line parsing (JSONL format)\n",
+					"                print(\"JSON parsing failed, trying line-by-line\")\n",
+					"                count = 0\n",
+					"                for line in log_content.splitlines():\n",
+					"                    line = line.strip()\n",
+					"                    if not line:\n",
+					"                        continue\n",
+					"                        \n",
+					"                    try:\n",
+					"                        record = json.loads(line)\n",
+					"                        if isinstance(record, dict) and 'file' in record:\n",
+					"                            file_path = record['file']\n",
+					"                            processed_files.add(file_path.lower())\n",
+					"                            processed_files.add(normalize_file_path(file_path))\n",
+					"                            count += 1\n",
+					"                    except:\n",
+					"                        # If line isn't valid JSON, try using it as-is\n",
+					"                        if '/' in line or '\\\\' in line:  # Looks like a file path\n",
+					"                            processed_files.add(line.lower())\n",
+					"                            processed_files.add(normalize_file_path(line))\n",
+					"                            count += 1\n",
+					"                \n",
+					"                print(f\"Parsed {count} entries from line-by-line reading\")\n",
+					"        \n",
+					"        except Exception as parse_error:\n",
+					"            print(f\"Error parsing log content: {str(parse_error)}\")\n",
+					"            # Fall back to Spark's JSON reader as a last resort\n",
+					"            try:\n",
+					"                log_df = spark.read.json(log_file_path)\n",
+					"                \n",
+					"                if 'file' in log_df.columns:\n",
+					"                    file_paths = log_df.select('file').rdd.flatMap(lambda x: x).collect()\n",
+					"                    for path in file_paths:\n",
+					"                        processed_files.add(path.lower())\n",
+					"                        processed_files.add(normalize_file_path(path))\n",
+					"                        \n",
+					"                print(f\"Parsed {len(processed_files)} entries using Spark JSON reader\")\n",
+					"            except Exception as spark_error:\n",
+					"                print(f\"Error using Spark JSON reader: {str(spark_error)}\")\n",
+					"        \n",
+					"        # Debug: Check for specific problematic file\n",
+					"        #sample_path = \"abfss://juror-ingestion@baubaisadfsaprod.dfs.core.windows.net/20241220/LA_Data/239-Swansea/Swansea/239_Swansea_001_2024.csv.csv.metadata.txt\"\n",
+					"        #norm_sample = normalize_file_path(sample_path)\n",
+					"        \n",
+					"        #print(f\"DEBUG: Checking if problematic file is in processed set:\")\n",
+					"        #print(f\"  Original: {sample_path}\")\n",
+					"        #print(f\"  Normalized: {norm_sample}\")\n",
+					"        #print(f\"  In processed set (original): {sample_path.lower() in processed_files}\")\n",
+					"        #print(f\"  In processed set (normalized): {norm_sample in processed_files}\")\n",
+					"        \n",
+					"        # Find similar entries in the processed files set\n",
+					"        similar_entries = []\n",
+					"        for entry in processed_files:\n",
+					"            if \"swansea\" in entry.lower() and \"metadata\" in entry.lower():\n",
+					"                similar_entries.append(entry)\n",
+					"                \n",
+					"        if similar_entries:\n",
+					"            print(\"Similar entries found in processed files set:\")\n",
+					"            for entry in similar_entries:\n",
+					"                print(f\"  {entry}\")\n",
+					"                \n",
+					"    except Exception as e:\n",
+					"        print(f\"Error reading processed files log: {str(e)}\")\n",
+					"        import traceback\n",
+					"        print(traceback.format_exc())\n",
+					"    \n",
+					"    return processed_files\n",
+					"    \n",
+					"    print(f\"Reading processed files log from: {log_file_path}\")\n",
+					"    print(f\"Alternative URL: {blob_log_path}\")\n",
+					"    \n",
+					"    try:\n",
+					"        # First check if the file exists\n",
+					"        if not mssparkutils.fs.exists(log_file_path):\n",
+					"            print(f\"Log file doesn't exist at {log_file_path}\")\n",
+					"            return processed_files\n",
+					"            \n",
+					"        # Read file content directly\n",
+					"        log_content = mssparkutils.fs.read(log_file_path)\n",
+					"        print(f\"Read log file, size: {len(log_content)} bytes\")\n",
+					"        \n",
+					"        # Try to parse as JSON in various formats\n",
+					"        try:\n",
+					"            import json\n",
+					"            \n",
+					"            # Attempt 1: Parse as a JSON array of objects with 'file' property\n",
+					"            try:\n",
+					"                log_data = json.loads(log_content)\n",
+					"                \n",
+					"                if isinstance(log_data, list):\n",
+					"                    # Process array of records\n",
+					"                    for item in log_data:\n",
+					"                        if isinstance(item, dict) and 'file' in item:\n",
+					"                            file_path = item['file']\n",
+					"                            # Store both original and normalized versions\n",
+					"                            processed_files.add(file_path.lower())\n",
+					"                            processed_files.add(normalize_file_path(file_path))\n",
+					"                elif isinstance(log_data, dict) and 'file' in log_data:\n",
+					"                    # Single object with 'file' property\n",
+					"                    file_path = log_data['file']\n",
+					"                    processed_files.add(file_path.lower())\n",
+					"                    processed_files.add(normalize_file_path(file_path))\n",
+					"                    \n",
+					"                print(f\"Parsed {len(processed_files)} entries from JSON\")\n",
+					"            except json.JSONDecodeError:\n",
+					"                # Attempt 2: Try line-by-line parsing (JSONL format)\n",
+					"                print(\"JSON parsing failed, trying line-by-line\")\n",
+					"                count = 0\n",
+					"                for line in log_content.splitlines():\n",
+					"                    line = line.strip()\n",
+					"                    if not line:\n",
+					"                        continue\n",
+					"                        \n",
+					"                    try:\n",
+					"                        record = json.loads(line)\n",
+					"                        if isinstance(record, dict) and 'file' in record:\n",
+					"                            file_path = record['file']\n",
+					"                            processed_files.add(file_path.lower())\n",
+					"                            processed_files.add(normalize_file_path(file_path))\n",
+					"                            count += 1\n",
+					"                    except:\n",
+					"                        # If line isn't valid JSON, try using it as-is\n",
+					"                        if '/' in line or '\\\\' in line:  # Looks like a file path\n",
+					"                            processed_files.add(line.lower())\n",
+					"                            processed_files.add(normalize_file_path(line))\n",
+					"                            count += 1\n",
+					"                \n",
+					"                print(f\"Parsed {count} entries from line-by-line reading\")\n",
+					"        \n",
+					"        except Exception as parse_error:\n",
+					"            print(f\"Error parsing log content: {str(parse_error)}\")\n",
+					"            # Fall back to Spark's JSON reader as a last resort\n",
+					"            try:\n",
+					"                log_df = spark.read.json(log_file_path)\n",
+					"                \n",
+					"                if 'file' in log_df.columns:\n",
+					"                    file_paths = log_df.select('file').rdd.flatMap(lambda x: x).collect()\n",
+					"                    for path in file_paths:\n",
+					"                        processed_files.add(path.lower())\n",
+					"                        processed_files.add(normalize_file_path(path))\n",
+					"                        \n",
+					"                print(f\"Parsed {len(processed_files)} entries using Spark JSON reader\")\n",
+					"            except Exception as spark_error:\n",
+					"                print(f\"Error using Spark JSON reader: {str(spark_error)}\")\n",
+					"        \n",
+					"        # Find similar entries in the processed files set\n",
+					"        similar_entries = []\n",
+					"        for entry in processed_files:\n",
+					"            if \"swansea\" in entry.lower() and \"metadata\" in entry.lower():\n",
+					"                similar_entries.append(entry)\n",
+					"                \n",
+					"        if similar_entries:\n",
+					"            print(\"Similar entries found in processed files set:\")\n",
+					"            for entry in similar_entries:\n",
+					"                print(f\"  {entry}\")\n",
+					"                \n",
+					"    except Exception as e:\n",
+					"        print(f\"Error reading processed files log: {str(e)}\")\n",
+					"        import traceback\n",
+					"        print(traceback.format_exc())\n",
+					"    \n",
+					"    return processed_files"
+				],
 				"execution_count": null
 			},
 			{
@@ -1037,20 +1256,52 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def normalize_file_path(path):\n",
-					"    \"\"\"Normalize file path to ensure consistent comparison\"\"\"\n",
-					"    if path is None:\n",
+					"    \"\"\"Normalize file path for consistent comparison with more aggressive standardization\"\"\"\n",
+					"    if not path:\n",
 					"        return \"\"\n",
+					"    \n",
+					"    # Convert to lowercase\n",
+					"    path = path.lower()\n",
+					"    \n",
+					"    # Handle different URL schemes\n",
+					"    # Convert blob URL to abfss format if needed\n",
+					"    if path.startswith(\"https://\") and \".blob.core.windows.net/\" in path:\n",
+					"        parts = path.split(\".blob.core.windows.net/\")\n",
+					"        if len(parts) == 2:\n",
+					"            account = parts[0].replace(\"https://\", \"\")\n",
+					"            container_path = parts[1]\n",
+					"            container_parts = container_path.split(\"/\", 1)\n",
+					"            if len(container_parts) > 0:\n",
+					"                container = container_parts[0]\n",
+					"                rest = container_parts[1] if len(container_parts) > 1 else \"\"\n",
+					"                path = f\"abfss://{container}@{account}.dfs.core.windows.net/{rest}\"\n",
+					"    \n",
+					"    # Remove any storage account info to standardize\n",
+					"    if \"@\" in path and \".dfs.core.windows.net/\" in path:\n",
+					"        parts = path.split(\".dfs.core.windows.net/\")\n",
+					"        if len(parts) == 2:\n",
+					"            path = parts[1]  # Just keep the part after the storage account\n",
+					"    \n",
 					"    # Remove any trailing slashes\n",
 					"    path = path.rstrip('/')\n",
-					"    # Convert to lowercase for case-insensitive comparison\n",
-					"    return path.lower()\n",
-					"\n",
+					"    \n",
+					"    # Remove any duplicate slashes\n",
+					"    while \"//\" in path:\n",
+					"        path = path.replace(\"//\", \"/\")\n",
+					"    \n",
+					"    return path"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def verify_file_processed(file_path, moved_files):\n",
 					"    \"\"\"Verify if a file was successfully processed\"\"\"\n",
 					"    # Check if the file path or a derivative is in the success lists\n",
@@ -1067,8 +1318,13 @@
 					"            if file_name in success_path:\n",
 					"                return True\n",
 					"    \n",
-					"    return False\n",
-					"\n",
+					"    return False"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def main():\n",
 					"    storage_account = \"baubaisadfsaprod\"\n",
 					"    source_path = f\"abfss://juror-ingestion@{storage_account}.dfs.core.windows.net\"\n",
@@ -1468,7 +1724,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 18
 			}
 		]
 	}

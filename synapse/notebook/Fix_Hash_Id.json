@@ -1,0 +1,113 @@
+{
+	"name": "Fix_Hash_Id",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkprod",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "0fdd6c6a-3388-4e04-9673-b203e4b55ec9"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
+				"name": "sparkprod",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from delta.tables import DeltaTable\n",
+					"\n",
+					"delta_path = \"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\"\n",
+					"delta_table = DeltaTable.forPath(spark, delta_path)\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col, lit, upper, trim, coalesce, concat_ws, xxhash64\n",
+					"\n",
+					"df_bad = delta_table.toDF().filter(col(\"hash_id\").isin(bad_hashes))\n",
+					"\n",
+					"df_fixed = df_bad.withColumn(\n",
+					"    \"hash_id\",\n",
+					"    xxhash64(\n",
+					"        concat_ws(\n",
+					"            \"||\",\n",
+					"            trim(coalesce(col(\"register_lett\"), lit(\"\"))),\n",
+					"            trim(coalesce(col(\"poll_number\"), lit(\"\"))),\n",
+					"            upper(trim(coalesce(col(\"fname\"), lit(\"\")))),\n",
+					"            upper(trim(coalesce(col(\"lname\"), lit(\"\")))),\n",
+					"            trim(coalesce(col(\"rec_num\"), lit(\"\"))),\n",
+					"            trim(coalesce(col(\"zip\"), lit(\"\"))),\n",
+					"            trim(coalesce(col(\"address\"), lit(\"\")))\n",
+					"        )\n",
+					"    )\n",
+					")\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_fixed.createOrReplaceTempView(\"corrected_hash_ids\")\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import expr\n",
+					"\n",
+					"delta_table.alias(\"target\").merge(\n",
+					"    source=spark.table(\"corrected_hash_ids\").alias(\"source\"),\n",
+					"    condition=\"target.hash_id = source.hash_id\"\n",
+					").whenMatchedUpdate(\n",
+					"    set={\"hash_id\": \"source.hash_id\"}  # Overwriting with new value\n",
+					").execute()\n",
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

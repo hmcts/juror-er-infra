@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4fd392ec-73ba-48d6-a719-10c0685bb1ab"
+				"spark.autotune.trackingId": "9daf4f0d-9987-434a-af0c-1b88e970879d"
 			}
 		},
 		"metadata": {
@@ -51,18 +51,19 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import col, lit, trim, upper, coalesce, concat_ws, xxhash64\n",
 					"from delta.tables import DeltaTable\n",
 					"\n",
-					"delta_path = \"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\"\n",
-					"delta_table = DeltaTable.forPath(spark, delta_path)\n",
-					""
+					"# Initialize Spark\n",
+					"spark = SparkSession.builder.appName(\"FixHashId\").getOrCreate()"
 				],
-				"execution_count": 1
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"bad_hashes =[\"-6253755087889134448_1589\",\n",
+					"bad_hash_ids =[\"-6253755087889134448_1589\",\n",
 					"\"6527605627713595994_1098\",\n",
 					"\"-4215539581872533658_2239\",\n",
 					"\"-9007684705622519925_1484\",\n",
@@ -1327,15 +1328,19 @@
 					"\"-6489746663896073692_365\",\n",
 					"\"7608664595657916038_763\"]"
 				],
-				"execution_count": 2
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"from pyspark.sql.functions import col, lit, upper, trim, coalesce, concat_ws, xxhash64\n",
+					"# Load the Delta table\n",
+					"delta_path = \"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\"\n",
+					"delta_table = DeltaTable.forPath(spark, delta_path)\n",
 					"\n",
-					"df_bad = delta_table.toDF().filter(col(\"hash_id\").isin(bad_hashes))\n",
+					"# Select rows that need fixing\n",
+					"df_bad = delta_table.toDF().filter(col(\"hash_id\").isin(bad_hash_ids))\n",
 					"\n",
+					"# Recalculate correct hash_id\n",
 					"df_fixed = df_bad.withColumn(\n",
 					"    \"hash_id\",\n",
 					"    xxhash64(\n",
@@ -1351,32 +1356,30 @@
 					"        )\n",
 					"    )\n",
 					")\n",
-					""
-				],
-				"execution_count": 3
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"df_fixed.createOrReplaceTempView(\"corrected_hash_ids\")\n",
-					""
-				],
-				"execution_count": 4
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"from pyspark.sql.functions import expr\n",
 					"\n",
+					"# Create temporary view for merge\n",
+					"df_fixed.createOrReplaceTempView(\"corrected_hash_ids\")\n",
+					"\n",
+					"# Perform the merge — match on identity columns, not hash_id\n",
 					"delta_table.alias(\"target\").merge(\n",
 					"    source=spark.table(\"corrected_hash_ids\").alias(\"source\"),\n",
-					"    condition=\"target.hash_id = source.hash_id\"\n",
+					"    condition=\"\"\"\n",
+					"        target.register_lett = source.register_lett AND\n",
+					"        target.poll_number = source.poll_number AND\n",
+					"        target.fname = source.fname AND\n",
+					"        target.lname = source.lname AND\n",
+					"        target.rec_num = source.rec_num AND\n",
+					"        target.address = source.address AND\n",
+					"        target.zip = source.zip\n",
+					"    \"\"\"\n",
 					").whenMatchedUpdate(\n",
-					"    set={\"hash_id\": \"source.hash_id\"}  # Overwriting with new value\n",
+					"    set={\"hash_id\": \"source.hash_id\"}\n",
 					").execute()\n",
+					"\n",
+					"print(\"✅ Finished updating incorrect hash_id values.\")\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": 10
 			}
 		]
 	}

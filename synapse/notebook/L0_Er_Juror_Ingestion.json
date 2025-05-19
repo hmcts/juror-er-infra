@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d2d99725-4138-4909-a943-6f0bf36def45"
+				"spark.autotune.trackingId": "29d0cd81-13bd-4bc2-9644-0ef158132170"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 1
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 3
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 4
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +297,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 5
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -375,7 +375,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 6
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -445,7 +445,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 7
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +501,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 8
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -536,7 +536,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 9
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -573,7 +573,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 10
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -614,7 +614,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 11
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -716,7 +716,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 12
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -761,7 +761,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 13
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -826,7 +826,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 14
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -879,7 +879,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 15
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -1011,7 +1011,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": 16
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -1037,7 +1037,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 17
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -1076,9 +1076,9 @@
 					"    while \"//\" in path:\n",
 					"        path = path.replace(\"//\", \"/\")\n",
 					"    \n",
-					"    return pat"
+					"    return path "
 				],
-				"execution_count": null
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -1099,9 +1099,9 @@
 					"            if file_name in success_path:\n",
 					"                return True\n",
 					"    \n",
-					"    return Fals"
+					"    return False  # Use False"
 				],
-				"execution_count": null
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -1110,12 +1110,10 @@
 					"    \"\"\"Read the processed files log from the correct location with direct access\"\"\"\n",
 					"    processed_files = set()\n",
 					"    \n",
-					"    # Use the correct log file path with https URL\n",
+					"    # Use the correct log file path\n",
 					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
-					"    blob_log_path = f\"https://{storage_account}.blob.core.windows.net/juror-etl/processed_files_log.json\"\n",
 					"    \n",
 					"    print(f\"Reading processed files log from: {log_file_path}\")\n",
-					"    print(f\"Alternative URL: {blob_log_path}\")\n",
 					"    \n",
 					"    try:\n",
 					"        # First check if the file exists\n",
@@ -1123,8 +1121,10 @@
 					"            print(f\"Log file doesn't exist at {log_file_path}\")\n",
 					"            return processed_files\n",
 					"            \n",
-					"        # Read file content directly\n",
-					"        log_content = mssparkutils.fs.read(log_file_path)\n",
+					"        # Read file content using spark.read.text() instead of mssparkutils.fs.read()\n",
+					"        text_df = spark.read.text(log_file_path)\n",
+					"        log_content = \"\\n\".join([row.value for row in text_df.collect()])\n",
+					"        \n",
 					"        print(f\"Read log file, size: {len(log_content)} bytes\")\n",
 					"        \n",
 					"        # Try to parse as JSON in various formats\n",
@@ -1198,7 +1198,7 @@
 					"    \n",
 					"    return processed_files"
 				],
-				"execution_count": null
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -1501,7 +1501,9 @@
 					"            try:\n",
 					"                import json\n",
 					"                if mssparkutils.fs.exists(log_file_path):\n",
-					"                    log_content = mssparkutils.fs.read(log_file_path)\n",
+					"                    # Use Spark's text reader instead of mssparkutils.fs.read\n",
+					"                    text_df = spark.read.text(log_file_path)\n",
+					"                    log_content = \"\\n\".join([row.value for row in text_df.collect()])\n",
 					"                    existing_entries = json.loads(log_content)\n",
 					"            except:\n",
 					"                print(f\"Error reading existing log, will create new\")\n",
@@ -1515,18 +1517,33 @@
 					"            # Write updated log\n",
 					"            print(f\"Writing updated log with {len(combined_entries)} entries ({len(new_entries)} new)\")\n",
 					"            \n",
-					"            import json\n",
-					"            log_json = json.dumps(combined_entries)\n",
+					"            # Create DataFrame and write to JSON\n",
+					"            from pyspark.sql.types import StructType, StructField, StringType\n",
+					"            schema = StructType([StructField(\"file\", StringType(), True)])\n",
 					"            \n",
-					"            # First write to temp file\n",
+					"            # Convert entries to a list of tuples for DataFrame creation\n",
+					"            entries_list = [(entry[\"file\"],) for entry in combined_entries]\n",
+					"            \n",
+					"            # Create DataFrame\n",
+					"            log_df = spark.createDataFrame(entries_list, schema)\n",
+					"            \n",
+					"            # Write to temp location first\n",
 					"            temp_log_path = f\"{log_file_path}.temp.{time.strftime('%Y%m%d%H%M%S')}\"\n",
-					"            mssparkutils.fs.put(temp_log_path, log_json, True)\n",
+					"            log_df.write.mode(\"overwrite\").json(temp_log_path)\n",
 					"            \n",
-					"            # Then move to final location\n",
+					"            # Move to final location\n",
 					"            if mssparkutils.fs.exists(temp_log_path):\n",
-					"                mssparkutils.fs.cp(temp_log_path, log_file_path, True)\n",
-					"                mssparkutils.fs.rm(temp_log_path, True)\n",
-					"                print(f\"Successfully updated log with {len(new_entries)} new entries\")\n",
+					"                # Copy the JSON file to final location\n",
+					"                # Get the JSON file from the directory (it will have a filename like part-00000-*.json)\n",
+					"                json_files = [f for f in mssparkutils.fs.ls(temp_log_path) if f.name.endswith(\".json\")]\n",
+					"                if json_files:\n",
+					"                    # Copy the first JSON file to final location\n",
+					"                    mssparkutils.fs.cp(json_files[0].path, log_file_path, True)\n",
+					"                    # Remove temp directory\n",
+					"                    mssparkutils.fs.rm(temp_log_path, True)\n",
+					"                    print(f\"Successfully updated log with {len(new_entries)} new entries\")\n",
+					"                else:\n",
+					"                    print(f\"No JSON files found in temp directory: {temp_log_path}\")\n",
 					"            else:\n",
 					"                print(f\"Failed to write temp log file\")\n",
 					"            \n",
@@ -1579,9 +1596,10 @@
 					"    print(f\"Files failed: {len(moved_files['failed'])}\")\n",
 					"\n",
 					"if __name__ == \"__main__\":\n",
-					"    main()"
+					"    main()\n",
+					""
 				],
-				"execution_count": 18
+				"execution_count": 61
 			}
 		]
 	}

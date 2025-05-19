@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "63f68183-a328-4ca7-b6b1-e08e23c02df2"
+				"spark.autotune.trackingId": "36229423-dbca-41f0-9aaf-6ffc7475b44c"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 41
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +297,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -375,7 +375,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -445,7 +445,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +501,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -535,7 +535,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -572,7 +572,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -613,7 +613,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -715,7 +715,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -760,7 +760,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -825,7 +825,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -878,96 +878,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"def create_file_index(source_path, storage_account):\n",
-					"    \"\"\"Create a JSON index of all files in the source path\"\"\"\n",
-					"    print(f\"Creating index of files in {source_path}\")\n",
-					"    \n",
-					"    file_index = {\n",
-					"        \"created_at\": time.strftime(\"%Y%m%d%H%M%S\"),\n",
-					"        \"files\": []\n",
-					"    }\n",
-					"    \n",
-					"    # Process the folder recursively - simplified version that doesn't process ZIP files\n",
-					"    def process_folder_for_index(path, depth=0):\n",
-					"        indent = \"  \" * depth\n",
-					"        try:\n",
-					"            print(f\"{indent}Scanning directory (depth {depth}): {path}\")\n",
-					"            files = mssparkutils.fs.ls(path)\n",
-					"            \n",
-					"            for file_info in files:\n",
-					"                if file_info.isDir:\n",
-					"                    process_folder_for_index(file_info.path, depth + 1)\n",
-					"                else:\n",
-					"                    print(f\"{indent}Found file: {file_info.path}\")\n",
-					"                    \n",
-					"                    # Extract date_folder and la_folder\n",
-					"                    date_folder, la_folder, confidence = get_folder_parts(file_info.path)\n",
-					"                    \n",
-					"                    # Add file to index\n",
-					"                    file_index[\"files\"].append({\n",
-					"                        \"path\": file_info.path,\n",
-					"                        \"file_name\": os.path.basename(file_info.path),\n",
-					"                        \"date_folder\": date_folder,\n",
-					"                        \"la_folder\": la_folder,\n",
-					"                        \"confidence\": confidence,\n",
-					"                        \"file_type\": get_file_type(file_info.path),\n",
-					"                        \"is_empty\": is_empty_file(file_info.path),\n",
-					"                        \"is_metadata\": is_metadata_file(file_info.path),\n",
-					"                        \"should_process\": should_process_file(file_info.path) and 'File Structure Definitions.xlsx' not in file_info.path,\n",
-					"                        \"processed\": False\n",
-					"                    })\n",
-					"        except Exception as e:\n",
-					"            print(f\"{indent}Error accessing path {path}: {str(e)}\")\n",
-					"    \n",
-					"    # Start the recursive process\n",
-					"    process_folder_for_index(source_path)\n",
-					"    \n",
-					"    # Write the index to a JSON file\n",
-					"    # Write the index to a JSON file\n",
-					"    index_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/index/file_index.json\"\n",
-					"    \n",
-					"    # Ensure the index directory exists\n",
-					"    index_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/index\"\n",
-					"    if not mssparkutils.fs.exists(index_dir):\n",
-					"        print(f\"Creating index directory: {index_dir}\")\n",
-					"        mssparkutils.fs.mkdirs(index_dir)\n",
-					"    \n",
-					"    # Convert to a proper DataFrame using a list of Row objects\n",
-					"    from pyspark.sql import Row\n",
-					"    index_rows = []\n",
-					"    \n",
-					"    # Add each file as a separate row in the DataFrame\n",
-					"    for file_data in file_index[\"files\"]:\n",
-					"        # Convert the individual file data to a Row\n",
-					"        file_row = Row(\n",
-					"            path=file_data[\"path\"],\n",
-					"            file_name=file_data[\"file_name\"],\n",
-					"            date_folder=file_data[\"date_folder\"],\n",
-					"            la_folder=file_data[\"la_folder\"],\n",
-					"            confidence=file_data[\"confidence\"],\n",
-					"            file_type=file_data[\"file_type\"],\n",
-					"            is_empty=file_data[\"is_empty\"],\n",
-					"            is_metadata=file_data[\"is_metadata\"],\n",
-					"            should_process=file_data[\"should_process\"],\n",
-					"            processed=file_data[\"processed\"]\n",
-					"        )\n",
-					"        index_rows.append(file_row)\n",
-					"    \n",
-					"    # Create DataFrame from the rows\n",
-					"    index_df = spark.createDataFrame(index_rows)\n",
-					"    \n",
-					"    # Write the DataFrame as a Parquet file (more robust than text)\n",
-					"    index_df.write.mode(\"overwrite\").parquet(index_path)\n",
-					"    \n",
-					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
-					"    return file_index"
-				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -1099,77 +1010,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"def process_file_group(file_group, date_folder, la_folder, storage_account, moved_files):\n",
-					"    # Modified function to ensure proper file copying\n",
-					"    try:\n",
-					"        print(f\"\\nProcessing file group: {len(file_group)} files for {date_folder}_{la_folder}\")\n",
-					"        \n",
-					"        # Ensure destination directory exists\n",
-					"        dest_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
-					"        if not mssparkutils.fs.exists(dest_dir):\n",
-					"            print(f\"Creating destination directory: {dest_dir}\")\n",
-					"            mssparkutils.fs.mkdirs(dest_dir)\n",
-					"        \n",
-					"        successful_files = 0\n",
-					"        \n",
-					"        # Process each file individually\n",
-					"        for idx, info in enumerate(file_group):\n",
-					"            file_path = info[\"path\"]\n",
-					"            file_name = info[\"file_name\"]\n",
-					"            file_type = info[\"file_type\"]\n",
-					"            \n",
-					"            # Skip if file doesn't exist\n",
-					"            if not mssparkutils.fs.exists(file_path):\n",
-					"                print(f\"  File doesn't exist, skipping: {file_path}\")\n",
-					"                continue\n",
-					"            \n",
-					"            # Create a unique destination filename \n",
-					"            unique_suffix = f\"_{idx}\" if idx > 0 else \"\"\n",
-					"            unique_folder_key = f\"{date_folder}_{la_folder}{unique_suffix}\"\n",
-					"            \n",
-					"            # Use Parquet as the destination format for consistency\n",
-					"            dest_path = f\"{dest_dir}/{unique_folder_key}.parquet\"\n",
-					"            \n",
-					"            try:\n",
-					"                # Process the file to Parquet using the process_file function\n",
-					"                success, new_path = process_file(file_path, date_folder, la_folder, file_name, storage_account)\n",
-					"                \n",
-					"                if success:\n",
-					"                    print(f\"  Successfully processed file to: {new_path}\")\n",
-					"                    moved_files['data_success'].append(new_path)\n",
-					"                    successful_files += 1\n",
-					"                else:\n",
-					"                    # Fallback to direct copy if processing fails\n",
-					"                    print(f\"  Processing failed, falling back to direct copy\")\n",
-					"                    fallback_path = f\"{dest_dir}/{unique_folder_key}.{file_type}\"\n",
-					"                    mssparkutils.fs.cp(file_path, fallback_path, True)\n",
-					"                    \n",
-					"                    if mssparkutils.fs.exists(fallback_path):\n",
-					"                        print(f\"  Successfully copied file with fallback method\")\n",
-					"                        moved_files['data_success'].append(fallback_path)\n",
-					"                        successful_files += 1\n",
-					"                    else:\n",
-					"                        print(f\"  ERROR: Fallback copy failed\")\n",
-					"                        moved_files['failed'].append(f\"{file_path} (copy failed)\")\n",
-					"            except Exception as proc_error:\n",
-					"                print(f\"  ERROR processing file: {str(proc_error)}\")\n",
-					"                moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
-					"        \n",
-					"        if successful_files > 0:\n",
-					"            return True, dest_dir\n",
-					"        else:\n",
-					"            return False, None\n",
-					"            \n",
-					"    except Exception as e:\n",
-					"        print(f\"Error in file group processing: {str(e)}\")\n",
-					"        return False, None"
-				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -1195,7 +1036,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -1621,9 +1462,12 @@
 					"    print(f\"Empty files moved: {len(moved_files.get('empty', []))}\")\n",
 					"    print(f\"Overseas files moved: {len(moved_files.get('overseas', []))}\")\n",
 					"    print(f\"Files quarantined: {len(moved_files['quarantine'])}\")\n",
-					"    print(f\"Files failed: {len(moved_files['failed'])}\")"
+					"    print(f\"Files failed: {len(moved_files['failed'])}\")\n",
+					"\n",
+					"if __name__ == \"__main__\":\n",
+					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 22
 			}
 		]
 	}

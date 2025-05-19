@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bf8468ae-24a6-4135-b787-d36076a40b57"
+				"spark.autotune.trackingId": "ce2ea1a8-fa22-484b-ad4c-5a1528289371"
 			}
 		},
 		"metadata": {
@@ -62,6 +62,35 @@
 			},
 			{
 				"cell_type": "code",
+				"source": [
+					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\")"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import count\n",
+					"\n",
+					"final_count = delta_df.groupBy('creation_date') \\\n",
+					"    .agg(count('creation_date')) \\\n",
+					"    .orderBy('creation_date')\n",
+					"\n",
+					"display(final_count)"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"# Initialize Spark Session if not already initialized\n",
 					"spark = SparkSession.builder.appName(\"ParquetReader\").getOrCreate()\n",

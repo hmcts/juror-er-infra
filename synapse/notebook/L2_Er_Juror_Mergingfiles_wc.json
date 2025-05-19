@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6f7b276b-dfaf-4728-938b-dac87f9776ca"
+				"spark.autotune.trackingId": "6f7a6341-9559-4b70-9b50-4ddca0121ee4"
 			}
 		},
 		"metadata": {
@@ -1681,9 +1681,9 @@
 					"\n",
 					"    # Step 3: Always set address6 to null\n",
 					"    if \"address6\" in df.columns:\n",
-					"        df = df.withColumn(\"address6\", lit(None))\n",
+					"        df = df.withColumn(\"address6\", lit(None).cast(\"string\"))\n",
 					"    else:\n",
-					"        df = df.withColumn(\"address6\", lit(None))\n",
+					"        df = df.withColumn(\"address6\", lit(None).cast(\"string\"))\n",
 					"        \n",
 					"    # Log final state\n",
 					"    empty_address4_count_after = df.filter(col(\"address4\").isNull()).count()\n",

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c2b00b72-1702-4b66-8b43-fd73a4394865"
+				"spark.autotune.trackingId": "af22a92e-0f50-479c-828d-56bbd6515632"
 			}
 		},
 		"metadata": {
@@ -256,7 +256,7 @@
 					"from pyspark.sql import DataFrame\n",
 					"from pyspark.sql.functions import col, when, upper, regexp_extract, regexp_replace, length, substring, lit"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -265,7 +265,7 @@
 					"STORAGE_ACCOUNT = \"baubaisadfsaprod\"\n",
 					"L2_LOG_PATH = f\"abfss://juror-etl@{STORAGE_ACCOUNT}.dfs.core.windows.net/l2_process_logs/processed_files_log.txt\""
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -285,7 +285,7 @@
 					"    \n",
 					"    return root_logger"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -298,7 +298,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -315,7 +315,7 @@
 					"    \n",
 					"    return path"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -337,7 +337,7 @@
 					"        print(f\"Error creating directory {path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -374,7 +374,7 @@
 					"]\n",
 					"HASH_SENSITIVE_DATA = False "
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -396,7 +396,7 @@
 					"    \n",
 					"    return config"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -413,7 +413,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -432,7 +432,7 @@
 					"        \n",
 					"    return escaped"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -626,7 +626,7 @@
 					"        logger.warning(\"Returning original DataFrame due to processing error\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -673,7 +673,7 @@
 					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -685,7 +685,7 @@
 					"    \"column_constraints\": column_constraints\n",
 					"}"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -755,7 +755,7 @@
 					"    print(\"Validation and transformations applied successfully\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "markdown",
@@ -824,7 +824,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -908,7 +908,7 @@
 					"    # CRITICAL: Do NOT make them identical - they should remain distinct\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -929,7 +929,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read schema file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -946,7 +946,7 @@
 					"    # Select only the required columns in the specified order\n",
 					"    return df.select([col(c[0]).cast(c[1]) for c in required_columns])"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -954,9 +954,12 @@
 					"def get_new_files(spark, input_path, process_log_path=None):\n",
 					"    \"\"\"Identify which files are new and need processing\"\"\"\n",
 					"    from notebookutils import mssparkutils\n",
+					"    import time\n",
 					"    \n",
 					"    # Use the constant for consistent path\n",
 					"    log_path = L2_LOG_PATH\n",
+					"    \n",
+					"    start_time = time.time()\n",
 					"    \n",
 					"    # Get all files in the input directory\n",
 					"    all_files = []\n",
@@ -980,40 +983,56 @@
 					"    try:\n",
 					"        if mssparkutils.fs.exists(log_path):\n",
 					"            print(f\"Log file exists at {log_path}\")\n",
-					"            log_content = mssparkutils.fs.read(log_path)\n",
 					"            \n",
-					"            # Process each line to extract file paths\n",
-					"            if log_content.strip():\n",
-					"                for line in log_content.strip().split('\\n'):\n",
-					"                    if line.strip():\n",
-					"                        # Extract file path (before the | symbol)\n",
-					"                        file_path = line.split('|')[0].strip()\n",
-					"                        if file_path:\n",
-					"                            processed_files.append(file_path)\n",
-					"            \n",
-					"            print(f\"Found {len(processed_files)} previously processed files in log\")\n",
+					"            try:\n",
+					"                # Read log file using Spark DataFrame API instead of fs.read\n",
+					"                log_df = spark.read.text(log_path)\n",
+					"                \n",
+					"                # Check if we got any data\n",
+					"                if log_df.count() > 0:\n",
+					"                    # Process each line to extract file paths\n",
+					"                    for row in log_df.collect():\n",
+					"                        line = row.value\n",
+					"                        if line and '|' in line:\n",
+					"                            # Split by pipe and take the first part (file path)\n",
+					"                            file_path = line.split('|')[0].strip()\n",
+					"                            if file_path:\n",
+					"                                processed_files.append(file_path)\n",
+					"                \n",
+					"                    print(f\"Found {len(processed_files)} previously processed files in log\")\n",
+					"                else:\n",
+					"                    print(f\"Log file exists but is empty\")\n",
+					"            except Exception as read_error:\n",
+					"                print(f\"Error reading log file with DataFrame API: {read_error}\")\n",
+					"                # Try an alternative method if DataFrame reading fails\n",
+					"                try:\n",
+					"                    # Check if the file exists and get its size\n",
+					"                    if mssparkutils.fs.exists(log_path):\n",
+					"                        print(\"Trying alternative file reading method...\")\n",
+					"                        \n",
+					"                        # Use a small Spark script to read the content\n",
+					"                        tempViewName = \"tempLogView\"\n",
+					"                        spark.sql(f\"\"\"\n",
+					"                        CREATE OR REPLACE TEMPORARY VIEW {tempViewName} AS\n",
+					"                        SELECT * FROM text.`{log_path}`\n",
+					"                        \"\"\")\n",
+					"                        \n",
+					"                        log_content_df = spark.sql(f\"SELECT * FROM {tempViewName}\")\n",
+					"                        \n",
+					"                        for row in log_content_df.collect():\n",
+					"                            line = row[0]  # Assuming the first column contains the text\n",
+					"                            if line and '|' in line:\n",
+					"                                file_path = line.split('|')[0].strip()\n",
+					"                                if file_path:\n",
+					"                                    processed_files.append(file_path)\n",
+					"                        \n",
+					"                        print(f\"Alternative method found {len(processed_files)} processed files\")\n",
+					"                    else:\n",
+					"                        print(f\"Log file doesn't exist according to alternative check\")\n",
+					"                except Exception as alt_error:\n",
+					"                    print(f\"Alternative method also failed: {alt_error}\")\n",
 					"        else:\n",
 					"            print(f\"Log file doesn't exist yet at {log_path}\")\n",
-					"            \n",
-					"            # Optional: Check L1 logs as fallback\n",
-					"            l1_log_path = f\"abfss://juror-etl@{STORAGE_ACCOUNT}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
-					"            if mssparkutils.fs.exists(l1_log_path):\n",
-					"                print(f\"Checking L1 log as fallback\")\n",
-					"                try:\n",
-					"                    l1_files_df = spark.read.json(l1_log_path)\n",
-					"                    \n",
-					"                    if \"file\" in l1_files_df.columns:\n",
-					"                        l1_files = [row.file for row in l1_files_df.collect()]\n",
-					"                        print(f\"Found {len(l1_files)} files in L1 log\")\n",
-					"                        \n",
-					"                        # Filter to only include relevant paths\n",
-					"                        for l1_file in l1_files:\n",
-					"                            if input_path in l1_file:\n",
-					"                                processed_files.append(l1_file)\n",
-					"                        \n",
-					"                        print(f\"Using {len(processed_files)} relevant files from L1 log\")\n",
-					"                except Exception as l1_error:\n",
-					"                    print(f\"Error reading L1 log: {l1_error}\")\n",
 					"    except Exception as e:\n",
 					"        print(f\"Error reading log: {e}\")\n",
 					"    \n",
@@ -1027,9 +1046,10 @@
 					"            print(f\"Skipping already processed file: {f}\")\n",
 					"    \n",
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
+					"    print(f\"File scanning completed in {time.time() - start_time:.2f} seconds\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "markdown",
@@ -1075,7 +1095,7 @@
 					"    \n",
 					"    return processed_dfs"
 				],
-				"execution_count": null
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -1155,7 +1175,7 @@
 					"        )\n",
 					"        return False, 0"
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "markdown",
@@ -1215,7 +1235,7 @@
 					"    \n",
 					"    return merged_df"
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1261,7 +1281,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return {\"status\": \"error\", \"error\": str(e)}"
 				],
-				"execution_count": null
+				"execution_count": 23
 			},
 			{
 				"cell_type": "markdown",
@@ -1291,7 +1311,7 @@
 					"        logging.warning(\"Missing CreationDate column, skipping transformation\")\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -1349,7 +1369,7 @@
 					"    \n",
 					"    return deduplicated"
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -1402,7 +1422,7 @@
 					"    \n",
 					"    return deduplicated_df"
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "markdown",
@@ -1463,7 +1483,7 @@
 					"    \n",
 					"    return hashed_df"
 				],
-				"execution_count": null
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -1535,7 +1555,7 @@
 					"    logger.info(\"Completed hashing of sensitive fields\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "markdown",
@@ -1687,7 +1707,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -1990,7 +2010,7 @@
 					"    # Drop temporary columns and return\n",
 					"    return df_filtered.drop(\"_remove_record\", \"_removal_reason\")"
 				],
-				"execution_count": null
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -2055,7 +2075,7 @@
 					"        # Return empty DataFrame with correct schema\n",
 					"        return spark.createDataFrame([], schema)"
 				],
-				"execution_count": null
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -2083,7 +2103,7 @@
 					"    df = df.withColumn(\"register_lett\", lit(None).cast(\"integer\"))\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 32
 			},
 			{
 				"cell_type": "markdown",
@@ -2213,7 +2233,7 @@
 					"        logging.error(traceback.format_exc())\n",
 					"        return new_data"
 				],
-				"execution_count": null
+				"execution_count": 33
 			},
 			{
 				"cell_type": "markdown",
@@ -2256,7 +2276,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -2288,7 +2308,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -2378,7 +2398,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -2574,7 +2594,7 @@
 					"        # Return original dataframe if transformation fails\n",
 					"        return df"
 				],
-				"execution_count": null
+				"execution_count": 37
 			},
 			{
 				"cell_type": "markdown",
@@ -2749,7 +2769,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 38
 			}
 		]
 	}

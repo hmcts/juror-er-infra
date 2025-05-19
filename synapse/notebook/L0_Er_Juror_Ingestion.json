@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8cfd5120-8afa-4152-8929-31e4fe798885"
+				"spark.autotune.trackingId": "2956e5e7-fa47-4334-a895-a167ec83f1cc"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +194,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +216,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +297,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -375,7 +375,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -445,7 +445,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +501,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -535,7 +535,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -572,7 +572,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -613,7 +613,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -715,7 +715,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -760,7 +760,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -825,7 +825,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -878,7 +878,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -967,7 +967,7 @@
 					"    print(f\"Created index with {len(file_index['files'])} files at {index_path}\")\n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -1099,7 +1099,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -1169,7 +1169,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -1195,7 +1195,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -1207,7 +1207,7 @@
 					"    log_file_path = f\"abfss://juror-ingestion@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
 					"    \n",
 					"    # Add debug mode to process all files and ignore log\n",
-					"    debug_mode = False  # Set to True to force process all files\n",
+					"    debug_mode = False  # Set to False to only process new files\n",
 					"    \n",
 					"    # Add a detailed log of all operations\n",
 					"    operations_log = []\n",
@@ -1326,10 +1326,20 @@
 					"    processed_files_log = []\n",
 					"    if not debug_mode:  # Skip reading log in debug mode\n",
 					"        try:\n",
-					"            processed_files_log = spark.read.json(log_file_path).select(\"file\").rdd.flatMap(lambda x: x).collect()\n",
-					"            logging.info(f\"Read processed files log with {len(processed_files_log)} entries\")\n",
-					"            print(f\"\\nProcessed files log contains {len(processed_files_log)} entries\")\n",
-					"            log_operation(\"read_log\", log_file_path, \"success\", {\"count\": len(processed_files_log)})\n",
+					"            if mssparkutils.fs.exists(log_file_path):\n",
+					"                processed_files_log = spark.read.json(log_file_path).select(\"file\").rdd.flatMap(lambda x: x).collect()\n",
+					"                logging.info(f\"Read processed files log with {len(processed_files_log)} entries\")\n",
+					"                print(f\"\\nProcessed files log contains {len(processed_files_log)} entries\")\n",
+					"                log_operation(\"read_log\", log_file_path, \"success\", {\"count\": len(processed_files_log)})\n",
+					"                \n",
+					"                # Print first few log entries for debugging\n",
+					"                if processed_files_log:\n",
+					"                    print(\"First 3 processed file entries in log:\")\n",
+					"                    for i, path in enumerate(processed_files_log[:3]):\n",
+					"                        print(f\"  {i+1}. {path}\")\n",
+					"            else:\n",
+					"                print(f\"\\nProcessed files log does not exist at {log_file_path}, will create new log\")\n",
+					"                log_operation(\"read_log\", log_file_path, \"info\", {\"message\": \"Log file does not exist yet\"})\n",
 					"        except Exception as e:\n",
 					"            logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"            print(f\"\\nCould not read processed files log: {str(e)}\")\n",
@@ -1341,6 +1351,10 @@
 					"    for file_info in file_index[\"files\"]:\n",
 					"        if debug_mode or file_info[\"path\"] not in processed_files_log:\n",
 					"            new_files.append(file_info)\n",
+					"            if not debug_mode and len(processed_files_log) > 0:\n",
+					"                print(f\"New file to process: {file_info['path']}\")\n",
+					"        else:\n",
+					"            print(f\"Skipping already processed file: {file_info['path']}\")\n",
 					"    \n",
 					"    print(f\"\\nNew files to process: {len(new_files)}\")\n",
 					"    log_operation(\"filter_files\", \"\", \"success\", {\"total\": len(file_index[\"files\"]), \"new\": len(new_files)})\n",
@@ -1463,12 +1477,22 @@
 					"            new_processed_files_log = spark.createDataFrame([(file,) for file in new_processed_files], [\"file\"])\n",
 					"            \n",
 					"            if processed_files_log:\n",
+					"                # Create DataFrame from existing log entries (THIS WAS MISSING)\n",
+					"                existing_log_df = spark.createDataFrame([(file,) for file in processed_files_log], [\"file\"])\n",
 					"                updated_log_df = existing_log_df.union(new_processed_files_log).distinct()\n",
 					"            else:\n",
 					"                updated_log_df = new_processed_files_log\n",
 					"                \n",
+					"            # Write the updated log\n",
 					"            updated_log_df.write.mode(\"overwrite\").json(log_file_path)\n",
-					"            logging.info(\"Updated processed files log\")\n",
+					"            \n",
+					"            # Verify the log file was written\n",
+					"            if mssparkutils.fs.exists(log_file_path):\n",
+					"                log_size = mssparkutils.fs.size(log_file_path)\n",
+					"                print(f\"Log file successfully updated, size: {log_size} bytes\")\n",
+					"                print(f\"Added {len(new_processed_files)} new entries to log\")\n",
+					"                \n",
+					"            logging.info(f\"Updated processed files log with {len(new_processed_files)} entries\")\n",
 					"            log_operation(\"update_log\", log_file_path, \"success\", {\"count\": len(new_processed_files)})\n",
 					"        except Exception as e:\n",
 					"            print(f\"Error updating processed files log: {str(e)}\")\n",
@@ -1517,10 +1541,9 @@
 					"    print(f\"Files failed: {len(moved_files['failed'])}\")\n",
 					"\n",
 					"if __name__ == \"__main__\":\n",
-					"    main()\n",
-					""
+					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 20
 			}
 		]
 	}

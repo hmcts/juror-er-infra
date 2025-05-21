@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "02fbac96-4ccf-4c97-b16e-13b06e1b754e"
+				"spark.autotune.trackingId": "9f7c95cf-11ef-4be4-8b56-16083e016491"
 			}
 		},
 		"metadata": {
@@ -821,6 +821,102 @@
 					"collapsed": false
 				},
 				"source": [
+					"from pyspark.sql.functions import to_date, col, lit\n",
+					"\n",
+					"# Define your date range\n",
+					"start_date = \"2025-01-08\"\n",
+					"end_date = \"2025-01-09\"\n",
+					"\n",
+					"# Load Delta table\n",
+					"\n",
+					"\n",
+					"# Filter using cast to string and parse as date\n",
+					"filtered_df = delta_df.filter(\n",
+					"    (to_date(col(\"creation_date\").cast(\"string\"), \"yyyyMMdd\") >= lit(start_date)) &\n",
+					"    (to_date(col(\"creation_date\").cast(\"string\"), \"yyyyMMdd\") <= lit(end_date))\n",
+					")\n",
+					"\n",
+					"# Get all column names\n",
+					"all_columns = filtered_df.columns\n",
+					"\n",
+					"# Keep all except the last 6\n",
+					"columns_to_keep = all_columns[:-6]\n",
+					"\n",
+					"# Select only the columns you want\n",
+					"filtered_trimmed_df = filtered_df.select(*columns_to_keep)\n",
+					"\n",
+					"# Show result\n",
+					"display(filtered_trimmed_df)\n",
+					""
+				],
+				"execution_count": 53
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"display(filtered_df.count())"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"import datetime\n",
+					"import time\n",
+					"import os\n",
+					"import re\n",
+					"from notebookutils import mssparkutils\n",
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import col, when, lit, regexp_replace, trim, upper, substring, to_date, date_format, expr\n",
+					"from pyspark.sql.types import StringType, IntegerType, TimestampType, LongType, DateType\n",
+					"import pyspark.sql.functions as F\n",
+					"\n",
+					"storage_account = \"baubaisadfsaprod\"\n",
+					"output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/exports\"\n",
+					"\n",
+					"# Create timestamp for unique filename\n",
+					"timestamp = datetime.datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
+					"\n",
+					"# Write to temporary CSV folder\n",
+					"temp_output_dir = f\"{output_path}/temp_{timestamp}\"\n",
+					"filtered_trimmed_df.coalesce(1).write \\\n",
+					"    .option(\"header\", \"true\") \\\n",
+					"    .option(\"quoteAll\", \"true\") \\\n",
+					"    .option(\"escape\", \"\\\\\") \\\n",
+					"    .mode(\"overwrite\") \\\n",
+					"    .csv(temp_output_dir)\n",
+					"\n",
+					"# Locate and rename the .csv file\n",
+					"files_written = mssparkutils.fs.ls(temp_output_dir)\n",
+					"csv_found = False\n",
+					"\n",
+					"for f in files_written:\n",
+					"    if f.path.endswith(\".csv\") and \"part-\" in f.path:\n",
+					"        final_csv_path = f\"{output_path}/voters_export_{timestamp}.csv\"\n",
+					"        mssparkutils.fs.cp(f.path, final_csv_path)\n",
+					"        print(f\"📄 Exported to: {final_csv_path}\")\n",
+					"        csv_found = True\n",
+					"        break\n",
+					"\n",
+					"# Check if a CSV file was found and copied\n",
+					"if not csv_found:\n",
+					"    print(\"⚠️ No CSV file was found in the output directory\")\n",
+					"    \n",
+					"# Clean up temp directory\n",
+					"mssparkutils.fs.rm(temp_output_dir, recurse=True)"
+				],
+				"execution_count": 55
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
+					"collapsed": false
+				},
+				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
 					"final_count = delta_df.groupBy('creation_date') \\\n",
@@ -847,16 +943,16 @@
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					},
 					"collapsed": false
 				},
 				"source": [
 					"display(delta_df)"
 				],
-				"execution_count": 39
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",

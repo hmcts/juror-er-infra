@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ba28ddd5-df4c-49d7-8d53-a0cff46d59a4"
+				"spark.autotune.trackingId": "83edc471-daef-410c-b891-f21424436e23"
 			}
 		},
 		"metadata": {
@@ -25,7 +25,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -57,9 +57,10 @@
 					"from notebookutils import mssparkutils\n",
 					"import logging\n",
 					"from datetime import datetime\n",
-					""
+					"from pyspark.sql.types import *  # This should include LongType\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, DateType, IntegerType, LongType"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -253,7 +254,7 @@
 					"        StructField(\"perm_disqual\", StringType(), True),       # VARCHAR(1)\n",
 					"        StructField(\"source_id\", StringType(), True),          # VARCHAR(1)\n",
 					"        StructField(\"postcode_start\", StringType(), True),     # VARCHAR(10) - generated in PostgreSQL\n",
-					"        StructField(\"hash_id\", StringType(), True)             # Keep hash_id for deduplication\n",
+					"        StructField(\"hash_id\", LongType(), True)             # Keep hash_id for deduplication\n",
 					"    ])\n",
 					"    \n",
 					"    # Apply field length constraints and transformations\n",
@@ -339,6 +340,11 @@
 					"        .withColumn(\"rec_num\", \n",
 					"                   when(col(\"rec_num\").isNull(), lit(None).cast(IntegerType()))\n",
 					"                   .otherwise(col(\"rec_num\").cast(IntegerType())))\n",
+					"    # Ensure hash_id is long type (bigint)\n",
+					"    df_with_hash = df_with_rec_num \\\n",
+					"          .withColumn(\"hash_id\", \n",
+					"                      when(col(\"hash_id\").isNull(), lit(None).cast(LongType()))\n",
+					"                      .otherwise(col(\"hash_id\").cast(LongType())))\n",
 					"    \n",
 					"    # Select only the required columns in the correct order\n",
 					"    final_columns = [\n",

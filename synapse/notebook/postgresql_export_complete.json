@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4e84f9af-9a9e-4cd1-a82a-3f96b0b7521a"
+				"spark.autotune.trackingId": "ced31dc8-9c2d-4f8f-a213-dd85f4143ab4"
 			}
 		},
 		"metadata": {
@@ -341,10 +341,7 @@
 					"        .withColumn(\"address5\",\n",
 					"                   when(col(\"address5\").isNull(), lit(None))\n",
 					"                   .otherwise(substring(trim(upper(col(\"address5\"))), 1, 35))) \\\n",
-					"        .withColumn(\"address6\", \n",
-					"                   when(col(\"address6\").isNull(), lit(None))\n",
-					"                   .when(trim(col(\"address6\")) == \"\", lit(None))\n",
-					"                   .otherwise(lit(None)).cast(StringType())) \\\n",
+					"        .withColumn(\"address6\", lit(None).cast(StringType())) \\\n",
 					"        .withColumn(\"zip\", \n",
 					"                   when(col(\"zip\").isNull(), lit(None))\n",
 					"                   .otherwise(substring(trim(upper(col(\"zip\"))), 1, 10))) \\\n",

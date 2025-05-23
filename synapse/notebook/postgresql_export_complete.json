@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "96d6f203-089d-48e8-b76d-5cd3c7f6598f"
+				"spark.autotune.trackingId": "db847622-51ac-462e-bd03-ba307fdde645"
 			}
 		},
 		"metadata": {
@@ -158,7 +158,7 @@
 					"    )\n",
 					"    \n",
 					"    after_name_filter = df.count()\n",
-					"    logger.info(f\"Records after name filtering: {after_name_filter} (removed: {initial_count - after_name_filter})\")\n",
+					"    logger.info(f\"Records after name filtering: {after_name_filter}\")\n",
 					"    \n",
 					"    # Step 2: Ensure address is not null and not empty\n",
 					"    logger.info(\"Step 2: Ensuring address is not null/empty\")\n",
@@ -171,7 +171,7 @@
 					"    )\n",
 					"    \n",
 					"    after_address_filter = df.count()\n",
-					"    logger.info(f\"Records after address filtering: {after_address_filter} (removed: {after_name_filter - after_address_filter})\")\n",
+					"    logger.info(f\"Records after address filtering: {after_address_filter}\")\n",
 					"    \n",
 					"    # Step 3: Clean address4 - remove if it matches zip without spaces\n",
 					"    logger.info(\"Step 3: Cleaning address4 - removing zip code duplicates\")\n",

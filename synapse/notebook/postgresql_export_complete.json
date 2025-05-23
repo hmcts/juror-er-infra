@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "919cda79-73ca-4788-a01f-3879337875ff"
+				"spark.autotune.trackingId": "4e84f9af-9a9e-4cd1-a82a-3f96b0b7521a"
 			}
 		},
 		"metadata": {
@@ -344,7 +344,7 @@
 					"        .withColumn(\"address6\", \n",
 					"                   when(col(\"address6\").isNull(), lit(None))\n",
 					"                   .when(trim(col(\"address6\")) == \"\", lit(None))\n",
-					"                   .otherwise(lit(None))) \\\n",
+					"                   .otherwise(lit(None)).cast(StringType())) \\\n",
 					"        .withColumn(\"zip\", \n",
 					"                   when(col(\"zip\").isNull(), lit(None))\n",
 					"                   .otherwise(substring(trim(upper(col(\"zip\"))), 1, 10))) \\\n",
@@ -730,7 +730,7 @@
 					"    else:\n",
 					"        logger.error(\"❌ Data availability check failed - cannot proceed with export\")"
 				],
-				"execution_count": 30
+				"execution_count": 31
 			}
 		]
 	}

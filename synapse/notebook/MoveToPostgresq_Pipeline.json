@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "92d6346f-294a-464c-8d4c-06c5cea1f2fa"
+				"spark.autotune.trackingId": "8f52df60-5599-4054-873a-e4df537b52c5"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.types import *  # This should include LongType\n",
 					"from pyspark.sql.types import StructType, StructField, StringType, DateType, IntegerType, LongType"
 				],
-				"execution_count": 2
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -76,7 +76,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 3
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -241,7 +241,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -392,7 +392,7 @@
 					"    null_fname = df_final.filter(col(\"fname\").isNull()).count()\n",
 					"\n",
 					"    \n",
-					"    if null_lname > 0 or null_fname > 0 or null_address > 0 or null_address4 > 0:\n",
+					"    if null_lname > 0 or null_fname > 0:\n",
 					"        logger.warning(f\"NULL constraint violations found: lname={null_lname}, fname={null_fname}\")\n",
 					"        \n",
 					"        # Remove records with NULL violations\n",
@@ -639,7 +639,7 @@
 					"    else:\n",
 					"        logger.error(\"💥 Enhanced PostgreSQL export pipeline failed\")"
 				],
-				"execution_count": 4
+				"execution_count": 8
 			}
 		]
 	}

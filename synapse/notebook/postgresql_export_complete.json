@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d6e9fe44-abd3-4fd6-9342-a4dad395d6c7"
+				"spark.autotune.trackingId": "2cb4b27b-0c20-4751-84c8-7514e3c24b7d"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 74
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 75
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +288,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 76
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -440,7 +440,7 @@
 					"    \n",
 					"    return df_final"
 				],
-				"execution_count": 77
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -502,7 +502,7 @@
 					"    return output_path\n",
 					""
 				],
-				"execution_count": 78
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -530,7 +530,7 @@
 					"            return None, None\n",
 					"        \n",
 					"        # Filter for specific batch date (hardcoded for batch processing)\n",
-					"        target_dates = [\"20241213\", \"20241216\"]  # Update this for your batch date\n",
+					"        target_dates = [\"20250520\"]  # Update this for your batch date\n",
 					"        logger.info(f\"Filtering for creation_date = {target_dates}\")\n",
 					"        \n",
 					"        # Check what creation_dates are available first\n",
@@ -567,6 +567,7 @@
 					"        if final_count == 0:\n",
 					"            logger.error(\"❌ No records remaining after transformation\")\n",
 					"            return None, None\n",
+					"\n",
 					"        # Create a PostgreSQL-compatible CSV for import\n",
 					"        timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
 					"        csv_output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/export/postgresql_import_{timestamp}\"\n",
@@ -698,19 +699,17 @@
 					"            sample_data = result_df.limit(3).collect()\n",
 					"            for i, row in enumerate(sample_data):\n",
 					"                logger.info(f\"   Row {i+1}: lname={row.lname}, fname={row.fname}, address={row.address}, address4={row.address4}\")\n",
-					"        print_detailed_summary(moved_files) \n",
-					"        print(f\"Data Files Successfully Moved: {len(moved_files['data_success'])}\")     \n",
+					"             \n",
 					"        else:\n",
 					"            logger.error(\"❌ Export pipeline failed\")\n",
 					"            if result_df is None:\n",
 					"                logger.error(\"   - DataFrame transformation failed\")\n",
 					"            if csv_path is None:\n",
 					"                logger.error(\"   - CSV export failed\")\n",
-					"        \n",
 					"    else:\n",
 					"        logger.error(\"❌ Data availability check failed - cannot proceed with export\")"
 				],
-				"execution_count": 79
+				"execution_count": null
 			}
 		]
 	}

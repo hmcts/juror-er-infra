@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "24833739-132f-4678-a0ad-4e6863594207"
+				"spark.autotune.trackingId": "4cd8cb6a-bc8b-4209-95af-b12b34ffb807"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 8
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +288,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 9
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -447,7 +447,7 @@
 					"    \n",
 					"    return df_final"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -539,7 +539,7 @@
 					"    \n",
 					"    return df_final"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -601,7 +601,7 @@
 					"    return output_path\n",
 					""
 				],
-				"execution_count": 11
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -629,7 +629,7 @@
 					"            return None, None\n",
 					"        \n",
 					"        # Filter for specific batch date (hardcoded for batch processing)\n",
-					"        target_date = \"20241213\"  # Update this for your batch date\n",
+					"        target_date = [\"20241213\", \"20241216\"]  # Update this for your batch date\n",
 					"        logger.info(f\"Filtering for creation_date = {target_date}\")\n",
 					"        \n",
 					"        # Check what creation_dates are available first\n",
@@ -820,7 +820,7 @@
 					"    else:\n",
 					"        logger.error(\"❌ Data availability check failed - cannot proceed with export\")"
 				],
-				"execution_count": 12
+				"execution_count": null
 			}
 		]
 	}

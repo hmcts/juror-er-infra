@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0cd658d2-57a6-4bfa-ac0d-976337b80a7f"
+				"spark.autotune.trackingId": "009f6463-939d-44d6-888f-e07db6771a19"
 			}
 		},
 		"metadata": {
@@ -63,6 +63,13 @@
 					"from datetime import datetime\n",
 					"import time\n",
 					"\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"# Configure logging\n",
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"logger = logging.getLogger()\n",
@@ -72,7 +79,14 @@
 					"    .appName(\"Voters Data Lake Export - PostgreSQL Schema\") \\\n",
 					"    .config(\"spark.sql.extensions\", \"io.delta.sql.DeltaSparkSessionExtension\") \\\n",
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
-					"    .getOrCreate()\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"\n",
 					"\n",
 					"def clean_data_before_transformation(df):\n",
 					"    \"\"\"\n",
@@ -599,7 +613,14 @@
 					"    \n",
 					"    if result_df is not None and csv_path is not None:\n",
 					"        logger.info(\"🎉 Enhanced PostgreSQL export pipeline completed successfully\")\n",
-					"        logger.info"
+					"        logger.info(f\"📁 CSV export path: {csv_path}\")\n",
+					"        logger.info(f\"📊 Total records exported: {result_df.count()}\")\n",
+					"    else:\n",
+					"        logger.error(\"❌ Export pipeline failed\")\n",
+					"        if result_df is None:\n",
+					"            logger.error(\"   - DataFrame transformation failed\")\n",
+					"        if csv_path is None:\n",
+					"            logger.error(\"   - CSV export failed\")"
 				],
 				"execution_count": 6
 			}

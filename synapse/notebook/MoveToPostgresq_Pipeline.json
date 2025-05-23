@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "83edc471-daef-410c-b891-f21424436e23"
+				"spark.autotune.trackingId": "92d6346f-294a-464c-8d4c-06c5cea1f2fa"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.types import *  # This should include LongType\n",
 					"from pyspark.sql.types import StructType, StructField, StringType, DateType, IntegerType, LongType"
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -76,12 +76,11 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"\n",
 					"def clean_data_before_transformation(df):\n",
 					"    \"\"\"\n",
 					"    Comprehensive data cleaning before PostgreSQL transformation\n",
@@ -92,7 +91,7 @@
 					"    logger.info(f\"Initial record count: {initial_count}\")\n",
 					"    \n",
 					"    # Step 1: Remove records with NULL/empty lname or fname\n",
-					"    logger.info(\"Step 1: Removing records with NULL/empty lname or fname\")\n",
+					"    logger.info(\"Step 1: Filtering records with NULL/empty lname or fname\")\n",
 					"    df = df.filter(\n",
 					"        (col(\"lname\").isNotNull()) & \n",
 					"        (trim(col(\"lname\")) != \"\") & \n",
@@ -109,23 +108,47 @@
 					"    after_name_filter = df.count()\n",
 					"    logger.info(f\"Records after name filtering: {after_name_filter} (removed: {initial_count - after_name_filter})\")\n",
 					"    \n",
-					"    # Step 2: Ensure address is not null and not empty\n",
-					"    logger.info(\"Step 2: Ensuring address is not null/empty\")\n",
-					"    df = df.filter(\n",
-					"        (col(\"address\").isNotNull()) & \n",
-					"        (trim(col(\"address\")) != \"\") &\n",
-					"        (upper(trim(col(\"address\"))) != \"NULL\") &\n",
-					"        (upper(trim(col(\"address\"))) != \"NA\") &\n",
-					"        (upper(trim(col(\"address\"))) != \"NAN\")\n",
+					"    # Step 2: Log address issues but don't filter\n",
+					"    logger.info(\"Step 2: Checking address quality (no filtering)\")\n",
+					"    address_issues = df.filter(\n",
+					"        (col(\"address\").isNull()) | \n",
+					"        (trim(col(\"address\")) == \"\") |\n",
+					"        (upper(trim(col(\"address\"))) == \"NULL\") |\n",
+					"        (upper(trim(col(\"address\"))) == \"NA\") |\n",
+					"        (upper(trim(col(\"address\"))) == \"NAN\")\n",
+					"    ).count()\n",
+					"    \n",
+					"    logger.info(f\"Found {address_issues} records with address issues (keeping all records)\")\n",
+					"    \n",
+					"    # Step 3: Clean zip code duplicates from address fields\n",
+					"    logger.info(\"Step 3: Cleaning address2-5 - removing zip code duplicates\")\n",
+					"    \n",
+					"    zip_duplicates_count = df.filter(\n",
+					"        (col(\"address2\") == regexp_replace(col(\"zip\"), \" \", \"\")) |\n",
+					"        (col(\"address3\") == regexp_replace(col(\"zip\"), \" \", \"\")) |\n",
+					"        (col(\"address4\") == regexp_replace(col(\"zip\"), \" \", \"\")) |\n",
+					"        (col(\"address5\") == regexp_replace(col(\"zip\"), \" \", \"\"))\n",
+					"    ).count()\n",
+					"    \n",
+					"    logger.info(f\"Found {zip_duplicates_count} records with zip code duplicates in address fields\")\n",
+					"    \n",
+					"    # Clean all address fields that match zip without spaces\n",
+					"    df = df.withColumn(\"address2\",\n",
+					"        when(col(\"address2\") == regexp_replace(col(\"zip\"), \" \", \"\"), lit(None))\n",
+					"        .otherwise(col(\"address2\"))\n",
+					"    ).withColumn(\"address3\",\n",
+					"        when(col(\"address3\") == regexp_replace(col(\"zip\"), \" \", \"\"), lit(None))\n",
+					"        .otherwise(col(\"address3\"))\n",
+					"    ).withColumn(\"address4\",\n",
+					"        when(col(\"address4\") == regexp_replace(col(\"zip\"), \" \", \"\"), lit(None))\n",
+					"        .otherwise(col(\"address4\"))\n",
+					"    ).withColumn(\"address5\",\n",
+					"        when(col(\"address5\") == regexp_replace(col(\"zip\"), \" \", \"\"), lit(None))\n",
+					"        .otherwise(col(\"address5\"))\n",
 					"    )\n",
-					"     # Count flagged records instead of filtering\n",
-					"    address_issues = df.filter(col(\"address_issue_flag\")).count()\n",
-					"    clean_addresses = after_name_filter - address_issues\n",
-					"    logger.info(f\"Address quality summary: {clean_addresses} clean addresses, {address_issues} flagged for review\")\n",
-					"    logger.info(f\"Continuing with all {df.count()} records (including flagged ones)\")\n",
-					"\n",
-					"\n",
-					"\n",
+					"    \n",
+					"    logger.info(f\"Cleaned zip code duplicates from {zip_duplicates_count} records\")\n",
+					"    \n",
 					"    # Step 4: Remove \"NAN\" values from address4\n",
 					"    logger.info(\"Step 4: Removing 'NAN' values from address4\")\n",
 					"    df = df.withColumn(\"address4\", \n",
@@ -136,7 +159,6 @@
 					"    # Step 5: Address field reorganization - shift addresses that start with numbers\n",
 					"    logger.info(\"Step 5: Reorganizing address fields\")\n",
 					"    \n",
-					" \n",
 					"    # Step 6: Address4 cannot be empty - comprehensive address shifting\n",
 					"    logger.info(\"Step 6: Ensuring address4 is not empty through comprehensive shifting\")\n",
 					"    \n",
@@ -217,7 +239,13 @@
 					"    logger.info(f\"Final record count after comprehensive cleaning: {final_count}\")\n",
 					"    logger.info(f\"Total records removed: {initial_count - final_count}\")\n",
 					"    \n",
-					"    return df\n",
+					"    return df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"\n",
 					"def transform_to_postgresql_schema(df):\n",
 					"    \"\"\"\n",
@@ -611,7 +639,7 @@
 					"    else:\n",
 					"        logger.error(\"💥 Enhanced PostgreSQL export pipeline failed\")"
 				],
-				"execution_count": null
+				"execution_count": 4
 			}
 		]
 	}

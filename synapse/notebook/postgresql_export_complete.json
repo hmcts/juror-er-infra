@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b69e243e-15c8-40fc-ab4a-79d015e8956f"
+				"spark.autotune.trackingId": "919cda79-73ca-4788-a01f-3879337875ff"
 			}
 		},
 		"metadata": {
@@ -540,7 +540,7 @@
 					"        \n",
 					"        # Filter for specific batch date (hardcoded for batch processing)\n",
 					"        target_dates = [\"20241213\", \"20241216\"]  # Update this for your batch date\n",
-					"        logger.info(f\"Filtering for creation_date = {target_date}\")\n",
+					"        logger.info(f\"Filtering for creation_date = {target_dates}\")\n",
 					"        \n",
 					"        # Check what creation_dates are available first\n",
 					"        logger.info(\"Checking available creation_dates...\")\n",
@@ -554,11 +554,11 @@
 					"        filtered_df = source_df.filter(col(\"creation_date\").isin(target_dates))\n",
 					"        filtered_count = filtered_df.count()\n",
 					"        \n",
-					"        logger.info(f\"Records with creation_date = {target_date}: {filtered_count}\")\n",
+					"        logger.info(f\"Records with creation_date = {target_dates}: {filtered_count}\")\n",
 					"        \n",
 					"        if filtered_count == 0:\n",
-					"            logger.error(f\"❌ No records found for creation_date = {target_date}\")\n",
-					"            logger.error(\"Please check the available creation_dates above and update the target_date\")\n",
+					"            logger.error(f\"❌ No records found for creation_date = {target_dates}\")\n",
+					"            logger.error(\"Please check the available creation_dates above and update the target_dates\")\n",
 					"            return None, None\n",
 					"        \n",
 					"        # Apply PostgreSQL schema transformation\n",

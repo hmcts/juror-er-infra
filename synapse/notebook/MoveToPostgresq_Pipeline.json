@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5d9cad10-3151-41a2-9d13-7a12cc50f940"
+				"spark.autotune.trackingId": "ba28ddd5-df4c-49d7-8d53-a0cff46d59a4"
 			}
 		},
 		"metadata": {
@@ -531,8 +531,7 @@
 					"        # MANUAL DATE CONFIGURATION - MODIFY THESE VALUES AS NEEDED\n",
 					"        # Define your date range - update these dates manually as needed\n",
 					"        target_dates = [\n",
-					"            20241219,  # 2024-12-19\n",
-					"            20241220,  # 2024-12-20\n",
+					"            20241213,  # 2024-12-19\n",
 					"            # Add more dates as needed in YYYYMMDD format\n",
 					"        ]\n",
 					"        \n",

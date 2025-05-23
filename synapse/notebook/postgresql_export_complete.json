@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9ec05abc-fca9-4c2a-9e93-90f78f781c35"
+				"spark.autotune.trackingId": "c921d589-14c3-4a53-b259-2cb855507276"
 			}
 		},
 		"metadata": {
@@ -336,27 +336,28 @@
 					"                   when(col(\"address3\").isNull(), lit(None))\n",
 					"                   .otherwise(substring(trim(upper(col(\"address3\"))), 1, 35))) \\\n",
 					"        .withColumn(\"address4\", \n",
-					"                   when(col(\"address4\").isNull(), lit(None))\n",
-					"                   .otherwise(substring(trim(upper(col(\"address4\"))), 1, 35))) \\\n",
+					"                   when(col(\"address4\").isNull(), lit(None))) \\\n",
 					"        .withColumn(\"address5\", \n",
 					"                   when(col(\"address5\").isNull(), lit(None))\n",
 					"                   .otherwise(substring(trim(upper(col(\"address5\"))), 1, 35))) \\\n",
-					"       # .withColumn(\"address6\", \n",
-					"       #           when(col(\"address6\").isNull(), lit(None))\n",
-					"      #              .otherwise(substring(trim(upper(col(\"address6\"))), 1, 35))) \\\n",
+					"       .withColumn(\"address6\", \n",
+					"                  when(col(\"address6\").isNull(), lit(None))) \\\n",
 					"        .withColumn(\"zip\", \n",
 					"                   when(col(\"zip\").isNull(), lit(None))\n",
 					"                   .otherwise(substring(trim(upper(col(\"zip\"))), 1, 10))) \\\n",
 					"        .withColumn(\"perm_disqual\", \n",
-					"                   when(col(\"perm_disqual\").isNull(), lit(None))\n",
-					"                   .otherwise(substring(trim(col(\"perm_disqual\")), 1, 1))) \\\n",
-					"      #  .withColumn(\"source_id\", \n",
-					"       #            when(col(\"source_id\").isNull(), lit(None))\n",
-					"        #           .otherwise(substring(trim(col(\"source_id\")), 1, 1)))\n",
+					"                   when(col(\"perm_disqual\").isNull(), lit(None))) \\\n",
+					"        .withColumn(\"source_id\", \n",
+					"                  when(col(\"source_id\").isNull(), lit(None)))))\n",
 					"    \n",
 					"    # Handle date fields - convert string dates to proper date type or NULL for PostgreSQL\n",
-					"    logger.info(\"Converting date fields - ensuring empty strings become NULL\")\n",
-					"    \n",
+					"    logger.info(\"Converting date fields - ensuring empty strings become NULL\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"    # Function to properly handle date conversion for PostgreSQL (YYYY-MM-DD format)\n",
 					"    def safe_date_conversion(date_col):\n",
 					"        return when(\n",

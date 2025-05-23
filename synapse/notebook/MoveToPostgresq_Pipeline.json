@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8f52df60-5599-4054-873a-e4df537b52c5"
+				"spark.autotune.trackingId": "36c4c8ea-08eb-4961-a51d-b9bb26ccb5eb"
 			}
 		},
 		"metadata": {
@@ -395,7 +395,7 @@
 					"    if null_lname > 0 or null_fname > 0:\n",
 					"        logger.warning(f\"NULL constraint violations found: lname={null_lname}, fname={null_fname}\")\n",
 					"        \n",
-					"        # Remove records with NULL violations\n",
+					"        # Remove records with NULL violations only for empty lname or fname\n",
 					"        df_final = df_final.filter(\n",
 					"            col(\"lname\").isNotNull() &\n",
 					"            col(\"fname\").isNotNull() \n",

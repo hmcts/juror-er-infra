@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c8104b1b-fb74-46c3-807d-ec205d550f4d"
+				"spark.autotune.trackingId": "b69e243e-15c8-40fc-ab4a-79d015e8956f"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 18
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 19
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +288,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 20
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -449,7 +449,7 @@
 					"    \n",
 					"    return df_final"
 				],
-				"execution_count": 21
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -511,7 +511,7 @@
 					"    return output_path\n",
 					""
 				],
-				"execution_count": 22
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -539,7 +539,7 @@
 					"            return None, None\n",
 					"        \n",
 					"        # Filter for specific batch date (hardcoded for batch processing)\n",
-					"        target_date = [\"20241213\", \"20241216\"]  # Update this for your batch date\n",
+					"        target_dates = [\"20241213\", \"20241216\"]  # Update this for your batch date\n",
 					"        logger.info(f\"Filtering for creation_date = {target_date}\")\n",
 					"        \n",
 					"        # Check what creation_dates are available first\n",
@@ -730,7 +730,7 @@
 					"    else:\n",
 					"        logger.error(\"❌ Data availability check failed - cannot proceed with export\")"
 				],
-				"execution_count": 23
+				"execution_count": 30
 			}
 		]
 	}

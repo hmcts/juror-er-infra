@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "40cbb23a-3e61-4844-8ab4-05fd0e6e9b21"
+				"spark.autotune.trackingId": "affd1955-7112-43d4-99fa-cbb90f4b7d88"
 			}
 		},
 		"metadata": {
@@ -689,7 +689,6 @@
 					"        return False\n",
 					"\n",
 					"# Execute the export with enhanced functionality\n",
-					"if __name__ == \"__main__\":\n",
 					"    logger.info(\"🚀 Starting Enhanced PostgreSQL Export Pipeline\")\n",
 					"    \n",
 					"    # First check data availability\n",

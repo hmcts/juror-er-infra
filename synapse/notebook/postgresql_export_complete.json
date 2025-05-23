@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "02ef5e55-58bb-43c0-9712-b051c4525046"
+				"spark.autotune.trackingId": "d6e9fe44-abd3-4fd6-9342-a4dad395d6c7"
 			}
 		},
 		"metadata": {
@@ -567,19 +567,6 @@
 					"        if final_count == 0:\n",
 					"            logger.error(\"❌ No records remaining after transformation\")\n",
 					"            return None, None\n",
-					"        \n",
-					"        # Write to output path (Parquet format)\n",
-					"        logger.info(f\"Writing PostgreSQL-ready data to {output_path}\")\n",
-					"        try:\n",
-					"            postgresql_df.write \\\n",
-					"                .mode(\"overwrite\") \\\n",
-					"                .option(\"overwriteSchema\", \"true\") \\\n",
-					"                .parquet(output_path)\n",
-					"            logger.info(\"✅ Parquet export completed successfully\")\n",
-					"        except Exception as e:\n",
-					"            logger.error(f\"❌ Failed to write Parquet: {str(e)}\")\n",
-					"            return postgresql_df, None\n",
-					"        \n",
 					"        # Create a PostgreSQL-compatible CSV for import\n",
 					"        timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
 					"        csv_output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/export/postgresql_import_{timestamp}\"\n",

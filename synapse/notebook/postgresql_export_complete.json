@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "302ff8a5-0971-40d3-a000-2ccd3ec51947"
+				"spark.autotune.trackingId": "40cbb23a-3e61-4844-8ab4-05fd0e6e9b21"
 			}
 		},
 		"metadata": {
@@ -582,7 +582,7 @@
 					"        \n",
 					"        # Create a PostgreSQL-compatible CSV for import\n",
 					"        timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
-					"        csv_output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/exports/postgresql_import_{timestamp}\"\n",
+					"        csv_output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/export/postgresql_import_{timestamp}\"\n",
 					"        \n",
 					"        # Create PostgreSQL-compatible CSV\n",
 					"        logger.info(f\"Creating PostgreSQL-compatible CSV export at {csv_output_path}\")\n",

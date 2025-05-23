@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "34906100-63d1-4960-b40e-7c1a3cb5c6df"
+				"spark.autotune.trackingId": "ae02ee65-17b0-4551-9737-a93427dd68ef"
 			}
 		},
 		"metadata": {
@@ -255,7 +255,6 @@
 					"    logger.info(f\"Final record count after comprehensive cleaning: {final_count}\")\n",
 					"    logger.info(f\"Total records removed: {initial_count - final_count}\")\n",
 					"    \n",
-					"    return dflogger.info(\"Step 7: Cleaning other NAN/NULL values\")\n",
 					"    \n",
 					"    # Clean address fields\n",
 					"    for addr_col in [\"address\", \"address2\", \"address3\", \"address4\", \"address5\", \"address6\"]:\n",
@@ -519,7 +518,7 @@
 					"            \n",
 					"            # Filter for recent creation dates\n",
 					"            filtered_df = source_df.filter(\n",
-					"                (col(\"creation_date\") == lit(\"20241219\"))\n",
+					"                (col(\"creation_date\") == lit(\"20241213\")))\n",
 					"            \n",
 					"            \n",
 					"            filtered_count = filtered_df.count()\n",
@@ -602,7 +601,7 @@
 					"        logger.info(\"🎉 Enhanced PostgreSQL export pipeline completed successfully\")\n",
 					"        logger.info"
 				],
-				"execution_count": 1
+				"execution_count": 6
 			}
 		]
 	}

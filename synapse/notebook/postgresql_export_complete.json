@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "affd1955-7112-43d4-99fa-cbb90f4b7d88"
+				"spark.autotune.trackingId": "02ef5e55-58bb-43c0-9712-b051c4525046"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 38
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 39
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +288,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 40
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -440,7 +440,7 @@
 					"    \n",
 					"    return df_final"
 				],
-				"execution_count": 41
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -502,7 +502,7 @@
 					"    return output_path\n",
 					""
 				],
-				"execution_count": 42
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -689,6 +689,7 @@
 					"        return False\n",
 					"\n",
 					"# Execute the export with enhanced functionality\n",
+					"if __name__ == \"__main__\":\n",
 					"    logger.info(\"🚀 Starting Enhanced PostgreSQL Export Pipeline\")\n",
 					"    \n",
 					"    # First check data availability\n",
@@ -710,17 +711,19 @@
 					"            sample_data = result_df.limit(3).collect()\n",
 					"            for i, row in enumerate(sample_data):\n",
 					"                logger.info(f\"   Row {i+1}: lname={row.lname}, fname={row.fname}, address={row.address}, address4={row.address4}\")\n",
-					"                \n",
+					"        print_detailed_summary(moved_files) \n",
+					"        print(f\"Data Files Successfully Moved: {len(moved_files['data_success'])}\")     \n",
 					"        else:\n",
 					"            logger.error(\"❌ Export pipeline failed\")\n",
 					"            if result_df is None:\n",
 					"                logger.error(\"   - DataFrame transformation failed\")\n",
 					"            if csv_path is None:\n",
 					"                logger.error(\"   - CSV export failed\")\n",
+					"        \n",
 					"    else:\n",
 					"        logger.error(\"❌ Data availability check failed - cannot proceed with export\")"
 				],
-				"execution_count": 43
+				"execution_count": 79
 			}
 		]
 	}

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "db847622-51ac-462e-bd03-ba307fdde645"
+				"spark.autotune.trackingId": "9ec05abc-fca9-4c2a-9e93-90f78f781c35"
 			}
 		},
 		"metadata": {
@@ -241,7 +241,6 @@
 					"    # Final cleanup - remove records that still have null address4\n",
 					"    logger.info(\"Step 6: Final cleanup - removing records with null address4\")\n",
 					"    before_final_filter = df.count()\n",
-					"    df = df.filter(col(\"address4\").isNotNull() & (trim(col(\"address4\")) != \"\"))\n",
 					"    after_final_filter = df.count()\n",
 					"    logger.info(f\"Records after final address4 filtering: {after_final_filter} (removed: {before_final_filter - after_final_filter})\")\n",
 					"    \n",

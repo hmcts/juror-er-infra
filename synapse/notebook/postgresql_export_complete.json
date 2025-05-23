@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "882f1669-5a45-4b1c-9553-daf74569e059"
+				"spark.autotune.trackingId": "302ff8a5-0971-40d3-a000-2ccd3ec51947"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 24
+				"execution_count": 38
 			},
 			{
 				"cell_type": "code",
@@ -81,7 +81,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 25
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +288,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 26
+				"execution_count": 40
 			},
 			{
 				"cell_type": "code",
@@ -440,7 +440,7 @@
 					"    \n",
 					"    return df_final"
 				],
-				"execution_count": 27
+				"execution_count": 41
 			},
 			{
 				"cell_type": "code",
@@ -502,7 +502,7 @@
 					"    return output_path\n",
 					""
 				],
-				"execution_count": 28
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
@@ -515,7 +515,7 @@
 					"        # Initialize storage paths\n",
 					"        storage_account = \"baubaisadfsaprod\"\n",
 					"        source_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
-					"        output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"        output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/export\"\n",
 					"        \n",
 					"        # Read the existing Delta table\n",
 					"        logger.info(f\"Reading voter data from {source_path}\")\n",
@@ -721,7 +721,7 @@
 					"    else:\n",
 					"        logger.error(\"❌ Data availability check failed - cannot proceed with export\")"
 				],
-				"execution_count": 31
+				"execution_count": 43
 			}
 		]
 	}

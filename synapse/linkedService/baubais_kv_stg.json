@@ -1,0 +1,10 @@
+{
+	"name": "baubais_kv_stg",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://baubais-stg-kv.vault.azure.net/"
+		}
+	}
+}

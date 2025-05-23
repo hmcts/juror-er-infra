@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8e29f014-2ac5-4ab2-9e4b-6262dcfaf1c3"
+				"spark.autotune.trackingId": "96d6f203-089d-48e8-b76d-5cd3c7f6598f"
 			}
 		},
 		"metadata": {
@@ -420,15 +420,13 @@
 					"    null_address = df_final.filter(col(\"address\").isNull()).count()\n",
 					"    null_address4 = df_final.filter(col(\"address4\").isNull()).count()\n",
 					"    \n",
-					"    if null_lname > 0 or null_fname > 0 or null_address > 0 or null_address4 > 0:\n",
-					"        logger.warning(f\"NULL constraint violations found: lname={null_lname}, fname={null_fname}, address={null_address}, address4={null_address4}\")\n",
+					"    if null_lname > 0 or null_fname > 0 :\n",
+					"        logger.warning(f\"NULL constraint violations found: lname={null_lname}, fname={null_fname}\")\n",
 					"        \n",
 					"        # Remove records with NULL violations\n",
 					"        df_final = df_final.filter(\n",
 					"            col(\"lname\").isNotNull() &\n",
-					"            col(\"fname\").isNotNull() &\n",
-					"            col(\"address\").isNotNull() &\n",
-					"            col(\"address4\").isNotNull()\n",
+					"            col(\"fname\").isNotNull() \n",
 					"        )\n",
 					"    \n",
 					"    # Check hash_id uniqueness for deduplication verification\n",

@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0c24a44e-6b5c-46a1-8ef3-bc895addeac9"
+				"spark.autotune.trackingId": "64895b75-0736-4f47-8592-1fb5ad365b92"
 			}
 		},
 		"metadata": {
@@ -98,6 +98,61 @@
 					"l3_backup_count = l3_backup_df.count()\n",
 					"print(f\"L3 backup record count: {l3_backup_count:,}\")\n",
 					"print(f\"L3 backup verification: {'✅ SUCCESS' if l3_count == l3_backup_count else '❌ FAILED'}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Document records by creation_date for the affected dates\n",
+					"target_dates = [\"20241213\", \"20241216\"]\n",
+					"\n",
+					"print(\"\\n📊 Current State Documentation:\")\n",
+					"print(\"=\" * 50)\n",
+					"\n",
+					"# L2 current state\n",
+					"print(\"L2 (voters_transformed) by creation_date:\")\n",
+					"l2_state = l2_df.filter(col(\"creation_date\").isin(target_dates)) \\\n",
+					"             .groupBy(\"creation_date\") \\\n",
+					"             .count() \\\n",
+					"             .orderBy(\"creation_date\")\n",
+					"l2_state.show()\n",
+					"\n",
+					"# L3 current state  \n",
+					"print(\"L3 (voters_deduplicated_delta) by creation_date:\")\n",
+					"l3_state = l3_df.filter(col(\"creation_date\").isin(target_dates)) \\\n",
+					"             .groupBy(\"creation_date\") \\\n",
+					"             .count() \\\n",
+					"             .orderBy(\"creation_date\")\n",
+					"l3_state.show()\n",
+					"\n",
+					"# L3 by process type\n",
+					"print(\"L3 by AdtclmnInsertedByProcessName for target dates:\")\n",
+					"l3_process_state = l3_df.filter(col(\"creation_date\").isin(target_dates)) \\\n",
+					"                        .groupBy(\"creation_date\", \"AdtclmnInsertedByProcessName\") \\\n",
+					"                        .count() \\\n",
+					"                        .orderBy(\"creation_date\", \"AdtclmnInsertedByProcessName\")\n",
+					"l3_process_state.show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Save backup information\n",
+					"backup_info = {\n",
+					"    \"timestamp\": timestamp,\n",
+					"    \"l2_backup_path\": l2_backup_path,\n",
+					"    \"l3_backup_path\": l3_backup_path,\n",
+					"    \"l2_original_count\": l2_count,\n",
+					"    \"l3_original_count\": l3_count,\n",
+					"    \"target_dates\": target_dates\n",
+					"}\n",
+					"\n",
+					"print(\"\\n📝 Backup Information:\")\n",
+					"print(\"=\" * 50)\n",
+					"for key, value in backup_info.items():\n",
+					"    print(f\"{key}: {value}\")"
 				],
 				"execution_count": null
 			}

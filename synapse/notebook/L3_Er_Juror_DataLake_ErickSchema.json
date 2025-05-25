@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d24fd5fd-e5a9-431f-9b43-c60dd1b6dbed"
+				"spark.autotune.trackingId": "ae9deb32-133f-4a02-a654-10289a893e27"
 			}
 		},
 		"metadata": {
@@ -268,7 +268,7 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": 1
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -284,10 +284,16 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 2
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
 				"source": [
 					"def export_aggregated_data_for_powerbi(delta_table_path):\n",
 					"    \"\"\"\n",
@@ -372,10 +378,16 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None"
 				],
-				"execution_count": 3
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
 				"source": [
 					"def export_voters_to_datalake_with_cdc():\n",
 					"    \"\"\"\n",
@@ -719,10 +731,16 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None"
 				],
-				"execution_count": 4
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
 				"source": [
 					"# Update the main execution code to handle the new return format and provide more detailed reporting\n",
 					"if __name__ == \"__main__\":\n",
@@ -800,20 +818,20 @@
 					"        print(f\"\\n❌ CRITICAL ERROR: {str(e)}\")\n",
 					"        print(\"Check the logs for detailed stack trace\")"
 				],
-				"execution_count": 5
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": true,
+					"editable": false,
 					"run_control": {
-						"frozen": false
+						"frozen": true
 					}
 				},
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 6
+				"execution_count": 39
 			},
 			{
 				"cell_type": "code",
@@ -832,34 +850,91 @@
 					"\n",
 					"# Filter using cast to string and parse as date\n",
 					"filtered_df = delta_df.filter(\n",
-					"    (col(\"creation_date\") == lit(20241219)) |\n",
-					"    (col(\"creation_date\") == lit(20241220))\n",
+					"    (col(\"creation_date\") == lit(\"20241213\")) |   # string comparison\n",
+					"    (col(\"creation_date\") == lit(\"20241216\"))    # string comparison\n",
+					"    \n",
 					")\n",
 					"\n",
 					"# Get all column names\n",
 					"all_columns = filtered_df.columns\n",
 					"\n",
 					"# Keep all except the last 6\n",
-					"columns_to_keep = all_columns[:-6]\n",
+					"columns_to_keep = all_columns[:-1]\n",
+					"\n",
 					"\n",
 					"# Select only the columns you want\n",
 					"filtered_trimmed_df = filtered_df.select(*columns_to_keep)\n",
 					"\n",
 					"# Show result\n",
-					"display(filtered_trimmed_df)\n",
+					"#display(filtered_trimmed_df)\n",
 					""
 				],
-				"execution_count": 62
+				"execution_count": 55
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					},
+					"collapsed": false
+				},
+				"source": [
+					"# Check L2 Delta table\n",
+					"l2_df = spark.read.format(\"delta\").load(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/voters_transformed\")\n",
+					"\n",
+					"l2_check = l2_df.filter(\n",
+					"    (col(\"rec_num\") == lit(\"110\"))  \n",
+					"   # (col(\"creation_date\") == lit(\"20241216\"))\n",
+					")\n",
+					"\n",
+					"print(f\"L2 records for target dates: {l2_check.count()}\")\n",
+					"display(l2_check)"
+				],
+				"execution_count": 58
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import count\n",
+					"\n",
+					"final_count = filtered_trimmed_df.groupBy('creation_date','rec_num') \\\n",
+					"    .agg(count('rec_num')) \\\n",
+					"    .orderBy('rec_num')\n",
+					"\n",
+					"display(final_count)"
+				],
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"display(filtered_df.count())"
+					"display(filtered_trimmed_df.count())"
 				],
-				"execution_count": 63
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(filtered_trimmed_df)"
+				],
+				"execution_count": 51
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
 					"import datetime\n",
 					"import time\n",
@@ -906,88 +981,6 @@
 					"mssparkutils.fs.rm(temp_output_dir, recurse=True)"
 				],
 				"execution_count": 64
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": false,
-					"run_control": {
-						"frozen": true
-					},
-					"collapsed": false
-				},
-				"source": [
-					"from pyspark.sql.functions import count\n",
-					"\n",
-					"final_count = delta_df.groupBy('creation_date') \\\n",
-					"    .agg(count('creation_date')) \\\n",
-					"    .orderBy('creation_date')\n",
-					"\n",
-					"display(final_count)"
-				],
-				"execution_count": 7
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": false,
-					"run_control": {
-						"frozen": true
-					}
-				},
-				"source": [
-					"delta_df.count()"
-				],
-				"execution_count": 38
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": true,
-					"run_control": {
-						"frozen": false
-					},
-					"collapsed": false
-				},
-				"source": [
-					"display(delta_df)"
-				],
-				"execution_count": 8
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": false,
-					"run_control": {
-						"frozen": true
-					},
-					"collapsed": false
-				},
-				"source": [
-					"from pyspark.sql.functions import count\n",
-					"\n",
-					"final_count = delta_df.groupBy('address6','rec_num') \\\n",
-					"    .agg(count('address6')) \\\n",
-					"    .orderBy('rec_num')\n",
-					"\n",
-					"display(final_count)"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": false,
-					"run_control": {
-						"frozen": true
-					},
-					"collapsed": false
-				},
-				"source": [
-					"foo_df = delta_df.filter(delta_df.rec_num==249)\n",
-					"foo_df.count()"
-				],
-				"execution_count": null
 			}
 		]
 	}

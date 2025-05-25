@@ -1,5 +1,5 @@
 {
-	"name": "L2_Backup_Files",
+	"name": "Create_Backup_Files",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5ab74167-7912-4dfb-a513-ba33f4bf5f13"
+				"spark.autotune.trackingId": "0c24a44e-6b5c-46a1-8ef3-bc895addeac9"
 			}
 		},
 		"metadata": {
@@ -75,6 +75,29 @@
 					"l2_backup_count = l2_backup_df.count()\n",
 					"print(f\"L2 backup record count: {l2_backup_count:,}\")\n",
 					"print(f\"L2 backup verification: {'✅ SUCCESS' if l2_count == l2_backup_count else '❌ FAILED'}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# L3 Backup\n",
+					"l3_source_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
+					"l3_backup_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/backup/voters_deduplicated_delta_backup_{timestamp}\"\n",
+					"\n",
+					"print(f\"Creating L3 backup: {l3_backup_path}\")\n",
+					"l3_df = spark.read.format(\"delta\").load(l3_source_path)\n",
+					"l3_count = l3_df.count()\n",
+					"print(f\"L3 original record count: {l3_count:,}\")\n",
+					"\n",
+					"# Create backup\n",
+					"l3_df.write.format(\"delta\").mode(\"overwrite\").save(l3_backup_path)\n",
+					"\n",
+					"# Verify backup\n",
+					"l3_backup_df = spark.read.format(\"delta\").load(l3_backup_path)\n",
+					"l3_backup_count = l3_backup_df.count()\n",
+					"print(f\"L3 backup record count: {l3_backup_count:,}\")\n",
+					"print(f\"L3 backup verification: {'✅ SUCCESS' if l3_count == l3_backup_count else '❌ FAILED'}\")"
 				],
 				"execution_count": null
 			}

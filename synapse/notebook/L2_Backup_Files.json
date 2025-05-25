@@ -1,0 +1,83 @@
+{
+	"name": "L2_Backup_Files",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkprod",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "5ab74167-7912-4dfb-a513-ba33f4bf5f13"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
+				"name": "sparkprod",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"import time\n",
+					"from datetime import datetime\n",
+					"\n",
+					"# Create timestamp for unique backup naming\n",
+					"timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
+					"storage_account = \"baubaisadfsaprod\"\n",
+					"\n",
+					"# L2 Backup\n",
+					"l2_source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
+					"l2_backup_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/backup/voters_transformed_backup_{timestamp}\"\n",
+					"\n",
+					"print(f\"Creating L2 backup: {l2_backup_path}\")\n",
+					"l2_df = spark.read.format(\"delta\").load(l2_source_path)\n",
+					"l2_count = l2_df.count()\n",
+					"print(f\"L2 original record count: {l2_count:,}\")\n",
+					"\n",
+					"# Create backup\n",
+					"l2_df.write.format(\"delta\").mode(\"overwrite\").save(l2_backup_path)\n",
+					"\n",
+					"# Verify backup\n",
+					"l2_backup_df = spark.read.format(\"delta\").load(l2_backup_path)\n",
+					"l2_backup_count = l2_backup_df.count()\n",
+					"print(f\"L2 backup record count: {l2_backup_count:,}\")\n",
+					"print(f\"L2 backup verification: {'✅ SUCCESS' if l2_count == l2_backup_count else '❌ FAILED'}\")"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

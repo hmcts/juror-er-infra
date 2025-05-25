@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "37edd3e1-04b0-4b59-b8a9-371aa8ff08e9"
+				"spark.autotune.trackingId": "508d4ce6-ed13-49b1-b4aa-e560cd5112f9"
 			}
 		},
 		"metadata": {
@@ -68,7 +68,7 @@
 					"import pyspark.sql.functions as F\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -76,7 +76,7 @@
 					"# Initialize Spark\n",
 					"spark = SparkSession.builder.getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -390,7 +390,7 @@
 					"    import traceback\n",
 					"    print(traceback.format_exc())"
 				],
-				"execution_count": null
+				"execution_count": 3
 			}
 		]
 	}

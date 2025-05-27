@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "18d0f8bc-f0f7-44cd-8955-aa60ba48ad85"
+				"spark.autotune.trackingId": "66855668-b5bf-4f9b-9352-97360fa71d69"
 			}
 		},
 		"metadata": {
@@ -268,7 +268,7 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": 29
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 23
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -831,34 +831,104 @@
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 24
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"from pyspark.sql.functions import col\n",
-					"\n",
-					"# Filter rows WHERE hash_id contains \"_\"\n",
-					"df_with_underscore = delta_df.filter(col(\"hash_id\").contains(\"_\"))\n",
-					"\n",
-					"count_with_underscore = df_with_underscore.count()\n",
-					"\n",
-					"\n",
-					"# Filter rows WHERE hash_id does NOT contain \"_\"\n",
-					"#df_without_underscore = df.filter(~col(\"hash_id\").contains(\"_\"))"
-				],
-				"execution_count": 5
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"print(f\"Records WITH underscore: {count_with_underscore}\")"
-				],
-				"execution_count": 6
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
 				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"print(\"Loading PostgreSQL CSV export...\")\n",
+					"postgres_csv_df = spark.read.option(\"header\", \"true\").csv(\n",
+					"    \"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/exports/staging_voters.csv\"\n",
+					")"
+				],
+				"execution_count": 34
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"# Since CSV only has hash_id column, just select it\n",
+					"postgres_hash_ids = postgres_csv_df.select('hash_id')\n",
+					"postgres_count = postgres_hash_ids.count()\n",
+					"print(f\"PostgreSQL export records: {postgres_count:,}\")\n",
+					"\n",
+					"# === COMPARISON ANALYSIS ===\n",
+					"print(\"\\n=== COMPARISON ANALYSIS ===\")\n",
+					"\n",
+					"# Partition both datasets for efficient operations\n",
+					"delta_hash_ids = delta_df.select('hash_id')\n",
+					"delta_hash_ids = delta_hash_ids.repartition(200, 'hash_id')\n",
+					"postgres_hash_ids = postgres_hash_ids.repartition(200, 'hash_id')\n",
+					"# 1. Find records in Delta but NOT in PostgreSQL (missing from PostgreSQL)\n",
+					"missing_from_postgres = delta_hash_ids.subtract(postgres_hash_ids)\n",
+					"missing_from_postgres_count = missing_from_postgres.count()\n",
+					"print(f\"Records in Delta but MISSING from PostgreSQL: {missing_from_postgres_count:,}\")\n",
+					""
+				],
+				"execution_count": 37
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"# === VALIDATION ===\n",
+					"\n",
+					"# === EXPORT MISSING RECORDS ===\n",
+					"if missing_from_postgres_count > 0:\n",
+					"    # Get full records from Delta table for missing hash_ids\n",
+					"    recovery_data = delta_df.join(missing_from_postgres, on='hash_id', how='inner')\n",
+					"    \n",
+					"    # Export all columns to CSV\n",
+					"    recovery_data.coalesce(1).write.mode('overwrite') \\\n",
+					"        .option('header', 'true') \\\n",
+					"        .csv(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/exports/missing_records.csv\")\n",
+					"    \n",
+					"    print(f\"✅ Exported {missing_from_postgres_count:,} records with all columns\")\n",
+					"\n",
+					"# === ANALYZE EXTRA RECORDS IN POSTGRESQL ===\n",
+					"\n",
+					"    print(f\"\\n=== EXTRA RECORDS IN POSTGRESQL ===\")\n",
+					"    print(\"These records exist in PostgreSQL but not in your Delta table\")\n",
+					"    print(\"This might indicate:\")\n",
+					"    print(\"- Records added directly to PostgreSQL\")\n",
+					"    print(\"- Different data processing versions\")\n",
+					"    print(\"- Data that should be in Delta but isn't\")\n",
+					"    \n",
+					"    \n",
+					"    # Export extra records for investigation\n",
+					"    extra_output_path = \"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/exports/extra_in_postgres.csv\"\n",
+					"    extra_in_postgres.coalesce(1).write.mode('overwrite') \\\n",
+					"        .option('header', 'true') \\\n",
+					"        .csv(extra_output_path)\n",
+					"    \n",
+					"    print(f\"Extra PostgreSQL hash_ids exported to: {extra_output_path}\")\n",
+					""
+				],
+				"execution_count": 43
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
 					"collapsed": false
 				},
 				"source": [

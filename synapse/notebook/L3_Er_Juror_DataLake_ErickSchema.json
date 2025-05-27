@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ae9deb32-133f-4a02-a654-10289a893e27"
+				"spark.autotune.trackingId": "18d0f8bc-f0f7-44cd-8955-aa60ba48ad85"
 			}
 		},
 		"metadata": {
@@ -268,7 +268,7 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": 43
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -284,7 +284,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 44
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -823,15 +823,38 @@
 			{
 				"cell_type": "code",
 				"metadata": {
-					"editable": false,
+					"editable": true,
 					"run_control": {
-						"frozen": true
+						"frozen": false
 					}
 				},
 				"source": [
 					"delta_df = spark.read.format(\"delta\").load( f\"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\")"
 				],
-				"execution_count": 39
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.functions import col\n",
+					"\n",
+					"# Filter rows WHERE hash_id contains \"_\"\n",
+					"df_with_underscore = delta_df.filter(col(\"hash_id\").contains(\"_\"))\n",
+					"\n",
+					"count_with_underscore = df_with_underscore.count()\n",
+					"\n",
+					"\n",
+					"# Filter rows WHERE hash_id does NOT contain \"_\"\n",
+					"#df_without_underscore = df.filter(~col(\"hash_id\").contains(\"_\"))"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"print(f\"Records WITH underscore: {count_with_underscore}\")"
+				],
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -850,8 +873,9 @@
 					"\n",
 					"# Filter using cast to string and parse as date\n",
 					"filtered_df = delta_df.filter(\n",
-					"    (col(\"creation_date\") == lit(\"20241213\")) |   # string comparison\n",
-					"    (col(\"creation_date\") == lit(\"20241216\"))    # string comparison\n",
+					"    (col(\"creation_date\") == lit(\"20250212\")) |   # string comparison\n",
+					"    (col(\"creation_date\") == lit(\"20250213\")) |\n",
+					"    (col(\"creation_date\") == lit(\"20250218\"))\n",
 					"    \n",
 					")\n",
 					"\n",
@@ -859,17 +883,82 @@
 					"all_columns = filtered_df.columns\n",
 					"\n",
 					"# Keep all except the last 6\n",
-					"columns_to_keep = all_columns[:-1]\n",
+					"columns_to_keep = all_columns[:-6]\n",
 					"\n",
 					"\n",
 					"# Select only the columns you want\n",
 					"filtered_trimmed_df = filtered_df.select(*columns_to_keep)\n",
 					"\n",
 					"# Show result\n",
-					"#display(filtered_trimmed_df)\n",
+					"display(filtered_trimmed_df)\n",
 					""
 				],
-				"execution_count": 55
+				"execution_count": 27
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"import datetime\n",
+					"# Configuration\n",
+					"storage_account = \"baubaisadfsaprod\"\n",
+					"input_df = filtered_trimmed_df\n",
+					"output_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/exports\"\n",
+					"\n",
+					"# Ensure output directory exists\n",
+					"if not mssparkutils.fs.exists(output_dir):\n",
+					"    mssparkutils.fs.mkdirs(output_dir)\n",
+					"\n",
+					"try:\n",
+					"    print(f\"🔄 Processing filtered DataFrame data\")\n",
+					"    \n",
+					"    # Use your existing DataFrame directly (no need to read from parquet)\n",
+					"    df = input_df\n",
+					"    record_count = df.count()\n",
+					"    print(f\"✅ Processing {record_count} records from filtered DataFrame\")\n",
+					"    \n",
+					"    # Generate a single CSV export\n",
+					"    timestamp = datetime.datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
+					"    temp_output_dir = f\"{output_dir}/temp_{timestamp}\"\n",
+					"    \n",
+					"    # Write to temporary CSV folder\n",
+					"    # You can remove coalesce(1) if you don't need a single file, or keep it if you do\n",
+					"    df.coalesce(1).write \\\n",
+					"        .option(\"header\", \"true\") \\\n",
+					"        .option(\"quoteAll\", \"true\") \\\n",
+					"        .mode(\"overwrite\") \\\n",
+					"        .csv(temp_output_dir)\n",
+					"    \n",
+					"    # Locate and rename the .csv file\n",
+					"    files_written = mssparkutils.fs.ls(temp_output_dir)\n",
+					"    for f in files_written:\n",
+					"        if f.path.endswith(\".csv\") and \"part-\" in f.path:\n",
+					"            final_csv_path = f\"{output_dir}/voters_export_{timestamp}.csv\"\n",
+					"            mssparkutils.fs.cp(f.path, final_csv_path)\n",
+					"            print(f\"📄 Exported to: {final_csv_path}\")\n",
+					"            break\n",
+					"    \n",
+					"    # Clean up temp folder\n",
+					"    mssparkutils.fs.rm(temp_output_dir, recurse=True)\n",
+					"    \n",
+					"except Exception as e:\n",
+					"    print(f\"❌ Failed to process: {str(e)}\")\n",
+					"    import traceback\n",
+					"    print(traceback.format_exc())"
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"display(filtered_trimmed_df.count())"
+				],
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -902,20 +991,20 @@
 				"source": [
 					"from pyspark.sql.functions import count\n",
 					"\n",
-					"final_count = filtered_trimmed_df.groupBy('creation_date','rec_num') \\\n",
+					"final_count = delta_df.groupBy('creation_date','rec_num') \\\n",
 					"    .agg(count('rec_num')) \\\n",
 					"    .orderBy('rec_num')\n",
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 56
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"display(filtered_trimmed_df.count())"
+					"display(delta_df.count())"
 				],
-				"execution_count": 57
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",

@@ -1,0 +1,19 @@
+{
+	"name": "AzurePostgreSql1",
+	"properties": {
+		"annotations": [],
+		"type": "AzurePostgreSql",
+		"version": "2.0",
+		"typeProperties": {
+			"server": "juror-api-demo.postgres.database.azure.com",
+			"port": "5432",
+			"database": "juror",
+			"sslMode": 2,
+			"authenticationType": "SystemAssignedManagedIdentity"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

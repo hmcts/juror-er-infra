@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8f632a2a-14c4-4e19-834a-b220a39258bd"
+				"spark.autotune.trackingId": "2624d6c3-d0af-4b71-99c4-06b4cf92a837"
 			}
 		},
 		"metadata": {
@@ -76,7 +76,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -139,7 +139,7 @@
 					"                 # Create a deterministic date based on hash\n",
 					"                 date_add(\n",
 					"                     to_date(lit(\"1950-01-01\")),\n",
-					"                     (abs(xxhash64(concat(col(column_name).cast(\"string\"), lit(salt)))) % (365 * 50))\n",
+					"                     (abs(hash(col(\"dob\"))) % 18250).cast(\"int\")  # Key fix: .cast(\"int\")\n",
 					"                 )\n",
 					"            ).otherwise(col(column_name))\n",
 					"        )\n",
@@ -338,7 +338,7 @@
 					"    \"\"\"\n",
 					"    logger.info(\"Cleaning timestamp fields\")\n",
 					"    \n",
-					"    timestamp_columns = ['date_selected1', 'date_selected2', 'date_selected3']\n",
+					"    timestamp_columns = ['dob']\n",
 					"    \n",
 					"    for col_name in timestamp_columns:\n",
 					"        if col_name in df.columns:\n",
@@ -526,7 +526,7 @@
 					"        return None\n",
 					"    \n",
 					"    # Format date columns for PostgreSQL (YYYY-MM-DD)\n",
-					"    datetime_columns = ['dob', 'date_selected1', 'date_selected2', 'date_selected3']\n",
+					"    datetime_columns = ['dob']\n",
 					"    \n",
 					"    for col_name in datetime_columns:\n",
 					"        if col_name in df.columns:\n",
@@ -721,7 +721,7 @@
 					"    else:\n",
 					"        logger.error(\"❌ Input data check failed - cannot proceed\")"
 				],
-				"execution_count": null
+				"execution_count": 3
 			}
 		]
 	}

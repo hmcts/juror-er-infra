@@ -1,7 +1,0 @@
-{
-	"name": "juror-api-demo",
-	"properties": {
-		"privateLinkResourceId": "/subscriptions/c68a4bed-4c3d-4956-af51-4ae164c1957c/resourceGroups/juror-demo-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/juror-api-demo",
-		"groupId": "postgresqlServer"
-	}
-}

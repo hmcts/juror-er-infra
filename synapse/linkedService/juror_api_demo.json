@@ -12,7 +12,7 @@
 			"authenticationType": "SystemAssignedManagedIdentity"
 		},
 		"connectVia": {
-			"referenceName": "AutoResolveIntegrationRuntime",
+			"referenceName": "SynapseSHIR",
 			"type": "IntegrationRuntimeReference"
 		}
 	}

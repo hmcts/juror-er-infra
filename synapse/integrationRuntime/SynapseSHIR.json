@@ -1,0 +1,6 @@
+{
+	"name": "SynapseSHIR",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

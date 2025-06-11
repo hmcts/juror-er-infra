@@ -1,0 +1,142 @@
+{
+	"name": "Load_voters_copy",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "1021d4b5-1a17-4811-bc63-8b1f390692b7"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType\n",
+					"from pyspark.sql.functions import lit, concat, substring, col, year, to_date\n",
+					"\n",
+					"schema = StructType([\n",
+					"    StructField(\"part_no\", StringType(), False),\n",
+					"    StructField(\"register_lett\", StringType(), True),\n",
+					"    StructField(\"poll_number\", StringType(), True),\n",
+					"    StructField(\"new_marker\", StringType(), True),\n",
+					"    StructField(\"title\", StringType(), True),\n",
+					"    StructField(\"lname\", StringType(), False),\n",
+					"    StructField(\"fname\", StringType(), False),\n",
+					"    StructField(\"dob\", DateType(), True),\n",
+					"    StructField(\"flags\", StringType(), True),\n",
+					"    StructField(\"address\", StringType(), False),\n",
+					"    StructField(\"address2\", StringType(), True),\n",
+					"    StructField(\"address3\", StringType(), True),\n",
+					"    StructField(\"address4\", StringType(), True),\n",
+					"    StructField(\"address5\", StringType(), True),\n",
+					"    StructField(\"address6\", StringType(), True),\n",
+					"    StructField(\"zip\", StringType(), True),\n",
+					"    StructField(\"date_selected1\", DateType(), True),\n",
+					"    StructField(\"date_selected2\", DateType(), True),\n",
+					"    StructField(\"date_selected3\", DateType(), True),\n",
+					"    StructField(\"rec_num\", IntegerType(), True),\n",
+					"    StructField(\"perm_disqual\", StringType(), True),\n",
+					"    StructField(\"source_id\", StringType(), True),\n",
+					"    # postcode_start will be derived\n",
+					"])"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# https://baubaisadfsastg.dfs.core.windows.net/juror-etl/exports/voters_export_20250501_180907.csv/.spark-staging-94682f2a-1673-4f1f-9816-8a65f590cc92/_temporary/0/_temporary/attempt_20250501180921120983583323497039_0007_m_000000_21/part-00000-94682f2a-1673-4f1f-9816-8a65f590cc92-c000.csv\n",
+					"# https://baubaisadfsastg.blob.core.windows.net/juror-etl/exports/voters_export_20250501_180907.csv/part-00000-94682f2a-1673-4f1f-9816-8a65f590cc92-c000.csv\n",
+					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
+					"storage = f\"baubaisadfsa{env}\"\n",
+					"container = \"juror-etl\"\n",
+					"target_file = \"exports/voters_export_20250501_180907.csv/part-00000-94682f2a-1673-4f1f-9816-8a65f590cc92-c000.csv\"\n",
+					"fileSource = f'abfss://{container}@{storage}.dfs.core.windows.net/{target_file}'\n",
+					"\n",
+					"csv_files = spark.read.format(\"csv\")\\\n",
+					"    .option(\"header\", \"true\") \\\n",
+					"    .option(\"inferSchema\", \"false\") \\\n",
+					"    .option(\"dateFormat\", \"yyyy-MM-dd\") \\\n",
+					"    .schema(schema) \\\n",
+					"    .load(fileSource, header='true')\n",
+					"\n",
+					"\n",
+					"\n",
+					""
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(csv_files)"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_masked = csv_files \\\n",
+					"    .withColumn(\"lname\", lit(\"REDACTED\")) \\\n",
+					"    .withColumn(\"fname\", lit(\"REDACTED\")) \\\n",
+					"    .withColumn(\"dob\", lit(\"XXXX-XX-XX\"))\n",
+					""
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
+				"source": [
+					"display(df_masked)"
+				],
+				"execution_count": 17
+			}
+		]
+	}
+}

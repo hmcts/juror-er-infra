@@ -61,7 +61,8 @@
 						"referenceName": "lake_csv",
 						"type": "DatasetReference",
 						"parameters": {
-							"container": "voters-temp-2025"
+							"container": "voters-temp-2025",
+							"file_path": "exclude_range_table.csv"
 						}
 					}
 				],

@@ -9,7 +9,16 @@
 			"port": "5432",
 			"database": "juror",
 			"sslMode": 2,
-			"authenticationType": "SystemAssignedManagedIdentity"
+			"username": "pgadmin",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "kv_juror_demo",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "api-POSTGRES-PASS"
+			},
+			"authenticationType": "Basic"
 		},
 		"connectVia": {
 			"referenceName": "SynapseSHIR",

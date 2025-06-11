@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Load_Lake_to_Posgresql",
-				"type": "Copy",
+				"name": "Get Files in folder",
+				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -15,338 +15,441 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "ParquetSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"wildcardFolderPath": {
-								"value": "@pipeline().parameters.parquet_file",
-								"type": "Expression"
-							},
-							"wildcardFileName": "*.parquet",
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "ParquetReadSettings"
-						}
-					},
-					"sink": {
-						"type": "AzurePostgreSqlSink",
-						"writeBatchSize": 1000000,
-						"writeBatchTimeout": "00:30:00",
-						"writeMethod": "CopyCommand"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "part_no",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "part_no",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "register_lett",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "register_lett",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "poll_number",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "poll_number",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "new_marker",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "new_marker",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "title",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "title",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "lname",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "lname",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "fname",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "fname",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "dob",
-									"type": "DateTime",
-									"physicalType": "DATE"
-								},
-								"sink": {
-									"name": "dob",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "flags",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "flags",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "address",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "address2",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address2",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "address3",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address3",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "address4",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address4",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "address5",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address5",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "address6",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address6",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "zip",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "zip",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "date_selected1",
-									"type": "DateTime",
-									"physicalType": "DATE"
-								},
-								"sink": {
-									"name": "date_selected1",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "date_selected2",
-									"type": "DateTime",
-									"physicalType": "DATE"
-								},
-								"sink": {
-									"name": "date_selected2",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "date_selected3",
-									"type": "DateTime",
-									"physicalType": "DATE"
-								},
-								"sink": {
-									"name": "date_selected3",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "rec_num",
-									"type": "Int32",
-									"physicalType": "INT32"
-								},
-								"sink": {
-									"name": "rec_num",
-									"type": "Int32",
-									"physicalType": "integer"
-								}
-							},
-							{
-								"source": {
-									"name": "perm_disqual",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "perm_disqual",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "source_id",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "source_id",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
+					"dataset": {
 						"referenceName": "lake_parket",
 						"type": "DatasetReference",
 						"parameters": {
 							"container": {
 								"value": "@pipeline().parameters.container",
 								"type": "Expression"
+							},
+							"directory": {
+								"value": "@pipeline().parameters.parquet_file",
+								"type": "Expression"
 							}
 						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "ParquetReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Filter Parquet Files",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get Files in folder",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
-				"outputs": [
-					{
-						"referenceName": "juror_api_db",
-						"type": "DatasetReference",
-						"parameters": {
-							"schema": {
-								"value": "@pipeline().parameters.sink_schema",
-								"type": "Expression"
-							},
-							"table": {
-								"value": "@pipeline().parameters.sink_table",
-								"type": "Expression"
-							}
-						}
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Files in folder').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@endswith(item().name, '.parquet')",
+						"type": "Expression"
 					}
-				]
+				}
+			},
+			{
+				"name": "Files loop",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter Parquet Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter Parquet Files').output.Value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Load_Lake_to_Posgresql",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ParquetSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"wildcardFolderPath": {
+											"value": "@pipeline().parameters.parquet_file",
+											"type": "Expression"
+										},
+										"wildcardFileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "ParquetReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzurePostgreSqlSink",
+									"writeBatchSize": 1000000,
+									"writeBatchTimeout": "00:30:00",
+									"writeMethod": "CopyCommand"
+								},
+								"enableStaging": false,
+								"enableSkipIncompatibleRow": true,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Warning",
+										"enableReliableLogging": false
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "AzureDataLakeStorage1",
+											"type": "LinkedServiceReference"
+										},
+										"path": "process-logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "part_no",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "part_no",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "register_lett",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "register_lett",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "poll_number",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "poll_number",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "new_marker",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "new_marker",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "title",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "title",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "lname",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "lname",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "fname",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "fname",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "dob",
+												"type": "DateTime",
+												"physicalType": "DATE"
+											},
+											"sink": {
+												"name": "dob",
+												"type": "DateTime",
+												"physicalType": "date"
+											}
+										},
+										{
+											"source": {
+												"name": "flags",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "flags",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "address",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "address",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "address2",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "address2",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "address3",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "address3",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "address4",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "address4",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "address5",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "address5",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "address6",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "address6",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "zip",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "zip",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "date_selected1",
+												"type": "DateTime",
+												"physicalType": "DATE"
+											},
+											"sink": {
+												"name": "date_selected1",
+												"type": "DateTime",
+												"physicalType": "date"
+											}
+										},
+										{
+											"source": {
+												"name": "date_selected2",
+												"type": "DateTime",
+												"physicalType": "DATE"
+											},
+											"sink": {
+												"name": "date_selected2",
+												"type": "DateTime",
+												"physicalType": "date"
+											}
+										},
+										{
+											"source": {
+												"name": "date_selected3",
+												"type": "DateTime",
+												"physicalType": "DATE"
+											},
+											"sink": {
+												"name": "date_selected3",
+												"type": "DateTime",
+												"physicalType": "date"
+											}
+										},
+										{
+											"source": {
+												"name": "rec_num",
+												"type": "Int32",
+												"physicalType": "INT32"
+											},
+											"sink": {
+												"name": "rec_num",
+												"type": "Int32",
+												"physicalType": "integer"
+											}
+										},
+										{
+											"source": {
+												"name": "perm_disqual",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "perm_disqual",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										},
+										{
+											"source": {
+												"name": "source_id",
+												"type": "String",
+												"physicalType": "UTF8"
+											},
+											"sink": {
+												"name": "source_id",
+												"type": "String",
+												"physicalType": "character varying"
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "lake_parket",
+									"type": "DatasetReference",
+									"parameters": {
+										"container": {
+											"value": "@pipeline().parameters.container",
+											"type": "Expression"
+										},
+										"directory": "any"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "juror_api_db",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@pipeline().parameters.sink_schema",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@pipeline().parameters.sink_table",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
 			"parquet_file": {
 				"type": "string",
-				"defaultValue": "masked_voters_temp.parquet"
+				"defaultValue": "masked_voters_temp2.parquet"
 			},
 			"container": {
 				"type": "string",

@@ -13,11 +13,12 @@
 			"executorMemory": "28g",
 			"executorCores": 4,
 			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": true,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1021d4b5-1a17-4811-bc63-8b1f390692b7"
+				"spark.autotune.trackingId": "d1a8ebab-b8e5-47c7-bec3-e59542b56325"
 			}
 		},
 		"metadata": {
@@ -49,10 +50,45 @@
 		},
 		"cells": [
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Imports and  global parameters"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType\n",
 					"from pyspark.sql.functions import lit, concat, substring, col, year, to_date\n",
+					"\n",
+					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
+					"storage = f\"baubaisadfsa{env}\""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Load CSV data"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"\n",
 					"schema = StructType([\n",
 					"    StructField(\"part_no\", StringType(), False),\n",
@@ -80,17 +116,14 @@
 					"    # postcode_start will be derived\n",
 					"])"
 				],
-				"execution_count": 14
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"# https://baubaisadfsastg.dfs.core.windows.net/juror-etl/exports/voters_export_20250501_180907.csv/.spark-staging-94682f2a-1673-4f1f-9816-8a65f590cc92/_temporary/0/_temporary/attempt_20250501180921120983583323497039_0007_m_000000_21/part-00000-94682f2a-1673-4f1f-9816-8a65f590cc92-c000.csv\n",
-					"# https://baubaisadfsastg.blob.core.windows.net/juror-etl/exports/voters_export_20250501_180907.csv/part-00000-94682f2a-1673-4f1f-9816-8a65f590cc92-c000.csv\n",
-					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
-					"storage = f\"baubaisadfsa{env}\"\n",
-					"container = \"juror-etl\"\n",
-					"target_file = \"exports/voters_export_20250501_180907.csv/part-00000-94682f2a-1673-4f1f-9816-8a65f590cc92-c000.csv\"\n",
+					"\n",
+					"container = \"voters-temp-2025\"\n",
+					"target_file = \"voters_temp.csv\"\n",
 					"fileSource = f'abfss://{container}@{storage}.dfs.core.windows.net/{target_file}'\n",
 					"\n",
 					"csv_files = spark.read.format(\"csv\")\\\n",
@@ -104,17 +137,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 11
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"collapsed": false
-				},
-				"source": [
-					"display(csv_files)"
-				],
-				"execution_count": 12
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -122,10 +145,61 @@
 					"df_masked = csv_files \\\n",
 					"    .withColumn(\"lname\", lit(\"REDACTED\")) \\\n",
 					"    .withColumn(\"fname\", lit(\"REDACTED\")) \\\n",
-					"    .withColumn(\"dob\", lit(\"XXXX-XX-XX\"))\n",
+					"    .withColumn(\"dob\", lit(None).cast(DateType()))\n",
 					""
 				],
-				"execution_count": 15
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"parquet_file = \"masked_voters_temp.parquet\"\n",
+					"file_sink = f'abfss://{container}@{storage}.dfs.core.windows.net/{parquet_file}'\n",
+					"df_masked.write.mode(\"overwrite\").parquet(file_sink)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Validate sink file"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"validation_df = spark.read.format(\"parquet\").load(file_sink)\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"print(file_sink)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"assert validation_df.count() == csv_files.count(), f\"Expected target count {validation_df.count() } to equal source count {csv_files.count()}\""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"validation_df_groupc = validation_df.groupBy(validation_df.zip).count()"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -133,9 +207,24 @@
 					"collapsed": false
 				},
 				"source": [
-					"display(df_masked)"
+					"csv_files_gc = csv_files.groupBy(csv_files.zip).count()\n",
+					"display(csv_files_gc)"
 				],
-				"execution_count": 17
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"\n",
+					"df1_counts = csv_files_gc.withColumnRenamed(\"count\", \"csv_count\")\n",
+					"df2_counts = validation_df_groupc.withColumnRenamed(\"count\", \"parquet_count\")\n",
+					"comparison_df = df1_counts.join(df2_counts, on=\"zip\", how=\"outer\")\n",
+					"\n",
+					"mismatches = comparison_df.filter(col(\"csv_count\") != col(\"parquet_count\"))\n",
+					"assert mismatches.count() == 0, f\"Expected group count mismatch is 0, count {mismatches.count()}\"\n",
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}

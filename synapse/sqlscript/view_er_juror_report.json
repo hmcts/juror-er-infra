@@ -1,0 +1,17 @@
+{
+	"name": "view_er_juror_report",
+	"properties": {
+		"content": {
+			"query": "SELECT TOP (100) [creation_date]\n,[rec_num]\n,[row_count]\n FROM [dbo].[er_juror_report_view]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "baubais_synapse_sql_stg",
+				"poolName": "baubais_synapse_sql_stg"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

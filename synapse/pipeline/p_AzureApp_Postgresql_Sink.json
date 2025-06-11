@@ -1,0 +1,121 @@
+{
+	"name": "p_AzureApp_Postgresql_Sink",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetRowCount",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "SetBatchVariables",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetRowCount",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "batchArray",
+					"value": {
+						"value": "@range(0, ceiling(div(activity('GetRowCount').output.firstRow.RowCount, 100000)))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "CreateBatchArray",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "SetBatchVariables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "batchRanges",
+					"value": {
+						"value": "@array(map(range(0, ceiling(div(activity('GetRowCount').output.firstRow.RowCount, 100000))), i => json(concat('{\"start\":', string(mul(i, 100000)), ', \"end\":', string(mul(add(i,1), 100000)), '}')))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEachBatch",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "CreateBatchArray",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('batchRanges')",
+						"type": "Expression"
+					},
+					"batchCount": 2,
+					"activities": [
+						{
+							"name": "CallAzureFunction",
+							"type": "AzureFunctionActivity",
+							"dependsOn": [],
+							"policy": {
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"functionName": "ProcessBatch",
+								"body": {
+									"batchStart": "@item().start",
+									"batchEnd": "@item().end"
+								},
+								"method": "POST"
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"batchArray": {
+				"type": "Array"
+			},
+			"batchRanges": {
+				"type": "Array"
+			}
+		},
+		"annotations": []
+	}
+}

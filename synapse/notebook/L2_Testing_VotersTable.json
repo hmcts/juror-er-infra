@@ -1,0 +1,448 @@
+{
+	"name": "L2_Testing_VotersTable",
+	"properties": {
+		"folder": {
+			"name": "Testing/L2"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "3a8706b6-6c09-4bf1-9571-f6a0cd2a2a95"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import *\n",
+					"import logging"
+				],
+				"execution_count": 28
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
+				"source": [
+					"# Read the data\n",
+					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_postgresql\")\n",
+					"\n",
+					"# Coalesce to a single partition\n",
+					"#df_single = df.coalesce(1)\n",
+					"\n",
+					"# Write as a single file to a different location\n",
+					"#df_single.write.mode(\"overwrite\").parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_temp_main\")\n",
+					""
+				],
+				"execution_count": 29
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"df.schema"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
+				"source": [
+					"df.count()"
+				],
+				"execution_count": 30
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					},
+					"collapsed": false
+				},
+				"source": [
+					"display(df.limit(10))"
+				],
+				"execution_count": 31
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def check_nan_values(df, sample_size=5):\n",
+					"    \"\"\"\n",
+					"    Check all columns in a DataFrame for \"NAN\", \"NaN\", \"nan\", etc. values\n",
+					"    \n",
+					"    Args:\n",
+					"        df: PySpark DataFrame to check\n",
+					"        sample_size: Number of example rows to return for each problematic column\n",
+					"    \n",
+					"    Returns:\n",
+					"        Dictionary with results of the check\n",
+					"    \"\"\"\n",
+					"    from pyspark.sql.functions import col, upper, trim, count, when, lit\n",
+					"    import time\n",
+					"    \n",
+					"    start_time = time.time()\n",
+					"    \n",
+					"    # First, let's verify we have all columns\n",
+					"    all_columns = df.columns\n",
+					"    print(f\"DataFrame has {len(all_columns)} columns: {all_columns}\")\n",
+					"    \n",
+					"    # Initialize results dictionary\n",
+					"    results = {\n",
+					"        \"columns_checked\": len(all_columns),\n",
+					"        \"columns_with_nan\": [],\n",
+					"        \"details\": {}\n",
+					"    }\n",
+					"    \n",
+					"    # List of NAN-like patterns to check\n",
+					"    nan_patterns = [\"NAN\", \"NaN\", \"nan\", \"NAT\", \"NaT\", \"nat\", \"NULL\", \"null\"]\n",
+					"    \n",
+					"    # Check each column explicitly from the columns list\n",
+					"    for column_name in all_columns:\n",
+					"        print(f\"Checking column: {column_name}\")\n",
+					"        \n",
+					"        # Create a select expression to find NAN-like values\n",
+					"        nan_conditions = []\n",
+					"        for pattern in nan_patterns:\n",
+					"            nan_conditions.append(\n",
+					"                (upper(trim(col(column_name).cast(\"string\"))) == pattern)\n",
+					"            )\n",
+					"        \n",
+					"        # Combine all conditions with OR\n",
+					"        combined_condition = None\n",
+					"        for condition in nan_conditions:\n",
+					"            if combined_condition is None:\n",
+					"                combined_condition = condition\n",
+					"            else:\n",
+					"                combined_condition = combined_condition | condition\n",
+					"        \n",
+					"        # Count rows with NAN-like values\n",
+					"        try:\n",
+					"            nan_count_df = df.select(\n",
+					"                count(when(combined_condition, 1)).alias(\"nan_count\")\n",
+					"            )\n",
+					"            \n",
+					"            nan_count = nan_count_df.collect()[0][\"nan_count\"]\n",
+					"            \n",
+					"            # If NAN values found, collect details\n",
+					"            if nan_count > 0:\n",
+					"                print(f\"  Found {nan_count} NAN-like values in column {column_name}\")\n",
+					"                results[\"columns_with_nan\"].append(column_name)\n",
+					"                \n",
+					"                # Get examples of NAN values\n",
+					"                examples = df.filter(combined_condition).limit(sample_size)\n",
+					"                example_values = [row[column_name] for row in examples.collect()]\n",
+					"                \n",
+					"                # Find which specific patterns are present\n",
+					"                pattern_counts = {}\n",
+					"                for pattern in nan_patterns:\n",
+					"                    pattern_count = df.filter(\n",
+					"                        upper(trim(col(column_name).cast(\"string\"))) == pattern\n",
+					"                    ).count()\n",
+					"                    \n",
+					"                    if pattern_count > 0:\n",
+					"                        pattern_counts[pattern] = pattern_count\n",
+					"                \n",
+					"                # Add details to results\n",
+					"                results[\"details\"][column_name] = {\n",
+					"                    \"nan_count\": nan_count,\n",
+					"                    \"example_values\": example_values,\n",
+					"                    \"pattern_counts\": pattern_counts\n",
+					"                }\n",
+					"        except Exception as e:\n",
+					"            print(f\"  Error checking column {column_name}: {str(e)}\")\n",
+					"    \n",
+					"    # Summarize results\n",
+					"    total_nan_columns = len(results[\"columns_with_nan\"])\n",
+					"    if total_nan_columns > 0:\n",
+					"        print(f\"\\nFound {total_nan_columns} columns with NAN-like values:\")\n",
+					"        for column in results[\"columns_with_nan\"]:\n",
+					"            details = results[\"details\"][column]\n",
+					"            patterns = \", \".join([f\"{p}({c})\" for p, c in details[\"pattern_counts\"].items()])\n",
+					"            print(f\"  - {column}: {details['nan_count']} NAN values ({patterns})\")\n",
+					"    else:\n",
+					"        print(\"\\nNo NAN-like values found in any column\")\n",
+					"    \n",
+					"    print(f\"Check completed in {time.time() - start_time:.2f} seconds\")\n",
+					"    return results"
+				],
+				"execution_count": 32
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
+				"source": [
+					"# Before calling check_nan_values, add these diagnostic lines:\n",
+					"print(\"DataFrame schema:\")\n",
+					"df.printSchema()\n",
+					"print(f\"DataFrame column count: {len(df.columns)}\")\n",
+					"print(f\"DataFrame columns: {df.columns}\")\n",
+					"print(f\"DataFrame row count: {df.count()}\")"
+				],
+				"execution_count": 33
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Use the full DataFrame instead of a count result\n",
+					"nan_check_results = check_nan_values(df)  # or transformed_data, etc.\n",
+					"\n",
+					"# Now you can access the results\n",
+					"print(f\"Found NAN values in {len(nan_check_results['columns_with_nan'])} columns\")\n",
+					"\n",
+					"# You can also access specific details\n",
+					"for column in nan_check_results['columns_with_nan']:\n",
+					"    details = nan_check_results['details'][column]\n",
+					"    print(f\"Column {column}: {details['nan_count']} NAN values\")\n",
+					"    print(f\"Examples: {details['example_values']}\")"
+				],
+				"execution_count": 34
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"df.limit(10).show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import col\n",
+					"non_empty_zip = df.filter(col(\"poll_number\").isNull())\n",
+					"\n",
+					"# Print the number of rows where 'zip' is not null\n",
+					"print(f\"Number of rows where 'pol' is not null: {non_empty_zip.count()}\")\n",
+					"\n",
+					"# Display all columns of the filtered DataFrame\n",
+					"display(non_empty_zip)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"from notebookutils import mssparkutils\n",
+					"path = \"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/voters_postgresql\"\n",
+					"exists = mssparkutils.fs.exists(path)\n",
+					"print(f\"Path exists: {exists}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"import logging  # Ensure logging is imported\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, TimestampType\n",
+					"from pyspark.sql.utils import AnalysisException\n",
+					"import os  # Import os for file system checks\n",
+					"\n",
+					"def handle_null_values(df):\n",
+					"    \"\"\"\n",
+					"    Handle NaN, NaT, and other invalid values in the DataFrame\n",
+					"    Convert them to None (NULL in SQL) to avoid PostgreSQL errors\n",
+					"    \"\"\"\n",
+					"    from pyspark.sql.functions import col, when, lit\n",
+					"\n",
+					"    # Log the initial state\n",
+					"    logging.info(f\"Starting null value handling for DataFrame with {df.count()} rows\")\n",
+					"\n",
+					"    # First, handle timestamp columns which might contain NaT\n",
+					"    timestamp_columns = ['date_selected1', 'date_selected2', 'date_selected3']\n",
+					"    for column in timestamp_columns:\n",
+					"        if column in df.columns:\n",
+					"            # For timestamp columns, explicitly set null values\n",
+					"            df = df.withColumn(\n",
+					"                column,\n",
+					"                when(\n",
+					"                    (col(column).isNull()) |\n",
+					"                    (col(column).cast(\"string\") == \"NaT\") |\n",
+					"                    (col(column).cast(\"string\") == \"nat\") |\n",
+					"                    (col(column).cast(\"string\") == \"nan\") |\n",
+					"                    (col(column).cast(\"string\") == \"NaN\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(col(column))\n",
+					"            )\n",
+					"            logging.info(f\"Processed timestamp column: {column}\")\n",
+					"\n",
+					"    # For all other columns, handle NaN and empty strings\n",
+					"    for column in df.columns:  # Use df.columns instead of undefined df_single.columns\n",
+					"        if column not in timestamp_columns:\n",
+					"            # Replace empty strings, \"NaN\", \"nan\", etc. with NULL\n",
+					"            df = df.withColumn(\n",
+					"                column,\n",
+					"                when(\n",
+					"                    (col(column).isNull()) |\n",
+					"                    (col(column).cast(\"string\") == \"\") |\n",
+					"                    (col(column).cast(\"string\") == \"nan\") |\n",
+					"                    (col(column).cast(\"string\") == \"NaN\") |\n",
+					"                    (col(column).cast(\"string\") == \"NULL\") |\n",
+					"                    (col(column).cast(\"string\") == \"NAN\") |\n",
+					"                    (col(column).cast(\"string\") == \"None\"),\n",
+					"                    lit(None)\n",
+					"                ).otherwise(col(column))\n",
+					"            )\n",
+					"\n",
+					"    logging.info(f\"Completed null value handling, DataFrame now has {df.count()} rows\")\n",
+					"    return df\n",
+					"\n",
+					"# Now to read existing data, clean it, and overwrite it:\n",
+					"storage_account = \"baubaisadfsastg\"\n",
+					"postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"\n",
+					"# Define schema manually in case the directory is empty or schema cannot be inferred\n",
+					"schema = StructType([\n",
+					"    StructField(\"date_selected1\", TimestampType(), True),\n",
+					"    StructField(\"date_selected2\", TimestampType(), True),\n",
+					"    StructField(\"date_selected3\", TimestampType(), True),\n",
+					"    StructField(\"other_column\", StringType(), True)  # Add other fields as needed\n",
+					"])\n",
+					"\n",
+					"# Read the existing data\n",
+					"try:\n",
+					"    print(f\"Checking if path exists and contains files: {postgresql_path}\")\n",
+					"    \n",
+					"    # Check if the directory exists and contains files\n",
+					"    hadoop_path = spark._jvm.org.apache.hadoop.fs.Path(postgresql_path)\n",
+					"    fs = spark._jvm.org.apache.hadoop.fs.FileSystem.get(spark._jsc.hadoopConfiguration())\n",
+					"    \n",
+					"    if not fs.exists(hadoop_path):\n",
+					"        raise Exception(f\"The specified path does not exist: {postgresql_path}\")\n",
+					"    \n",
+					"    # Check if the directory contains files\n",
+					"    file_status = fs.listStatus(hadoop_path)\n",
+					"    if not file_status or len(file_status) == 0:\n",
+					"        raise Exception(f\"The directory exists but contains no files: {postgresql_path}\")\n",
+					"\n",
+					"    # Read the Parquet files\n",
+					"    existing_data = spark.read.schema(schema).parquet(postgresql_path)\n",
+					"    print(f\"Read {existing_data.count()} records from {postgresql_path}\")\n",
+					"\n",
+					"    # Apply the null value handler\n",
+					"    cleaned_data = handle_null_values(existing_data)\n",
+					"\n",
+					"    # Overwrite the existing data\n",
+					"    print(f\"Writing cleaned data back to {postgresql_path}\")\n",
+					"    cleaned_data.write.mode(\"overwrite\").parquet(postgresql_path)\n",
+					"\n",
+					"    print(f\"Successfully overwrote data at {postgresql_path}\")\n",
+					"except AnalysisException as e:\n",
+					"    print(f\"Error reading data: {e}\")\n",
+					"    print(\"The directory might be empty or inaccessible.\")\n",
+					"except Exception as e:\n",
+					"    print(f\"Error processing data: {str(e)}\")\n",
+					"    import traceback\n",
+					"    print(traceback.format_exc())"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import count\n",
+					"\n",
+					"final_count = df.groupBy('creation_date','rec_num') \\\n",
+					"    .agg(count('rec_num')) \\\n",
+					"    .orderBy('rec_num')\n",
+					"\n",
+					"display(final_count)"
+				],
+				"execution_count": 35
+			}
+		]
+	}
+}

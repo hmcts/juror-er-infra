@@ -1,0 +1,142 @@
+{
+	"name": "Parquet_To_Csv_Whole",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "9a930b5b-23db-4354-b9fc-fdcc10bc2c06"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import col, when, lit\n",
+					"from notebookutils import mssparkutils\n",
+					"import logging\n",
+					"import datetime\n",
+					"\n",
+					"# Configure logging\n",
+					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
+					"logger = logging.getLogger()"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": true,
+					"run_control": {
+						"frozen": false
+					}
+				},
+				"source": [
+					"def export_data_to_csv():\n",
+					"    try:\n",
+					"        # Get storage account from environment\n",
+					"        storage_account = \"baubaisadfsastg\"\n",
+					"        \n",
+					"        # Define source and destination paths\n",
+					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"        timestamp = datetime.datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n",
+					"        export_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/exports/voters_export_{timestamp}.csv\"\n",
+					"        \n",
+					"        logger.info(f\"Reading data from: {source_path}\")\n",
+					"        \n",
+					"        # Read source data\n",
+					"        df = spark.read.parquet(source_path)\n",
+					"        initial_count = df.count()\n",
+					"        logger.info(f\"Read {initial_count} records from source\")\n",
+					"        \n",
+					"        # Filter out rows with null or empty zip values\n",
+					"        df_filtered = df.filter(\n",
+					"            (col(\"zip\").isNotNull()) & \n",
+					"            (col(\"zip\") != \"\") & \n",
+					"            (~col(\"zip\").isin(\"NULL\", \"null\", \"NaN\", \"nan\", \"None\", \"none\"))\n",
+					"        )\n",
+					"        \n",
+					"        filtered_count = df_filtered.count()\n",
+					"        removed_count = initial_count - filtered_count\n",
+					"        logger.info(f\"Filtered out {removed_count} rows with empty zip values\")\n",
+					"        logger.info(f\"Keeping {filtered_count} rows\")\n",
+					"        \n",
+					"        # Make sure export directory exists\n",
+					"        export_dir = \"/\".join(export_path.split(\"/\")[:-1])\n",
+					"        if not mssparkutils.fs.exists(export_dir):\n",
+					"            logger.info(f\"Creating export directory: {export_dir}\")\n",
+					"            mssparkutils.fs.mkdirs(export_dir)\n",
+					"        \n",
+					"        # Write to CSV with header\n",
+					"        logger.info(f\"Writing data to CSV: {export_path}\")\n",
+					"        df_filtered.coalesce(1).write \\\n",
+					"            .option(\"header\", \"true\") \\\n",
+					"            .option(\"delimiter\", \",\") \\\n",
+					"            .option(\"quoteAll\", \"true\") \\\n",
+					"            .mode(\"overwrite\") \\\n",
+					"            .csv(export_path)\n",
+					"        \n",
+					"        logger.info(f\"CSV export completed successfully. File: {export_path}\")\n",
+					"        return {\n",
+					"            \"status\": \"success\", \n",
+					"            \"total_records\": initial_count,\n",
+					"            \"exported_records\": filtered_count, \n",
+					"            \"removed_records\": removed_count,\n",
+					"            \"export_path\": export_path\n",
+					"        }\n",
+					"        \n",
+					"    except Exception as e:\n",
+					"        logger.error(f\"Error exporting data: {str(e)}\")\n",
+					"        import traceback\n",
+					"        logger.error(traceback.format_exc())\n",
+					"        return {\"status\": \"error\", \"message\": str(e)}\n",
+					"\n",
+					"# Execute the export function\n",
+					"result = export_data_to_csv()\n",
+					"print(f\"Export result: {result}\")"
+				],
+				"execution_count": 2
+			}
+		]
+	}
+}

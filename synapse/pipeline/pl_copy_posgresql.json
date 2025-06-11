@@ -59,7 +59,10 @@
 				"inputs": [
 					{
 						"referenceName": "lake_csv",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "voters-temp-2025"
+						}
 					}
 				],
 				"outputs": [

@@ -16,14 +16,16 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DelimitedTextSource",
+						"type": "ParquetSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
+							"wildcardFolderPath": "masked_voters_temp.parquet",
+							"wildcardFileName": "*.parquet",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
+							"type": "ParquetReadSettings"
 						}
 					},
 					"sink": {
@@ -58,11 +60,10 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "lake_csv",
+						"referenceName": "lake_parket",
 						"type": "DatasetReference",
 						"parameters": {
-							"container": "voters-temp-2025",
-							"file_path": "exclude_range_table.csv"
+							"container": "voters-temp-2025"
 						}
 					}
 				],

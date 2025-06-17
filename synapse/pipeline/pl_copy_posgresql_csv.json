@@ -1,0 +1,165 @@
+{
+	"name": "pl_copy_posgresql_csv",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load_Lake_to_Posgresql",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFileName": {
+								"value": "@pipeline().parameters.file_name",
+								"type": "Expression"
+							},
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzurePostgreSqlSink",
+						"writeBatchSize": 1000000,
+						"writeBatchTimeout": "00:30:00",
+						"writeMethod": "CopyCommand"
+					},
+					"enableStaging": false,
+					"enableSkipIncompatibleRow": true,
+					"logSettings": {
+						"enableCopyActivityLog": true,
+						"copyActivityLogSettings": {
+							"logLevel": "Warning",
+							"enableReliableLogging": false
+						},
+						"logLocationSettings": {
+							"linkedServiceName": {
+								"referenceName": "AzureDataLakeStorage1",
+								"type": "LinkedServiceReference"
+							},
+							"path": "process-logs"
+						}
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "hash_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "hash_id",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "creation_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "creation_date",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "processed_timestamp",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "processed_timestamp",
+									"type": "DateTime",
+									"physicalType": "timestamp without time zone"
+								}
+							},
+							{
+								"source": {
+									"name": "part_no",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "part_no",
+									"type": "String",
+									"physicalType": "text"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "lake_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": {
+								"value": "@pipeline().parameters.container",
+								"type": "Expression"
+							},
+							"file_path": "."
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "juror_api_db",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": {
+								"value": "@pipeline().parameters.sink_schema",
+								"type": "Expression"
+							},
+							"table": {
+								"value": "@pipeline().parameters.sink_table",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"file_name": {
+				"type": "string",
+				"defaultValue": "processed_hashes_new.csv"
+			},
+			"container": {
+				"type": "string",
+				"defaultValue": "voters-temp-2025"
+			},
+			"sink_schema": {
+				"type": "string",
+				"defaultValue": "juror_eric"
+			},
+			"sink_table": {
+				"type": "string",
+				"defaultValue": "processed_hashes_new"
+			}
+		},
+		"annotations": []
+	}
+}

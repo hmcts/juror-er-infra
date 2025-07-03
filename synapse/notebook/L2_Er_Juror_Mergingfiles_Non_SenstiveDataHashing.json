@@ -1,6 +1,9 @@
 {
 	"name": "L2_Er_Juror_Mergingfiles_Non_SenstiveDataHashing",
 	"properties": {
+		"folder": {
+			"name": "Archive"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "24d54279-a466-4f7c-8b0b-ac1d467c9a40"
+				"spark.autotune.trackingId": "f7872bec-2c1a-43dd-a9e0-6a199d37181b"
 			}
 		},
 		"metadata": {

@@ -1,6 +1,9 @@
 {
-	"name": "L1_MappingSchema",
+	"name": "L1_MappingSchema_v01",
 	"properties": {
+		"folder": {
+			"name": "Archive"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "60a2c214-acf4-4f71-afb7-077cfba3e2d9"
+				"spark.autotune.trackingId": "24423569-e724-4c1a-b840-62e2ca02e5ac"
 			}
 		},
 		"metadata": {
@@ -63,65 +66,39 @@
 					"## Purpose\n",
 					"This notebook is part of an ETL pipeline for processing electoral data. It ensures data consistency, quality, and integration with Azure Data Lake Storage (ADLS) using Apache Spark.\n",
 					"\n",
-					"### Initialization & Utilities\n",
-					"- **create_spark_session()**: Initializes a Spark session with Excel support.\n",
-					"- **ensure_folder_exists(folder_path)**: Ensures a specified folder exists in ADLS.\n",
-					"- **list_files(folder_path, extensions=None)**: Lists files in a folder with specified extensions.\n",
-					"- **get_folder_parts(file_path)**: Extracts date and LA code from file path.\n",
-					"\n",
-					"### Configuration & Mapping\n",
-					"- **read_column_mapping(spark, config_path)**: Reads column mapping configuration from JSON.\n",
-					"- **get_reverse_mapping(column_mapping)**: Generates a reverse mapping for column standardization.\n",
-					"- **standardize_column_names(df, reverse_mapping, column_mapping=None)**: Standardizes DataFrame column names.\n",
-					"- **resolve_marker_columns(df)**: Handles marker columns based on mapping configuration.\n",
-					"\n",
-					"### Data Reading\n",
-					"- **read_excel_file(spark, file_path)**: Reads Excel files using pandas and converts to Spark DataFrame.\n",
-					"- **read_file(spark, file_path)**: Reads a file (Parquet or Excel) and returns a Spark DataFrame.\n",
-					"\n",
-					"### Data Transformation & Cleaning\n",
-					"- **ensure_required_fields(df)**: Ensures all required fields exist with correct data types.\n",
-					"- **combine_name_components(df)**: Combines initials and middle names into the forename.\n",
-					"- **enhanced_split_elector_name(df)**: Splits the `Elector Name` into surname, forename, and middlename.\n",
-					"- **extract_numeric_la_code(df)**: Extracts numeric part from `LA_Code`.\n",
-					"- **clean_special_characters(df)**: Cleans special characters from names, addresses, and postcodes.\n",
-					"- **clean_character_data(df)**: Cleans apostrophes, control characters, and invalid data in names/addresses.\n",
-					"- **fix_numeric_fields(df)**: Ensures numeric fields are not interpreted as dates.\n",
-					"- **process_name_components(df)**: Processes and standardizes name components.\n",
-					"- **filter_records_with_empty_fields(df)**: Removes records with empty or invalid critical fields.\n",
-					"- **transform_data(df, creation_date, la_code=None)**: Orchestrates all cleaning and transformation steps.\n",
-					"\n",
-					"### Output & Logging\n",
-					"- **filter_to_required_columns(df, column_mapping=None, keep_unmapped=False)**: Filters DataFrame to required columns.\n",
-					"- **move_to_quarantine(source_path, quarantine_folder, reason=\"error\")**: Copies problematic files to quarantine.\n",
-					"- **process_file(...)**: Processes a single file through all ETL steps and writes output.\n",
-					"- **read_processed_files_log(spark, log_file_path)**: Reads the log of processed files.\n",
-					"- **update_processed_files_log(spark, log_file_path, processed_files_log, new_files)**: Updates the processed files log.\n",
-					"- **update_process_log(spark, new_file_paths, process_log_path)**: Updates the process log with new files.\n",
-					"- **get_new_files(spark, input_path, process_log_path)**: Identifies new files to process.\n",
-					"- **print_summary(results)**: Prints a summary of processing results.\n",
-					"- **main()**: Orchestrates the entire ETL workflow.\n",
-					"\n",
-					"---\n",
-					"\n",
 					"## Key Features\n",
-					"\n",
-					"- **Data Standardization**: Consistent column names and formats.\n",
-					"- **Error Handling**: Detailed logging and error management.\n",
-					"- **Distributed Processing**: Uses Apache Spark for scalability.\n",
-					"- **ADLS Integration**: Reads/writes files to Azure Data Lake Storage.\n",
-					"- **Data Validation**: Ensures data quality and integrity.\n",
-					"\n",
-					"---\n",
+					"- **Data Standardization**: Ensures consistent column names and data formats.\n",
+					"- **Error Handling**: Logs detailed messages and handles errors gracefully.\n",
+					"- **Distributed Processing**: Leverages Apache Spark for scalability.\n",
+					"- **ADLS Integration**: Reads and writes files to Azure Data Lake Storage.\n",
+					"- **Data Validation**: Validates critical fields to maintain data quality.\n",
 					"\n",
 					"## Workflow Overview\n",
+					"1. **Initialization**: Sets up logging and Spark session.\n",
+					"2. **File Management**: Ensures required folders exist and lists source files.\n",
+					"3. **Column Mapping**: Reads JSON configuration for column mappings and applies transformations.\n",
+					"4. **Data Transformation**: Cleans, standardizes, and validates data.\n",
+					"5. **Output**: Writes transformed data to Parquet format and logs processed files.\n",
 					"\n",
-					"1. **Initialization**: Set up logging and Spark session.\n",
-					"2. **File Management**: Ensure folders exist and list source files.\n",
-					"3. **Column Mapping**: Read JSON config for column mappings and apply standardization.\n",
-					"4. **Data Transformation**: Clean, standardize, and validate data.\n",
-					"5. **Output**: Write transformed data to Parquet and update logs.\n",
-					"6. **Summary**: Print processing summary and update logs.\n",
+					"## Key Functions\n",
+					"- `create_spark_session()`: Initializes a Spark session.\n",
+					"- `ensure_folder_exists(folder_path)`: Ensures specified folders exist in ADLS.\n",
+					"- `read_column_mapping(spark, config_path)`: Reads column mapping configuration.\n",
+					"- `get_reverse_mapping(column_mapping)`: Creates a reverse mapping for standardizing column names.\n",
+					"- `standardize_column_names(df, reverse_mapping)`: Standardizes column names in the DataFrame.\n",
+					"- `ensure_required_fields(df)`: Ensures all required fields exist in the DataFrame with proper data types.\n",
+					"- `combine_name_components(df)`: Combines initials and middle names into the `Elector Forename` column.\n",
+					"- `enhanced_split_elector_name(df)`: Splits the `Elector Name` column into `Elector Surname`, `Elector Forename`, and `Elector Middlename`.\n",
+					"- `clean_special_characters(df)`: Removes non-ASCII characters from name, address, and postcode fields.\n",
+					"- `fix_numeric_fields(df)`: Ensures numeric fields are correctly formatted and not interpreted as dates.\n",
+					"- `filter_records_with_empty_fields(df)`: Filters out records with empty critical fields or invalid characters.\n",
+					"- `transform_data(df, creation_date, la_code)`: Cleans, transforms, and validates the data.\n",
+					"- `filter_to_required_columns(df, column_mapping, keep_unmapped)`: Filters the DataFrame to include only required columns.\n",
+					"- `process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping)`: Processes individual files and applies transformations.\n",
+					"- `read_processed_files_log(spark, log_file_path)`: Reads the log of previously processed files.\n",
+					"- `update_processed_files_log(spark, log_file_path, processed_files_log, new_files)`: Updates the log of processed files.\n",
+					"- `print_summary(results)`: Prints a summary of the processing results.\n",
+					"- `main()`: Orchestrates the ETL workflow.\n",
 					""
 				]
 			},
@@ -141,7 +118,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -151,7 +128,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -165,7 +142,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -183,7 +160,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +193,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -241,7 +218,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -258,7 +235,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -288,7 +265,7 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -306,48 +283,29 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def standardize_column_names(df, reverse_mapping, column_mapping=None):\n",
+					"def standardize_column_names(df, reverse_mapping):\n",
 					"    \"\"\"Standardize column names using the mapping\"\"\"\n",
 					"    if not reverse_mapping:\n",
 					"        logging.warning(\"Empty reverse mapping provided - cannot standardize columns\")\n",
 					"        return df\n",
-					"    \n",
-					"    # Initialize column_mapping if None\n",
-					"    if column_mapping is None:\n",
-					"        column_mapping = {}  # Empty dict, will use standard names directly\n",
-					"    \n",
+					"\n",
 					"    renamed_columns = []\n",
-					"    already_mapped_to = set()\n",
 					"\n",
 					"    for col in df.columns:\n",
 					"        std_name = reverse_mapping.get(col.lower())\n",
 					"        if std_name:\n",
-					"            # Get the target column name from column_mapping if available\n",
-					"            target_col = column_mapping.get(std_name, std_name)\n",
-					"            \n",
-					"            # Check if we've already mapped to this target column\n",
-					"            if target_col in already_mapped_to:\n",
-					"                # Generate a unique name\n",
-					"                new_col = f\"{target_col}_DUPLICATE\"\n",
-					"                logging.warning(f\"Duplicate mapping: {col} -> {target_col}, using {new_col} instead\")\n",
-					"                df = df.withColumnRenamed(col, new_col)\n",
-					"                renamed_columns.append(f\"{col} -> {new_col} (duplicate)\")\n",
-					"            else:\n",
-					"                # Rename to the target column\n",
-					"                df = df.withColumnRenamed(col, target_col)\n",
-					"                renamed_columns.append(f\"{col} -> {target_col}\")\n",
-					"                already_mapped_to.add(target_col)\n",
+					"            df = df.withColumnRenamed(col, std_name)\n",
+					"            renamed_columns.append(f\"{col} -> {std_name}\")\n",
 					"\n",
 					"    # Check if Flags/Markers exists after standardization, add if missing\n",
-					"    flags_field = column_mapping.get(\"Flags/Markers\", \"Flags/Markers\")\n",
-					"    if flags_field not in df.columns:\n",
-					"        logging.info(f\"Adding missing '{flags_field}' column after standardization\")\n",
-					"        df = df.withColumn(flags_field, lit(None).cast(StringType()))\n",
+					"    if \"Flags/Markers\" not in df.columns:\n",
+					"        logging.info(\"Adding missing 'Flags/Markers' column after standardization\")\n",
+					"        df = df.withColumn(\"Flags/Markers\", lit(None).cast(StringType()))\n",
 					"\n",
 					"    if renamed_columns:\n",
 					"        logging.info(\n",
@@ -358,7 +316,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -390,7 +348,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -476,7 +434,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -533,7 +491,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -555,7 +513,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -645,7 +603,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -782,7 +740,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -839,7 +797,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -866,7 +824,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -901,7 +859,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -951,7 +909,7 @@
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -996,7 +954,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -1026,96 +984,12 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def resolve_marker_columns(df):\n",
-					"    \"\"\"\n",
-					"    Handle marker columns based on the updated mapping configuration:\n",
-					"    - \"Elector Number\" maps to \"register_lett\"\n",
-					"    - \"Elector Markers\" maps to \"new_marker\"\n",
-					"    - \"Flags/Markers\" maps to \"flags\"\n",
-					"    \n",
-					"    This function should be called BEFORE column renaming/standardization.\n",
-					"    \"\"\"\n",
-					"    # Get current columns\n",
-					"    columns = df.columns\n",
-					"    \n",
-					"    # Check for relevant columns\n",
-					"    has_elector_markers = \"Elector Markers\" in columns\n",
-					"    has_flags_markers = \"Flags/Markers\" in columns\n",
-					"    has_new_marker = \"New Marker\" in columns\n",
-					"    \n",
-					"    # CASE 1: \"New Marker\" exists - rename \"Elector Markers\" to \"Flags/Markers\" if it exists\n",
-					"    if has_new_marker and has_elector_markers:\n",
-					"        # Handle case where both exist\n",
-					"        if has_flags_markers:\n",
-					"            # We need to merge \"Elector Markers\" into \"Flags/Markers\"\n",
-					"            df = df.withColumn(\n",
-					"                \"Flags/Markers\",\n",
-					"                when(col(\"Flags/Markers\").isNotNull(), col(\"Flags/Markers\"))\n",
-					"                .otherwise(col(\"Elector Markers\"))\n",
-					"            )\n",
-					"            # Remove duplicate\n",
-					"            df = df.drop(\"Elector Markers\")\n",
-					"        else:\n",
-					"            # Simply rename\n",
-					"            df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
-					"    \n",
-					"    # CASE 2: \"New Marker\" doesn't exist - check position of \"Elector Markers\"\n",
-					"    elif not has_new_marker and has_elector_markers:\n",
-					"        # Check position\n",
-					"        index = columns.index(\"Elector Markers\")\n",
-					"        if index <= 3:\n",
-					"            # Should be renamed to \"Flags/Markers\"\n",
-					"            if has_flags_markers:\n",
-					"                # Handle case where both exist\n",
-					"                df = df.withColumn(\n",
-					"                    \"Flags/Markers\",\n",
-					"                    when(col(\"Flags/Markers\").isNotNull(), col(\"Flags/Markers\"))\n",
-					"                    .otherwise(col(\"Elector Markers\"))\n",
-					"                )\n",
-					"                # Remove duplicate\n",
-					"                df = df.drop(\"Elector Markers\")\n",
-					"            else:\n",
-					"                # Simply rename\n",
-					"                df = df.withColumnRenamed(\"Elector Markers\", \"Flags/Markers\")\n",
-					"    \n",
-					"    return df"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"def move_to_quarantine(source_path, quarantine_folder, reason=\"error\"):\n",
-					"    \"\"\"\n",
-					"    Copy a file to the L1_quarantine folder with a reason tag, but don't delete the original.\n",
-					"    \"\"\"\n",
-					"    try:\n",
-					"        if not mssparkutils.fs.exists(quarantine_folder):\n",
-					"            mssparkutils.fs.mkdirs(quarantine_folder)\n",
-					"        \n",
-					"        file_name = os.path.basename(source_path)\n",
-					"        timestamp = time.strftime(\"%Y%m%d%H%M%S\")\n",
-					"        quarantined_file = f\"{quarantine_folder}/{timestamp}_{reason}_{file_name}\"\n",
-					"        \n",
-					"        # Copy but don't delete\n",
-					"        mssparkutils.fs.cp(source_path, quarantined_file, True)\n",
-					"        logging.info(f\"Copied file to quarantine (original preserved): {quarantined_file}\")\n",
-					"        return quarantined_file\n",
-					"    except Exception as e:\n",
-					"        logging.error(f\"Failed to copy file to quarantine: {str(e)}\")\n",
-					"        return None"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None, storage_account=\"baubaisadfsaprod\"):\n",
+					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None):\n",
 					"    \"\"\"Process a source file and transform it to parquet format\"\"\"\n",
 					"    # Print more detailed debugging info\n",
 					"    print(f\"Debug - Starting to process file: {source_path}\")\n",
@@ -1153,11 +1027,8 @@
 					"            logging.info(\n",
 					"                f\"Successfully read file with {df.count()} rows and {len(df.columns)} columns\"\n",
 					"            )\n",
-					"            df = resolve_marker_columns(df)\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error reading file: {str(e)}\"\n",
-					"            storage_account = \"baubaisadfsaprod\"  # Or get it from the config\n",
-					"            move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"        # Standardize column names using mapping\n",
@@ -1197,10 +1068,8 @@
 					"                )\n",
 					"\n",
 					"            logging.info(f\"Successfully transformed data with {df.count()} rows\")\n",
-					"        \n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error transforming data: {str(e)}\"\n",
-					"            move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"        logging.info(\n",
@@ -1224,15 +1093,13 @@
 					"            return result\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error writing output file: {str(e)}\"\n",
-					"            move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"    except Exception as e:\n",
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
-					"        move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"        return result"
 				],
-				"execution_count": null
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -1258,7 +1125,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -1295,7 +1162,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -1349,7 +1216,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -1402,7 +1269,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -1433,7 +1300,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -1450,7 +1317,7 @@
 					"    spark = create_spark_session()\n",
 					"\n",
 					"    # Define paths\n",
-					"    storage_account = \"baubaisadfsaprod\"\n",
+					"    storage_account = \"baubaisadfsastg\"\n",
 					"    files_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
 					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
@@ -1509,7 +1376,7 @@
 					"    results = []\n",
 					"    for i, file_path in enumerate(new_files):\n",
 					"        print(f\"Processing {i + 1}/{len(new_files)}: {os.path.basename(file_path)}\")\n",
-					"        result = process_file(spark, file_path, reverse_mapping, transform_folder, error_folder, column_mapping, storage_account)\n",
+					"        result = process_file(spark, file_path, reverse_mapping, transform_folder, error_folder, column_mapping)\n",
 					"        results.append(result)\n",
 					"\n",
 					"    # Save summary\n",
@@ -1541,9 +1408,9 @@
 					"    FORCE_CLEAN_RUN = False\n",
 					"\n",
 					"    if FORCE_CLEAN_RUN:\n",
-					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
+					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
 					"            try:\n",
-					"                mssparkutils.fs.rm(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
+					"                mssparkutils.fs.rm(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
 					"                print(\"Deleted existing log to force fresh processing\")\n",
 					"            except Exception as e:\n",
 					"                print(f\"Error deleting log file: {str(e)}\")\n",
@@ -1551,7 +1418,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": null
+				"execution_count": 29
 			}
 		]
 	}

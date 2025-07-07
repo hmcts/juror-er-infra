@@ -1,5 +1,5 @@
 {
-	"name": "L1_MappingSchema",
+	"name": "L1_Er_Juror_MappingSchema",
 	"properties": {
 		"folder": {
 			"name": "crime"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "350f44db-541d-4a54-9a09-d026c25e1071"
+				"spark.autotune.trackingId": "e0578321-5d9f-4860-93bd-26e5d9136325"
 			}
 		},
 		"metadata": {

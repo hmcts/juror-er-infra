@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a4fee9e2-fefc-4468-8359-61e72e0b009f"
+				"spark.autotune.trackingId": "05476636-8305-4329-924f-6ad56496a735"
 			}
 		},
 		"metadata": {
@@ -36,7 +36,18 @@
 				]
 			},
 			{
-				"cell_type": "markdown",
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
 				"source": [
 					"## Notebook Function Reference\n",
 					"\n",
@@ -156,12 +167,9 @@
 					"---\n",
 					"\n",
 					"> For detailed usage, see the function docstrings and code cells in this notebook.\n",
-					"\n",
-					"---\n",
-					"\n",
-					"Let me know if you want this in a different format or want to include/exclude any functions!\n",
 					""
-				]
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

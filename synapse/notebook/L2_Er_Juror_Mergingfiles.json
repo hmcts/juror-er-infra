@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7f2c6b7a-167a-46e0-bcc4-fe98ca855df6"
+				"spark.autotune.trackingId": "731ad202-906d-4152-b9fd-5b2ecb562cd8"
 			}
 		},
 		"metadata": {
@@ -180,8 +180,6 @@
 					"> For detailed usage, see the function docstrings and code cells in this notebook.\n",
 					"\n",
 					"---\n",
-					"\n",
-					"Let me know if you want this in a different format or want to include/exclude any functions!\n",
 					""
 				]
 			},

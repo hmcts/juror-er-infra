@@ -129,6 +129,11 @@ data "azuread_group" "dlrm_group" {
   security_enabled = true
 }
 
+data "azurerm_storage_account" "bais_bau" {
+  name                = "baubais${var.env}"
+  resource_group_name = "bau-bais_${var.env}_resource_group"
+}
+
 
 resource "azurerm_synapse_role_assignment" "dlrm" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
@@ -191,4 +196,11 @@ resource "azurerm_role_assignment" "rg_3" {
   principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
   role_definition_name = "Key Vault Reader"
   scope                = azurerm_resource_group.adf_juror_rg.id
+}
+
+
+resource "azurerm_role_assignment" "bais_bau_reader" {
+  scope = azurerm_storage_account.bais_bau.id
+  role_definition_name = "Storage File Data Privileged Reader"
+  principal_id = = azurerm_synapse_workspace.this.identity[0].principal_id
 }

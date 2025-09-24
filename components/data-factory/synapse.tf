@@ -199,7 +199,7 @@ resource "azurerm_role_assignment" "rg_3" {
 }
 
 resource "azurerm_role_assignment" "bais_bau_reader" {
-  scope                = azurerm_storage_account.bais_bau.id
+  scope                = data.azurerm_storage_account.bais_bau.id
   role_definition_name = "Storage File Data Privileged Reader"
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }

@@ -1,0 +1,14 @@
+{
+	"name": "baisbau",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"accountKind": "FileStorage"
+		},
+		"connectVia": {
+			"referenceName": "IR-SHIR-AKS",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

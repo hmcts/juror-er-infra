@@ -1,0 +1,25 @@
+{
+	"name": "DS_synapse_bau_binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_JurorERIC_storage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"containerName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": {
+					"value": "@dataset().containerName",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}

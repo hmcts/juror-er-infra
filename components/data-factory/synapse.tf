@@ -130,6 +130,7 @@ data "azuread_group" "dlrm_group" {
 }
 
 data "azurerm_storage_account" "bais_bau" {
+  for_each = toset(var.env == "stg" ? [var.env] : [])
   name                = "baubais${var.env}"
   resource_group_name = "bau-bais_${var.env}_resource_group"
 }

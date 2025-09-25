@@ -199,7 +199,7 @@ resource "azurerm_role_assignment" "rg_3" {
 }
 
 resource "azurerm_role_assignment" "bais_bau_reader" {
-  for_each = var.env == "stg" ? [var.env] : []
+  for_each = toset(var.env == "stg" ? [var.env] : [])
 
   scope                = data.azurerm_storage_account.bais_bau.id
   role_definition_name = "Storage File Data Privileged Reader"

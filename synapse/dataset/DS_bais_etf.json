@@ -1,0 +1,26 @@
+{
+	"name": "DS_bais_etf",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_bais_bau_etf",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"path": {
+				"type": "string",
+				"defaultValue": "BAIS/Sites/External-In-Legacy/Juror_ER"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureFileStorageLocation",
+				"folderPath": {
+					"value": "@dataset().path",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}

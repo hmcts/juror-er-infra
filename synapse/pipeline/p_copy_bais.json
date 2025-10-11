@@ -24,6 +24,7 @@
 								"value": "@pipeline().parameters.folder",
 								"type": "Expression"
 							},
+							"wildcardFileName": "*",
 							"deleteFilesAfterCompletion": false
 						},
 						"formatSettings": {

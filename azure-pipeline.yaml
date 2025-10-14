@@ -92,4 +92,5 @@ stages:
               adfOverrideParameters: '-LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ deployment.environment }}.file.core.windows.net/"'
               agentPool: ${{ variables.agentPool }}
               env: ${{ deployment.environment }}
+              operation: ${{ if eq(parameters.overrideAction, 'apply') }}validateDeploy${{ else }}validate
               dependsOn: TerraformPlanApply

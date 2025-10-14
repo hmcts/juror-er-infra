@@ -1,0 +1,22 @@
+{
+	"name": "Database1",
+	"properties": {
+		"Name": "Database1",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://baubais-storage-data-lake-stg@synapsebaubaisstg.dfs.core.windows.net/Database1",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "baubais-synapse-stg-WorkspaceDefaultStorage"
+			}
+		}
+	},
+	"type": "DATABASE"
+}

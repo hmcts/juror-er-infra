@@ -1,0 +1,94 @@
+{
+	"name": "Testing_Excel_Packages",
+	"properties": {
+		"folder": {
+			"name": "Testing"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkstg",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "44f38d24-02ce-4d25-87a1-60557d29e4d8"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import SparkSession"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Initialize Spark session\n",
+					"spark = SparkSession.builder \\\n",
+					"    .appName(\"CheckSparkExcelPackage\") \\\n",
+					"    .getOrCreate()\n",
+					"\n",
+					"# Function to check if the package is installed\n",
+					"def check_spark_excel_package():\n",
+					"    try:\n",
+					"        # Attempt to read an Excel file\n",
+					"        df = spark.read.format(\"com.crealytics.spark.excel\") \\\n",
+					"            .option(\"header\", \"true\") \\\n",
+					"            .option(\"inferSchema\", \"true\") \\\n",
+					"            .load(\"abfss://juror-ingestion@baubaisadfsastg.dfs.core.windows.net/20241217/LA_Data/029-Blaby/31UB_blaby-district_001_2024.XLSX\")\n",
+					"        \n",
+					"        # Show the DataFrame\n",
+					"        df.show()\n",
+					"        print(\"The com.crealytics.spark.excel package is installed and working correctly.\")\n",
+					"    except Exception as e:\n",
+					"        print(f\"Error: {e}\")\n",
+					"        print(\"The com.crealytics.spark.excel package is not installed or not working correctly.\")\n",
+					"\n",
+					"# Check if the package is installed\n",
+					"check_spark_excel_package()\n",
+					"\n",
+					"# Print the Spark session configuration\n",
+					"print(spark.sparkContext.getConf().getAll())"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

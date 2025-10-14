@@ -1,10 +1,13 @@
 {
 	"name": "L1_Er_Juror_MappingSchema",
 	"properties": {
+		"folder": {
+			"name": "crime"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "sparkstg",
+			"referenceName": "sparkprod",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "17a83475-75c1-417a-8810-b912ff1d1062"
+				"spark.autotune.trackingId": "e0578321-5d9f-4860-93bd-26e5d9136325"
 			}
 		},
 		"metadata": {
@@ -31,10 +34,10 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
-				"name": "sparkstg",
+				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
+				"name": "sparkprod",
 				"type": "Spark",
-				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -58,6 +61,11 @@
 					}
 				},
 				"source": [
+					"# L1 Mapping Schema - Electoral Data ETL\n",
+					"\n",
+					"## Purpose\n",
+					"This notebook is part of an ETL pipeline for processing electoral data. It ensures data consistency, quality, and integration with Azure Data Lake Storage (ADLS) using Apache Spark.\n",
+					"\n",
 					"### Initialization & Utilities\n",
 					"- **create_spark_session()**: Initializes a Spark session with Excel support.\n",
 					"- **ensure_folder_exists(folder_path)**: Ensures a specified folder exists in ADLS.\n",

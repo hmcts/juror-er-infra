@@ -25,12 +25,9 @@ parameters:
   default: false
 - name: enableTriggers
   default: false
-- name: operation
-  type: string
-  values:
-  - validateDeploy
-  - validate
-  default: 'validate'
+- name: validateOnly
+  type: boolean
+  default: true
 jobs:
 - deployment: deploy_synapse
   displayName: 'Deploy Synapse Workspace'
@@ -40,6 +37,10 @@ jobs:
   condition: succeeded()
   variables:
     packageWheelName: 'none'
+    ${{ if eq(parameters.validateOnly, true) }}:
+      operation: 'validate'
+    ${{ else }}:
+      operation: 'validateDeploy'
   environment: ${{ parameters.env }}
   strategy:
     runOnce:
@@ -49,6 +50,7 @@ jobs:
           clean: true
         - task: PythonScript@0
           displayName: 'Notebook Validation'
+          condition: ne(${{ parameters.validateOnly }}, true)
           inputs:
             scriptSource: 'filePath' # Options: filePath, inline
             scriptPath: 'devops/scripts/NotebookValidator.py'
@@ -67,7 +69,7 @@ jobs:
           inputs:
             azureSubscription: ${{ parameters.subscriptionEndpoint }}
             ResourceGroupName: ${{ parameters.resourceGroup }}
-            operation: ${{ parameters.operation }}
+            operation: ${{ variables.operation }}
             ArtifactsFolder: 'synapse'
             TargetWorkspaceName: ${{ parameters.synapseName }}
             DeleteArtifactsNotInTemplate: false
@@ -78,7 +80,7 @@ jobs:
             OverrideArmParameters: -workspaceName ${{ parameters.synapseName }} ${{ parameters.adfOverrideParameters }}
         - task: toggle-triggers-dev@2
           displayName: 'Restart triggers'
-          condition: eq(${{ parameters.enableTriggers }}, true)
+          condition: and(eq(${{ parameters.enableTriggers }}, true), ne(${{ parameters.validateOnly }}, true))
           inputs:
             azureSubscription: ${{ parameters.subscriptionEndpoint }}
             ResourceGroupName: ${{ parameters.resourceGroup }}

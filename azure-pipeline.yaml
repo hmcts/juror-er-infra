@@ -64,6 +64,14 @@ stages:
               keyvaultSecret: "azure-devops-sp-token"
               serviceConnection: "azurerm-sandbox"
               overrideAction: ${{ parameters.overrideAction }}
+          - task: PythonScript@0
+            displayName: 'Notebook Validation'
+            condition: ne(${{ parameters.validateOnly }}, true)
+            inputs:
+              scriptSource: 'filePath' # Options: filePath, inline
+              scriptPath: 'devops/scripts/NotebookValidator.py'
+              arguments: $(Build.Repository.LocalPath)
+              failOnStderr: true # Optional
 
   - ${{ each deployment in parameters.environment_components }}:
       - stage: ${{ deployment.deployment }}

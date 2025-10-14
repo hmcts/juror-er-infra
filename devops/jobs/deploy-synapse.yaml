@@ -46,13 +46,6 @@ jobs:
         steps:
         - checkout: self
           clean: true
-        - task: PythonScript@0
-          displayName: 'Notebook Validation'
-          inputs:
-            scriptSource: 'filePath' # Options: filePath, inline
-            scriptPath: 'devops/scripts/NotebookValidator.py'
-            arguments: $(Build.Repository.LocalPath)
-            failOnStderr: true # Optional
         - task: toggle-triggers-dev@2
           displayName: 'Disable triggers'
           condition: ne(${{ parameters.validateOnly }}, true)

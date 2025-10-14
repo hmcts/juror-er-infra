@@ -1,0 +1,79 @@
+parameters:
+- name: subscriptionEndpoint
+  type: string
+- name: synapseName
+  type: string
+- name: resourceGroup
+  type: string
+  default: mi-$(environment)-rg
+- name: env
+  type: string
+  default: $(environment)
+- name: agentPool
+  type: string
+  default: hmcts-ss-$(environment)
+- name: adfOverrideParameters
+  type: string
+  default: ''
+- name: triggers
+  type: string
+  default: '*'
+- name: dependsOn
+  type: string
+  default: ''
+- name: enableTriggers
+  default: false
+jobs:
+- deployment: deploy_synapse
+  displayName: 'Deploy Synapse Workspace'
+  pool:
+    vmImage: ubuntu-latest
+  dependsOn: ${{ parameters.dependsOn }}
+  condition: succeeded()
+  variables:
+    packageWheelName: 'none'
+  environment: ${{ parameters.env }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+          clean: true
+        - task: PythonScript@0
+          displayName: 'Notebook Validation'
+          inputs:
+            scriptSource: 'filePath' # Options: filePath, inline
+            scriptPath: 'devops/scripts/NotebookValidator.py'
+            arguments: $(Build.Repository.LocalPath)
+            failOnStderr: true # Optional
+        - task: toggle-triggers-dev@2
+          displayName: 'Disable triggers'
+          inputs:
+            azureSubscription: ${{ parameters.subscriptionEndpoint }}
+            ResourceGroupName: ${{ parameters.resourceGroup }}
+            WorkspaceName: ${{ parameters.synapseName }}
+            ToggleOn: false
+            Triggers: '*'
+        - task: Synapse workspace deployment@2
+          displayName: 'Synapse deployment task for workspace: ${{ parameters.synapseName }}'
+          inputs:
+            azureSubscription: ${{ parameters.subscriptionEndpoint }}
+            ResourceGroupName: ${{ parameters.resourceGroup }}
+            operation: validateDeploy
+            ArtifactsFolder: 'workspace'
+            TargetWorkspaceName: ${{ parameters.synapseName }}
+            DeleteArtifactsNotInTemplate: false
+            DeployManagedPrivateEndpoints: false
+            FailOnMissingOverrides: false
+            Environment: 'prod'
+            npmpackage: 'prod'
+            OverrideArmParameters: -workspaceName ${{ parameters.synapseName }} ${{ parameters.adfOverrideParameters }}
+        - task: toggle-triggers-dev@2
+          displayName: 'Restart triggers'
+          condition: eq(${{ parameters.enableTriggers }}, true)
+          inputs:
+            azureSubscription: ${{ parameters.subscriptionEndpoint }}
+            ResourceGroupName: ${{ parameters.resourceGroup }}
+            WorkspaceName: ${{ parameters.synapseName }}
+            ToggleOn: true
+            Triggers: ${{ parameters.triggers }}

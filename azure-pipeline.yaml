@@ -68,7 +68,7 @@ stages:
             displayName: 'Notebook Validation'
             inputs:
               scriptSource: 'filePath' # Options: filePath, inline
-              scriptPath: '$(Build.SourcesDirectory)/devops/scripts/NotebookValidator.py'
+              scriptPath: '$(System.DefaultWorkingDirectory)/$(buildRepoSuffix)/devops/scripts/NotebookValidator.py'
               arguments: $(Build.Repository.LocalPath)
               failOnStderr: true # Optional
 

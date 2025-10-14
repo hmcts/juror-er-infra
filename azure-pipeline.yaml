@@ -69,7 +69,7 @@ stages:
             inputs:
               scriptSource: 'filePath' # Options: filePath, inline
               scriptPath: 'devops/scripts/NotebookValidator.py'
-              arguments: $(Build.Repository.LocalPath)
+              arguments: $(Build.Repository.LocalPath)/{(Build.Repository.Name)
               failOnStderr: true # Optional
 
   - ${{ each deployment in parameters.environment_components }}:

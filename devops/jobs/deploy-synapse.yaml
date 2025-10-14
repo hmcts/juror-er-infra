@@ -48,7 +48,6 @@ jobs:
           clean: true
         - task: PythonScript@0
           displayName: 'Notebook Validation'
-          condition: ne(${{ parameters.validateOnly }}, true)
           inputs:
             scriptSource: 'filePath' # Options: filePath, inline
             scriptPath: 'devops/scripts/NotebookValidator.py'
@@ -56,6 +55,7 @@ jobs:
             failOnStderr: true # Optional
         - task: toggle-triggers-dev@2
           displayName: 'Disable triggers'
+          condition: ne(${{ parameters.validateOnly }}, true)
           inputs:
             azureSubscription: ${{ parameters.subscriptionEndpoint }}
             ResourceGroupName: ${{ parameters.resourceGroup }}

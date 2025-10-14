@@ -7,7 +7,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "sparkprod",
+			"referenceName": "sparkstg",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "be2965a5-33a9-4528-a44d-3ce62c4bd19e"
+				"spark.autotune.trackingId": "1d374d94-f356-43cc-90e4-f56d6118d0fc"
 			}
 		},
 		"metadata": {
@@ -34,10 +34,10 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
-				"name": "sparkprod",
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"name": "sparkstg",
 				"type": "Spark",
-				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -146,6 +146,18 @@
 					"import traceback"
 				],
 				"execution_count": 62
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"env = \"stg\""
+				],
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -298,6 +310,19 @@
 					"        return False"
 				],
 				"execution_count": 66
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"##  Unzipp file"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -1271,6 +1296,19 @@
 				"execution_count": 82
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Main method"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"def main():\n",
@@ -1670,6 +1708,44 @@
 					""
 				],
 				"execution_count": 83
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Debug code"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"mssparkutils.fs.ls(\".\")"
+				],
+				"execution_count": 69
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"extract_to = \"unzipped\"\n",
+					"for root, dirs, files in os.walk(extract_to):\n",
+					"    for file in files:\n",
+					"        local_file_path = os.path.join(root, file)\n",
+					"        relative_path = os.path.relpath(local_file_path, extract_to)\n",
+					"        remote_dir = os.path.dirname(file_path)\n",
+					"        remote_file_path = f\"{remote_dir}/{relative_path}\"\n",
+					"        \n",
+					"        print(f\"Uploading: {local_file_path} to {remote_file_path}\")\n",
+					"        mssparkutils.fs.cp(f\"file:/{local_file_path}\", remote_file_path)\n",
+					"    \n",
+					"    print(f\"Successfully unzipped file: {file_path}\")"
+				],
+				"execution_count": 67
 			}
 		]
 	}

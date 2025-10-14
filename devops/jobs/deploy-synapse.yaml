@@ -60,7 +60,7 @@ jobs:
             azureSubscription: ${{ parameters.subscriptionEndpoint }}
             ResourceGroupName: ${{ parameters.resourceGroup }}
             operation: validateDeploy
-            ArtifactsFolder: 'workspace'
+            ArtifactsFolder: 'synapse'
             TargetWorkspaceName: ${{ parameters.synapseName }}
             DeleteArtifactsNotInTemplate: false
             DeployManagedPrivateEndpoints: false

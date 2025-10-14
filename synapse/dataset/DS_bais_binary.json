@@ -1,0 +1,16 @@
+{
+	"name": "DS_bais_binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_bais_bau_etf",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureFileStorageLocation"
+			}
+		}
+	}
+}

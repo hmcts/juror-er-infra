@@ -1,0 +1,70 @@
+{
+	"name": "p_copy_bais",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy from bais",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0:30:00",
+					"retry": 1,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureFileStorageReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": {
+								"value": "@pipeline().parameters.folder",
+								"type": "Expression"
+							},
+							"wildcardFileName": "*",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_bais_binary",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_juror_eric_landing",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "qz-test"
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"folder": {
+				"type": "string",
+				"defaultValue": "BAIS/Sites/External-In-Legacy/Juror_ER"
+			},
+			"last_modified": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}

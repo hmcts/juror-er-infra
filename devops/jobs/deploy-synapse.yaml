@@ -23,8 +23,6 @@ parameters:
   default: ''
 - name: enableTriggers
   default: false
-- name: enableTriggers
-  default: false
 - name: validateOnly
   type: boolean
   default: true

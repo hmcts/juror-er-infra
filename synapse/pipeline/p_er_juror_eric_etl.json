@@ -20,12 +20,14 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sparkprod",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
-					"driverSize": "Small"
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
 				}
 			},
 			{
@@ -53,12 +55,14 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sparkprod",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
-					"driverSize": "Small"
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
 				}
 			},
 			{
@@ -86,12 +90,14 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sparkprod",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
-					"driverSize": "Small"
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
 				}
 			},
 			{
@@ -119,35 +125,14 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sparkprod",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
-					"driverSize": "Small"
-				}
-			},
-			{
-				"name": "Execute Postgsql Batch",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "L2_MergingFiles",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "p_AzureApp_Postgresql_Sink",
-						"type": "PipelineReference"
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
 					},
-					"waitOnCompletion": true
+					"driverSize": "Small",
+					"numExecutors": null
 				}
 			}
 		],

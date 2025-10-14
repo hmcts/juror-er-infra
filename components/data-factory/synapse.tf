@@ -74,7 +74,7 @@ resource "azurerm_synapse_sql_pool" "this" {
 
 resource "azurerm_synapse_spark_pool" "this" {
   count                = var.enable_synapse_spark_pool ? 1 : 0
-  name                 = "sparkpool"
+  name                 = "spark${var.product}"
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d1881103-5e8a-4023-a78f-d2db8c6f3b2f"
+				"spark.autotune.trackingId": "09e93eec-22fd-4218-ab53-f28df8420740"
 			}
 		},
 		"metadata": {
@@ -45,7 +45,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -167,7 +168,7 @@
 					"    report_df.write.mode(\"overwrite\").json(output_path)\n",
 					"    print(f\"\\nDetailed report saved to {output_path}\")"
 				],
-				"execution_count": 37
+				"execution_count": null
 			}
 		]
 	}

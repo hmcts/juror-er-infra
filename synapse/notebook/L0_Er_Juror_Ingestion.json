@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "be2965a5-33a9-4528-a44d-3ce62c4bd19e"
+				"spark.autotune.trackingId": "695809a3-d965-4329-bc38-0375a77553a0"
 			}
 		},
 		"metadata": {
@@ -36,17 +36,10 @@
 			"a365ComputeOptions": {
 				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
 				"name": "sparkprod",
-				"type": "Spark",
-				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
-				},
-				"sparkVersion": "3.4",
-				"nodeCount": 3,
-				"cores": 4,
-				"memory": 28,
-				"automaticScaleJobs": false
+				}
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -145,7 +138,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 62
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +157,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 63
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -194,7 +187,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 64
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -216,7 +209,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 65
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -297,7 +290,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 66
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -375,7 +368,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 67
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -445,7 +438,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 68
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +494,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 69
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -536,7 +529,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 70
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -573,7 +566,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 71
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -614,7 +607,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 72
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -716,7 +709,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 73
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -761,7 +754,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 74
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -826,7 +819,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 75
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -879,7 +872,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 76
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1011,7 +1004,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False  # Use False"
 				],
-				"execution_count": 77
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1037,7 +1030,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 78
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1078,7 +1071,7 @@
 					"    \n",
 					"    return path "
 				],
-				"execution_count": 79
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1101,7 +1094,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": 80
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1198,7 +1191,7 @@
 					"    \n",
 					"    return processed_files"
 				],
-				"execution_count": 81
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1268,7 +1261,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": 82
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1669,7 +1662,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 83
+				"execution_count": null
 			}
 		]
 	}

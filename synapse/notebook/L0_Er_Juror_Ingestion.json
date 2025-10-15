@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "66865d19-db63-422e-a132-35d51b3835e0"
+				"spark.autotune.trackingId": "c9dc6b3b-c678-4e4a-b005-d2868b4a9426"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 45
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 46
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -172,7 +172,7 @@
 					"env = \"stg\"\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": 47
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -202,7 +202,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 48
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -224,7 +224,32 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 49
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def is_file_in_year(file_path, year_filter=\"2025\"):\n",
+					"    \"\"\"\n",
+					"    Check if file is in a folder starting with specified year\n",
+					"    \n",
+					"    Example:\n",
+					"        \".../20251014/LA_Data/file.csv\" → True (2025)\n",
+					"        \".../20241015/LA_Data/file.csv\" → False (2024)\n",
+					"    \"\"\"\n",
+					"    import re\n",
+					"    parts = file_path.split('/')\n",
+					"    \n",
+					"    for part in parts:\n",
+					"        if re.match(r'^\\d{8}$', part):  # Date folder (YYYYMMDD)\n",
+					"            if part.startswith(year_filter):\n",
+					"                return True\n",
+					"            else:\n",
+					"                return False  # Found date folder but wrong year\n",
+					"    \n",
+					"    return True  # No date folder found - allow"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -280,7 +305,7 @@
 					"        print(f\"Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": 50
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -444,7 +469,7 @@
 					"        print(f\"{indent}Traceback: {traceback.format_exc()}\")\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": 51
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -514,7 +539,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 52
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -570,7 +595,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 53
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -605,7 +630,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 54
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -642,7 +667,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 55
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -683,7 +708,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 56
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -785,7 +810,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 57
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -830,7 +855,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 58
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -895,7 +920,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 59
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -974,7 +999,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 60
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1062,7 +1087,7 @@
 					"        move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
 					"        return False"
 				],
-				"execution_count": 61
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1088,7 +1113,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 62
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1109,7 +1134,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": 63
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1132,7 +1157,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": 64
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1194,7 +1219,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": 65
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1264,7 +1289,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": 66
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1396,7 +1421,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 67
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1405,13 +1430,15 @@
 					"    source_path = f\"abfss://juror-ingestion@{storage_account}.dfs.core.windows.net\"\n",
 					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
 					"    \n",
-					"    # IMPORTANT: Set to False to process only new files\n",
-					"    debug_mode = False\n",
+					"    # CONFIGURATION\n",
+					"    debug_mode = False  # Process only new files\n",
+					"    year_filter = \"2025\"  # Only process 2025 files\n",
 					"    \n",
 					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    print(\"L0 JUROR INGESTION PIPELINE\")\n",
 					"    print(\"=\" * 70)\n",
 					"    print(f\"Mode: {'DEBUG (all files)' if debug_mode else 'PRODUCTION (new files only)'}\")\n",
+					"    print(f\"Year filter: {year_filter}\")\n",
 					"    print(\"=\" * 70)\n",
 					"    \n",
 					"    # Initialize tracking\n",
@@ -1422,7 +1449,8 @@
 					"        'overseas': [],\n",
 					"        'failed': [],\n",
 					"        'quarantine': [],\n",
-					"        'zip_extracted': []\n",
+					"        'zip_extracted': [],\n",
+					"        'zip_skipped': []\n",
 					"    }\n",
 					"    \n",
 					"    # Verify source path exists\n",
@@ -1430,82 +1458,171 @@
 					"        print(f\"ERROR: Source path does not exist: {source_path}\")\n",
 					"        return\n",
 					"    \n",
-					"    # Ensure destination directories exist\n",
-					"    dest_dirs = [\n",
-					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\",\n",
-					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/metadata\",\n",
-					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/quarantine\",\n",
-					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/empty\",\n",
-					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/overseas\"\n",
-					"    ]\n",
+					"    # ========================================================================\n",
+					"    # STEP 1: Scan for all files AND extract ZIPs\n",
+					"    # ========================================================================\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 1: SCANNING & EXTRACTING ZIPS\")\n",
+					"    print(\"=\" * 70)\n",
+					"    print(\"🔍 Scanning folders and extracting ZIP files...\")\n",
+					"    print(\"   (Corrupted/password-protected ZIPs → quarantine)\")\n",
 					"    \n",
-					"    for dir_path in dest_dirs:\n",
-					"        if not mssparkutils.fs.exists(dir_path):\n",
-					"            mssparkutils.fs.mkdirs(dir_path)\n",
-					"    \n",
-					"    # STEP 1: Scan for all files (including extracting ZIPs)\n",
-					"    print(\"\\n🔍 STEP 1: Scanning for files...\")\n",
 					"    all_files = process_folder(source_path, storage_account, moved_files)\n",
-					"    print(f\"   Found {len(all_files)} total files\")\n",
 					"    \n",
-					"    # STEP 2: Create file index (fast - don't check if empty yet)\n",
-					"    print(\"\\n📋 STEP 2: Creating file index...\")\n",
-					"    file_index = create_file_index_fast(all_files)\n",
+					"    print(f\"\\n📊 Scan results:\")\n",
+					"    print(f\"   Total files found: {len(all_files)}\")\n",
+					"    print(f\"   ZIPs extracted: {len(moved_files.get('zip_extracted', []))}\")\n",
+					"    print(f\"   ZIPs quarantined: {len([f for f in moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
+					"    \n",
+					"    # ========================================================================\n",
+					"    # STEP 2: Check each file for empty/corrupted (quarantine bad ones)\n",
+					"    # ========================================================================\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 2: CHECKING FILES FOR EMPTY/CORRUPTED\")\n",
+					"    print(\"=\" * 70)\n",
+					"    print(\"🔍 Checking CSV and Excel files...\")\n",
+					"    print(\"   (Empty/corrupted files → quarantine)\")\n",
+					"    \n",
+					"    valid_files = []\n",
+					"    \n",
+					"    for file_path in all_files:\n",
+					"        file_name = os.path.basename(file_path)\n",
+					"        file_ext = os.path.splitext(file_path)[1].lower()\n",
+					"        \n",
+					"        # Only check CSV and Excel files\n",
+					"        if file_ext in ['.csv', '.xlsx', '.xls']:\n",
+					"            # Check if empty or corrupted\n",
+					"            has_error, error_code = is_empty_file(file_path)\n",
+					"            \n",
+					"            if has_error and error_code:\n",
+					"                # File is empty or corrupted - QUARANTINE\n",
+					"                print(f\"   ❌ {file_name}: {error_code}\")\n",
+					"                move_to_quarantine(file_path, storage_account, moved_files, error_code)\n",
+					"            else:\n",
+					"                # File is good - add to valid files\n",
+					"                print(f\"   ✅ {file_name}: OK\")\n",
+					"                valid_files.append(file_path)\n",
+					"        else:\n",
+					"            # Not CSV/Excel - just add to valid files\n",
+					"            valid_files.append(file_path)\n",
+					"    \n",
+					"    print(f\"\\n📊 File check results:\")\n",
+					"    print(f\"   Valid files: {len(valid_files)}\")\n",
+					"    print(f\"   Files quarantined: {len(moved_files['quarantine']) - len([f for f in moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
+					"    \n",
+					"    # ========================================================================\n",
+					"    # STEP 3: Create file index (only for valid, non-quarantined files)\n",
+					"    # ========================================================================\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 3: CREATING FILE INDEX\")\n",
+					"    print(\"=\" * 70)\n",
+					"    print(\"📋 Indexing valid files...\")\n",
+					"    \n",
+					"    file_index = {\n",
+					"        \"created_at\": time.strftime(\"%Y%m%d%H%M%S\"),\n",
+					"        \"files\": []\n",
+					"    }\n",
+					"    \n",
+					"    for file_path in valid_files:\n",
+					"        try:\n",
+					"            file_name = os.path.basename(file_path)\n",
+					"            date_folder, la_folder, confidence = get_folder_parts(file_path)\n",
+					"            \n",
+					"            file_info = {\n",
+					"                \"path\": file_path,\n",
+					"                \"file_name\": file_name,\n",
+					"                \"date_folder\": date_folder,\n",
+					"                \"la_folder\": la_folder,\n",
+					"                \"confidence\": confidence,\n",
+					"                \"file_type\": get_file_type(file_path),\n",
+					"                \"is_empty\": False,  # Already checked\n",
+					"                \"is_metadata\": is_metadata_file(file_path),\n",
+					"                \"should_process\": should_process_file(file_path),\n",
+					"                \"processed\": False\n",
+					"            }\n",
+					"            file_index[\"files\"].append(file_info)\n",
+					"        except Exception as e:\n",
+					"            print(f\"   ⚠️  Error indexing {file_name}: {str(e)}\")\n",
+					"    \n",
 					"    print(f\"   Indexed {len(file_index['files'])} files\")\n",
 					"    \n",
-					"    # STEP 3: Read processed files log\n",
-					"    print(\"\\n📖 STEP 3: Reading processed files log...\")\n",
-					"    processed_files_set = read_processed_files_log(storage_account)\n",
+					"    # ========================================================================\n",
+					"    # STEP 4: Filter by year (2025)\n",
+					"    # ========================================================================\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(f\"STEP 4: FILTERING BY YEAR ({year_filter})\")\n",
+					"    print(\"=\" * 70)\n",
 					"    \n",
-					"    # STEP 4: Filter out already processed files\n",
-					"    print(\"\\n🔍 STEP 4: Filtering files...\")\n",
-					"    new_files = []\n",
-					"    skipped_files = []\n",
+					"    files_in_year = []\n",
+					"    files_wrong_year = []\n",
 					"    \n",
 					"    for file_info in file_index[\"files\"]:\n",
+					"        if is_file_in_year(file_info[\"path\"], year_filter):\n",
+					"            files_in_year.append(file_info)\n",
+					"        else:\n",
+					"            files_wrong_year.append(file_info[\"path\"])\n",
+					"            print(f\"   ⏭️  Skipping (not {year_filter}): {file_info['file_name']}\")\n",
+					"    \n",
+					"    print(f\"\\n📊 Year filter results:\")\n",
+					"    print(f\"   Files in {year_filter}: {len(files_in_year)}\")\n",
+					"    print(f\"   Files skipped (wrong year): {len(files_wrong_year)}\")\n",
+					"    \n",
+					"    # ========================================================================\n",
+					"    # STEP 5: Filter by processed log (new files only)\n",
+					"    # ========================================================================\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 5: FILTERING NEW FILES (NOT ALREADY PROCESSED)\")\n",
+					"    print(\"=\" * 70)\n",
+					"    \n",
+					"    # Read processed files log\n",
+					"    processed_files_set = read_processed_files_log(storage_account)\n",
+					"    \n",
+					"    new_files = []\n",
+					"    already_processed = []\n",
+					"    \n",
+					"    for file_info in files_in_year:\n",
 					"        file_path = file_info[\"path\"]\n",
 					"        norm_path = normalize_file_path(file_path)\n",
 					"        \n",
-					"        # Check if file exists\n",
-					"        if not mssparkutils.fs.exists(file_path):\n",
-					"            print(f\"   ⚠️  File doesn't exist: {os.path.basename(file_path)}\")\n",
-					"            skipped_files.append(file_path)\n",
-					"            continue\n",
-					"        \n",
-					"        # Check if already processed\n",
 					"        if debug_mode:\n",
-					"            # Debug mode: process everything\n",
+					"            # Debug mode: process all\n",
 					"            new_files.append(file_info)\n",
 					"        elif file_path.lower() in processed_files_set or norm_path in processed_files_set:\n",
 					"            # Already processed - skip\n",
-					"            skipped_files.append(file_path)\n",
+					"            already_processed.append(file_path)\n",
+					"            print(f\"   ⏭️  Already processed: {file_info['file_name']}\")\n",
 					"        else:\n",
 					"            # New file - process it\n",
 					"            new_files.append(file_info)\n",
-					"            print(f\"   ✨ NEW: {os.path.basename(file_path)}\")\n",
+					"            print(f\"   ✨ NEW: {file_info['file_name']}\")\n",
 					"    \n",
-					"    print(f\"\\n📊 Filtering results:\")\n",
-					"    print(f\"   Total files: {len(file_index['files'])}\")\n",
+					"    print(f\"\\n📊 New file filter results:\")\n",
 					"    print(f\"   New files to process: {len(new_files)}\")\n",
-					"    print(f\"   Skipped (already processed): {len(skipped_files)}\")\n",
+					"    print(f\"   Already processed (skipped): {len(already_processed)}\")\n",
 					"    \n",
 					"    if len(new_files) == 0:\n",
-					"        print(\"\\n✅ No new files to process. Exiting.\")\n",
+					"        print(\"\\n✅ No new files to process\")\n",
+					"        print_quarantine_summary(moved_files)\n",
 					"        return\n",
 					"    \n",
-					"    # STEP 5: Group files for processing\n",
-					"    print(\"\\n📦 STEP 5: Grouping files...\")\n",
+					"    # ========================================================================\n",
+					"    # STEP 6: Group files for processing\n",
+					"    # ========================================================================\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 6: GROUPING FILES FOR PROCESSING\")\n",
+					"    print(\"=\" * 70)\n",
+					"    \n",
 					"    file_groups = {}\n",
 					"    individual_files = []\n",
 					"    \n",
 					"    for file_info in new_files:\n",
-					"        # Check if should process individually\n",
+					"        # Files to process individually\n",
 					"        if (file_info[\"is_metadata\"] or \n",
 					"            file_info[\"confidence\"] == \"very_low\" or \n",
 					"            not file_info[\"should_process\"]):\n",
 					"            individual_files.append(file_info)\n",
+					"        # Files to group by date/LA\n",
 					"        elif file_info[\"date_folder\"] and file_info[\"la_folder\"]:\n",
-					"            # Group by date and LA folder\n",
 					"            group_key = (file_info[\"date_folder\"], file_info[\"la_folder\"])\n",
 					"            if group_key not in file_groups:\n",
 					"                file_groups[group_key] = []\n",
@@ -1516,65 +1633,79 @@
 					"    print(f\"   File groups: {len(file_groups)}\")\n",
 					"    print(f\"   Individual files: {len(individual_files)}\")\n",
 					"    \n",
-					"    # STEP 6: Process files\n",
-					"    print(\"\\n⚙️  STEP 6: Processing files...\")\n",
+					"    # ========================================================================\n",
+					"    # STEP 7: Process files\n",
+					"    # ========================================================================\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 7: PROCESSING FILES\")\n",
+					"    print(\"=\" * 70)\n",
+					"    \n",
 					"    successfully_processed_files = []\n",
 					"    \n",
 					"    # Process individual files\n",
-					"    print(f\"\\n   Processing {len(individual_files)} individual files...\")\n",
-					"    for i, file_info in enumerate(individual_files, 1):\n",
-					"        try:\n",
-					"            print(f\"   [{i}/{len(individual_files)}] {os.path.basename(file_info['path'])}\")\n",
-					"            success = process_individual_file(file_info, storage_account, moved_files)\n",
-					"            \n",
-					"            if success and verify_file_processed(file_info[\"path\"], moved_files):\n",
-					"                successfully_processed_files.append(file_info[\"path\"])\n",
-					"        except Exception as e:\n",
-					"            print(f\"   ❌ ERROR: {str(e)}\")\n",
-					"            moved_files['failed'].append(file_info[\"path\"])\n",
+					"    if individual_files:\n",
+					"        print(f\"\\n⚙️  Processing {len(individual_files)} individual files...\")\n",
+					"        for i, file_info in enumerate(individual_files, 1):\n",
+					"            try:\n",
+					"                print(f\"\\n[{i}/{len(individual_files)}] {file_info['file_name']}\")\n",
+					"                success = process_individual_file(file_info, storage_account, moved_files)\n",
+					"                \n",
+					"                if success and verify_file_processed(file_info[\"path\"], moved_files):\n",
+					"                    successfully_processed_files.append(file_info[\"path\"])\n",
+					"            except Exception as e:\n",
+					"                print(f\"   ❌ Error: {str(e)}\")\n",
+					"                moved_files['failed'].append(file_info[\"path\"])\n",
 					"    \n",
 					"    # Process file groups\n",
-					"    print(f\"\\n   Processing {len(file_groups)} file groups...\")\n",
-					"    for idx, ((date_folder, la_folder), file_group) in enumerate(file_groups.items(), 1):\n",
-					"        try:\n",
-					"            group_id = f\"{date_folder}_{la_folder}\"\n",
-					"            print(f\"   [{idx}/{len(file_groups)}] {group_id} ({len(file_group)} files)\")\n",
-					"            \n",
-					"            success, path = process_file_group(file_group, date_folder, la_folder, storage_account, moved_files)\n",
-					"            \n",
-					"            if success:\n",
-					"                for file_info in file_group:\n",
-					"                    successfully_processed_files.append(file_info[\"path\"])\n",
-					"            else:\n",
-					"                # Fallback to individual processing\n",
-					"                for file_info in file_group:\n",
-					"                    try:\n",
-					"                        success = process_individual_file(file_info, storage_account, moved_files)\n",
-					"                        if success and verify_file_processed(file_info[\"path\"], moved_files):\n",
-					"                            successfully_processed_files.append(file_info[\"path\"])\n",
-					"                    except:\n",
-					"                        moved_files['failed'].append(file_info[\"path\"])\n",
-					"        except Exception as e:\n",
-					"            print(f\"   ❌ ERROR: {str(e)}\")\n",
+					"    if file_groups:\n",
+					"        print(f\"\\n⚙️  Processing {len(file_groups)} file groups...\")\n",
+					"        for idx, ((date_folder, la_folder), file_group) in enumerate(file_groups.items(), 1):\n",
+					"            try:\n",
+					"                group_id = f\"{date_folder}_{la_folder}\"\n",
+					"                print(f\"\\n[{idx}/{len(file_groups)}] {group_id} ({len(file_group)} files)\")\n",
+					"                \n",
+					"                success, path = process_file_group(file_group, date_folder, la_folder, storage_account, moved_files)\n",
+					"                \n",
+					"                if success:\n",
+					"                    for file_info in file_group:\n",
+					"                        successfully_processed_files.append(file_info[\"path\"])\n",
+					"                else:\n",
+					"                    # Fallback to individual\n",
+					"                    for file_info in file_group:\n",
+					"                        try:\n",
+					"                            success = process_individual_file(file_info, storage_account, moved_files)\n",
+					"                            if success and verify_file_processed(file_info[\"path\"], moved_files):\n",
+					"                                successfully_processed_files.append(file_info[\"path\"])\n",
+					"                        except:\n",
+					"                            moved_files['failed'].append(file_info[\"path\"])\n",
+					"            except Exception as e:\n",
+					"                print(f\"   ❌ Error: {str(e)}\")\n",
 					"    \n",
-					"    # STEP 7: Update processed files log\n",
+					"    # ========================================================================\n",
+					"    # STEP 8: Update processed files log\n",
+					"    # ========================================================================\n",
 					"    if not debug_mode and len(successfully_processed_files) > 0:\n",
-					"        print(\"\\n📝 STEP 7: Updating processed files log...\")\n",
+					"        print(\"\\n\" + \"=\" * 70)\n",
+					"        print(\"STEP 8: UPDATING PROCESSED FILES LOG\")\n",
+					"        print(\"=\" * 70)\n",
 					"        update_processed_files_log(storage_account, log_file_path, successfully_processed_files)\n",
 					"    \n",
-					"    # STEP 8: Print summary\n",
+					"    # ========================================================================\n",
+					"    # FINAL SUMMARY\n",
+					"    # ========================================================================\n",
 					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    print(\"PROCESSING COMPLETE\")\n",
 					"    print(\"=\" * 70)\n",
-					"    print(f\"Files scanned: {len(file_index['files'])}\")\n",
-					"    print(f\"New files processed: {len(new_files)}\")\n",
-					"    print(f\"Successfully processed: {len(successfully_processed_files)}\")\n",
-					"    print(f\"Data files: {len(moved_files['data_success'])}\")\n",
-					"    print(f\"Metadata files: {len(moved_files['metadata_success'])}\")\n",
-					"    print(f\"ZIPs extracted: {len(moved_files.get('zip_extracted', []))}\")\n",
-					"    print(f\"Quarantined: {len(moved_files['quarantine'])}\")\n",
-					"    print(f\"Failed: {len(moved_files['failed'])}\")\n",
+					"    print(f\"📊 Files scanned: {len(all_files)}\")\n",
+					"    print(f\"✅ Files processed: {len(successfully_processed_files)}\")\n",
+					"    print(f\"📦 ZIPs extracted: {len(moved_files.get('zip_extracted', []))}\")\n",
+					"    print(f\"❌ Files quarantined: {len(moved_files['quarantine'])}\")\n",
+					"    print(f\"⏭️  Files skipped (wrong year): {len(files_wrong_year)}\")\n",
+					"    print(f\"⏭️  Files skipped (already processed): {len(already_processed)}\")\n",
 					"    print(\"=\" * 70)\n",
+					"    \n",
+					"    # Show quarantine details\n",
+					"    print_quarantine_summary(moved_files)\n",
 					"\n",
 					"\n",
 					"\n",
@@ -1582,7 +1713,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 68
+				"execution_count": null
 			}
 		]
 	}

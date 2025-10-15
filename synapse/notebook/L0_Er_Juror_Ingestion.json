@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "56990b6d-5e96-4579-ad9a-efd010b07f3a"
+				"spark.autotune.trackingId": "66865d19-db63-422e-a132-35d51b3835e0"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 45
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -172,7 +172,7 @@
 					"env = \"stg\"\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": null
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -202,7 +202,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -224,7 +224,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -280,7 +280,7 @@
 					"        print(f\"Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": null
+				"execution_count": 50
 			},
 			{
 				"cell_type": "code",
@@ -444,7 +444,7 @@
 					"        print(f\"{indent}Traceback: {traceback.format_exc()}\")\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": null
+				"execution_count": 51
 			},
 			{
 				"cell_type": "code",
@@ -514,7 +514,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 52
 			},
 			{
 				"cell_type": "code",
@@ -570,7 +570,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -605,7 +605,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -642,7 +642,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -683,7 +683,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -785,7 +785,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -830,7 +830,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -895,7 +895,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -974,7 +974,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -1062,7 +1062,7 @@
 					"        move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -1088,7 +1088,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -1109,7 +1109,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": null
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -1132,7 +1132,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": null
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -1194,7 +1194,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": null
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -1263,6 +1263,58 @@
 					"    except Exception as e:\n",
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
+				],
+				"execution_count": 66
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def create_file_index_fast(all_files):\n",
+					"    \"\"\"\n",
+					"    Create file index WITHOUT checking if files are empty (faster)\n",
+					"    Only check empty status during actual processing\n",
+					"    \"\"\"\n",
+					"    file_index = {\n",
+					"        \"created_at\": time.strftime(\"%Y%m%d%H%M%S\"),\n",
+					"        \"files\": []\n",
+					"    }\n",
+					"    \n",
+					"    for file_path in all_files:\n",
+					"        try:\n",
+					"            file_name = os.path.basename(file_path)\n",
+					"            date_folder, la_folder, confidence = get_folder_parts(file_path)\n",
+					"            \n",
+					"            file_info = {\n",
+					"                \"path\": file_path,\n",
+					"                \"file_name\": file_name,\n",
+					"                \"date_folder\": date_folder,\n",
+					"                \"la_folder\": la_folder,\n",
+					"                \"confidence\": confidence,\n",
+					"                \"file_type\": get_file_type(file_path),\n",
+					"                \"is_empty\": False,  # Don't check yet - check during processing\n",
+					"                \"is_metadata\": is_metadata_file(file_path),\n",
+					"                \"should_process\": should_process_file(file_path) and 'File Structure Definitions.xlsx' not in file_path,\n",
+					"                \"processed\": False\n",
+					"            }\n",
+					"            file_index[\"files\"].append(file_info)\n",
+					"            \n",
+					"        except Exception as e:\n",
+					"            print(f\"Error indexing file {file_path}: {str(e)}\")\n",
+					"            # Add with minimal info\n",
+					"            file_index[\"files\"].append({\n",
+					"                \"path\": file_path,\n",
+					"                \"file_name\": os.path.basename(file_path),\n",
+					"                \"date_folder\": \"unknown\",\n",
+					"                \"la_folder\": \"unknown\",\n",
+					"                \"confidence\": \"very_low\",\n",
+					"                \"file_type\": None,\n",
+					"                \"is_empty\": False,\n",
+					"                \"is_metadata\": False,\n",
+					"                \"should_process\": True,\n",
+					"                \"processed\": False\n",
+					"            })\n",
+					"    \n",
+					"    return file_index"
 				],
 				"execution_count": null
 			},
@@ -1344,7 +1396,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -1530,7 +1582,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 68
 			}
 		]
 	}

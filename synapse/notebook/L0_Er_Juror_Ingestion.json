@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c9dc6b3b-c678-4e4a-b005-d2868b4a9426"
+				"spark.autotune.trackingId": "0f13f112-ec91-43a1-8cdd-b9d258b651f0"
 			}
 		},
 		"metadata": {
@@ -145,7 +145,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 94
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -172,7 +172,7 @@
 					"env = \"stg\"\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": null
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
@@ -202,7 +202,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 97
 			},
 			{
 				"cell_type": "code",
@@ -224,32 +224,65 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 98
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def is_file_in_year(file_path, year_filter=\"2025\"):\n",
 					"    \"\"\"\n",
-					"    Check if file is in a folder starting with specified year\n",
+					"    Check if file is in FIRST LEVEL date folder starting with specified year\n",
+					"    \n",
+					"    Structure: juror-ingestion/YYYYMMDD/LA_Data/...\n",
+					"                               ^^^^^^^^ Must start with year_filter\n",
+					"    \n",
+					"    Args:\n",
+					"        file_path: Full path to file\n",
+					"        year_filter: Year to filter (e.g., \"2025\")\n",
+					"    \n",
+					"    Returns:\n",
+					"        bool: True if in correct year folder, False otherwise\n",
 					"    \n",
 					"    Example:\n",
-					"        \".../20251014/LA_Data/file.csv\" → True (2025)\n",
-					"        \".../20241015/LA_Data/file.csv\" → False (2024)\n",
+					"        \"juror-ingestion/20251014/LA_Data/file.csv\" → True (2025)\n",
+					"        \"juror-ingestion/20241015/LA_Data/file.csv\" → False (2024)\n",
 					"    \"\"\"\n",
 					"    import re\n",
+					"    \n",
+					"    # Split path into parts\n",
 					"    parts = file_path.split('/')\n",
 					"    \n",
-					"    for part in parts:\n",
-					"        if re.match(r'^\\d{8}$', part):  # Date folder (YYYYMMDD)\n",
-					"            if part.startswith(year_filter):\n",
-					"                return True\n",
-					"            else:\n",
-					"                return False  # Found date folder but wrong year\n",
+					"    # Find juror-ingestion container index\n",
+					"    container_index = -1\n",
+					"    for i, part in enumerate(parts):\n",
+					"        if 'juror-ingestion' in part.lower():\n",
+					"            container_index = i\n",
+					"            break\n",
 					"    \n",
-					"    return True  # No date folder found - allow"
+					"    # If found, check the NEXT part (first level folder after container)\n",
+					"    if container_index >= 0 and len(parts) > container_index + 1:\n",
+					"        first_level_folder = parts[container_index + 1]\n",
+					"        \n",
+					"        # Check if it's a date folder (8 digits: YYYYMMDD)\n",
+					"        if re.match(r'^\\d{8}$', first_level_folder):\n",
+					"            # Check if it starts with the year filter\n",
+					"            if first_level_folder.startswith(year_filter):\n",
+					"                print(f\"   ✅ {first_level_folder} starts with {year_filter}\")\n",
+					"                return True  # Correct year\n",
+					"            else:\n",
+					"                print(f\"   ⏭️  {first_level_folder} does NOT start with {year_filter}\")\n",
+					"                return False  # Wrong year\n",
+					"        else:\n",
+					"            print(f\"   ⚠️  First level '{first_level_folder}' is not a date folder\")\n",
+					"            return False\n",
+					"    \n",
+					"    # No proper structure found\n",
+					"    print(f\"   ⚠️  Could not find juror-ingestion container in path\")\n",
+					"    return False\n",
+					"\n",
+					""
 				],
-				"execution_count": null
+				"execution_count": 99
 			},
 			{
 				"cell_type": "code",
@@ -305,7 +338,7 @@
 					"        print(f\"Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": null
+				"execution_count": 100
 			},
 			{
 				"cell_type": "code",
@@ -469,7 +502,7 @@
 					"        print(f\"{indent}Traceback: {traceback.format_exc()}\")\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": null
+				"execution_count": 101
 			},
 			{
 				"cell_type": "code",
@@ -539,7 +572,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -595,7 +628,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -630,7 +663,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -667,7 +700,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -708,7 +741,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 106
 			},
 			{
 				"cell_type": "code",
@@ -810,7 +843,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -855,7 +888,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -920,7 +953,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -999,7 +1032,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 110
 			},
 			{
 				"cell_type": "code",
@@ -1087,7 +1120,7 @@
 					"        move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 111
 			},
 			{
 				"cell_type": "code",
@@ -1113,7 +1146,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": null
+				"execution_count": 112
 			},
 			{
 				"cell_type": "code",
@@ -1134,7 +1167,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": null
+				"execution_count": 113
 			},
 			{
 				"cell_type": "code",
@@ -1157,7 +1190,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": null
+				"execution_count": 114
 			},
 			{
 				"cell_type": "code",
@@ -1219,7 +1252,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": null
+				"execution_count": 115
 			},
 			{
 				"cell_type": "code",
@@ -1289,7 +1322,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": null
+				"execution_count": 116
 			},
 			{
 				"cell_type": "code",
@@ -1341,7 +1374,7 @@
 					"    \n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 117
 			},
 			{
 				"cell_type": "code",
@@ -1421,7 +1454,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 118
 			},
 			{
 				"cell_type": "code",
@@ -1709,11 +1742,12 @@
 					"\n",
 					"\n",
 					"\n",
+					"\n",
 					"if __name__ == \"__main__\":\n",
 					"    main()\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 119
 			}
 		]
 	}

@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b8ecdd37-687e-4bba-8be2-e7ab5cc4a951"
+				"spark.autotune.trackingId": "fb890ab9-e9d2-48eb-84b6-2b363475430f"
 			}
 		},
 		"metadata": {
@@ -57,7 +57,7 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -102,7 +102,7 @@
 				"source": [
 					"display(df_single)"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"else:\n",
 					"    print(\"No duplicates found based on hash_id\")"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -151,7 +151,7 @@
 					"foo_df = df_single.filter(df_single.hash_id==-1001152186509638914)\n",
 					"display(foo_df)"
 				],
-				"execution_count": 12
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -179,7 +179,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 10
+				"execution_count": null
 			}
 		]
 	}

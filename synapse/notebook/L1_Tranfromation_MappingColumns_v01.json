@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6bbf5d54-e603-4853-9e1c-bc4f4747b445"
+				"spark.autotune.trackingId": "edb30425-609f-4ae6-84e2-ba42da545944"
 			}
 		},
 		"metadata": {
@@ -45,7 +45,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -126,7 +127,7 @@
 					"from pyspark.sql import Window\n",
 					"from pyspark.sql.types import StructType, StructField, StringType"
 				],
-				"execution_count": 21
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -143,7 +144,7 @@
 					"        .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 22
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -177,7 +178,7 @@
 					"        except Exception as e2:\n",
 					"            raise Exception(f\"Failed to read mapping file. Primary error: {str(e)}, Fallback error: {str(e2)}\")"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -203,7 +204,7 @@
 					"            reverse_map[alias.lower()] = standard_name\n",
 					"    return reverse_map"
 				],
-				"execution_count": 24
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -230,7 +231,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 25
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -256,7 +257,7 @@
 					"        return 'csv'\n",
 					"    return None"
 				],
-				"execution_count": 26
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -283,7 +284,7 @@
 					"        # Return an empty DataFrame with basic structure rather than failing\n",
 					"        return spark.createDataFrame([], StructType([]))"
 				],
-				"execution_count": 27
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -312,7 +313,7 @@
 					"            logging.error(f\"Error reading Excel with Sheet1: {str(e2)}\")\n",
 					"            return spark.read.format(\"com.crealytics.spark.excel\").option(\"header\", \"true\").option(\"inferSchema\", \"true\").option(\"treatEmptyValuesAsNulls\", \"true\").option(\"sheetIndex\", 0).load(file_path)"
 				],
-				"execution_count": 28
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -325,7 +326,7 @@
 					"            logging.info(f\"Renamed column: {col} -> {std_name}\")\n",
 					"    return df"
 				],
-				"execution_count": 29
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -359,7 +360,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 30
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -371,7 +372,7 @@
 					"        col(column_name).cast(\"int\")\n",
 					"    ).otherwise(col(column_name))"
 				],
-				"execution_count": 31
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -435,7 +436,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 32
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -448,7 +449,7 @@
 					"            df = df.withColumn(col_name, when(col(col_name).isNotNull(), upper(trim(col(col_name)))).otherwise(None))\n",
 					"    return df"
 				],
-				"execution_count": 33
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -488,7 +489,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 34
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -519,7 +520,7 @@
 					"        logging.error(f\"Error writing file: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 35
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -579,7 +580,7 @@
 					"            \"error\": str(e)\n",
 					"        }"
 				],
-				"execution_count": 36
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -598,7 +599,7 @@
 					"        logging.error(f\"Error reading mapping files: {str(e)}\")\n",
 					"        return set()"
 				],
-				"execution_count": 37
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -645,7 +646,7 @@
 					"        traceback.print_exc()\n",
 					"        return False"
 				],
-				"execution_count": 38
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -663,7 +664,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 39
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -779,7 +780,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 40
+				"execution_count": null
 			}
 		]
 	}

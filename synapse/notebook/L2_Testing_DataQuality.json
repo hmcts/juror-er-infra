@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cb3f9f42-68b2-45d2-9d1d-0fc50c22b450"
+				"spark.autotune.trackingId": "da923cae-c70d-4ebc-bba3-b07d7512be75"
 			}
 		},
 		"metadata": {
@@ -45,7 +45,8 @@
 				"sparkVersion": "3.4",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -60,7 +61,7 @@
 					"import logging\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 5
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -77,7 +78,7 @@
 					"\n",
 					"spark = create_spark_session()"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -88,7 +89,7 @@
 					"output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_temp\"\n",
 					"deduplicated_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_deduplicated\""
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -238,7 +239,7 @@
 					"\n",
 					"print(\"\\n--- DIAGNOSTICS COMPLETE ---\")"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -248,7 +249,7 @@
 				"source": [
 					"display(final_df)"
 				],
-				"execution_count": 10
+				"execution_count": null
 			}
 		]
 	}

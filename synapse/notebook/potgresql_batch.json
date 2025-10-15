@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "adaad873-1ae2-4f4f-b396-460b688e0226"
+				"spark.autotune.trackingId": "b10c6076-e22d-4ef6-83d6-95581c3636ab"
 			}
 		},
 		"metadata": {
@@ -198,7 +198,7 @@
 					"except Exception as e:\n",
 					"    print(f\"Export failed: {str(e)}\")"
 				],
-				"execution_count": 7
+				"execution_count": null
 			}
 		]
 	}

@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "371f1cbf-b2ac-47fc-a6a7-ff4d801c9452"
+				"spark.autotune.trackingId": "88404e00-b97e-42fc-ac33-276425531173"
 			}
 		},
 		"metadata": {
@@ -1765,58 +1765,74 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "scala"
+					}
+				},
 				"source": [
-					"# mssparkutils.fs.ls(f\"abfss://juror-raw@{storage_account}.dfs.core.windows.net/\")\n",
-					"mssparkutils.fs.ls(\"/\")"
+					"%%spark\n",
+					"import org.apache.hadoop.fs.FileSystem;  \n",
+					"import org.apache.hadoop.fs.Path;  \n",
+					"import org.apache.hadoop.fs.FileStatus;  \n",
+					"import java.net.URI  \n",
+					"val conf = spark.sessionState.newHadoopConf()  \n",
+					"val fs = FileSystem.get(new URI(\"/\"), conf)  \n",
+					"for (fileStatus <- fs.listStatus(new Path(\"/\"))) {  \n",
+					"    println(s\"file name: ${fileStatus.getPath.getName} - modify time: ${fileStatus.getModificationTime}\")  \n",
+					"}  \n",
+					"val data = fs.listStatus(new Path(\"/\"))"
 				],
-				"execution_count": 37
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"file_path"
+					"from datetime import datetime\n",
+					"from notebookutils import mssparkutils\n",
+					"file_s = mssparkutils.fs.ls(source_path)\n",
+					"for f in file_s: \n",
+					"    print(f.name, datetime.fromtimestamp(f.modifyTime / 1000))\n",
+					"#  "
 				],
-				"execution_count": 45
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"outputs_hidden": true
+					}
+				},
 				"source": [
-					"dst_path = 'abfss://qz-test@baubaisadfsastg.dfs.core.windows.net/20251014.zip'\n",
-					"os.path.dirname(dst_path)\n",
-					"remote_dir = 'abfss://qz-test@baubaisadfsastg.dfs.core.windows.net'"
-				],
-				"execution_count": 49
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"remote_dir"
-				],
-				"execution_count": 48
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"local_file_path"
-				],
-				"execution_count": 54
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"for root, dirs, files in os.walk(extract_to):\n",
-					"    for file in files:\n",
-					"        local_file_path = os.path.join(root, file)\n",
-					"        relative_path = os.path.relpath(local_file_path, extract_to)\n",
-					"        # remote_dir = os.path.dirname(file_path)\n",
-					"        remote_file_path = f\"{remote_dir}/{extract_to}/{relative_path}\"\n",
-					"        \n",
-					"        print(f\"Uploading: {local_file_path} to {remote_file_path}\")\n",
-					"        mssparkutils.fs.cp(f\"file://{os.path.abspath(local_file_path)}\", remote_file_path)\n",
+					"source_path = f\"{dest_container}/{extract_to}\"\n",
+					"moved_files = {\n",
+					"    'data_success': [],\n",
+					"    'metadata_success': [],\n",
+					"    'empty': [],\n",
+					"    'overseas': [],\n",
+					"    'failed': [],\n",
+					"    'quarantine': []\n",
+					"}\n",
 					"    \n",
-					"    print(f\"Successfully unzipped file: {file_path}\")"
+					"all_files = process_folder(source_path, storage_account, moved_files)\n",
+					""
 				],
-				"execution_count": 52
+				"execution_count": 62
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"all_files"
+				],
+				"execution_count": 63
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"moved_files"
+				],
+				"execution_count": 64
 			}
 		]
 	}

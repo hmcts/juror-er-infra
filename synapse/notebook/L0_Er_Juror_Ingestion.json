@@ -16,11 +16,12 @@
 			"executorMemory": "28g",
 			"executorCores": 4,
 			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": true,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1d374d94-f356-43cc-90e4-f56d6118d0fc"
+				"spark.autotune.trackingId": "371f1cbf-b2ac-47fc-a6a7-ff4d801c9452"
 			}
 		},
 		"metadata": {
@@ -128,6 +129,19 @@
 				]
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## imports"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"import logging\n",
@@ -145,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 62
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -155,9 +169,10 @@
 					]
 				},
 				"source": [
-					"env = \"stg\""
+					"env = \"stg\"\n",
+					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": 61
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -176,7 +191,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 63
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -206,7 +221,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 64
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +243,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 65
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -309,7 +324,7 @@
 					"        # Default to false if we can't determine\n",
 					"        return False"
 				],
-				"execution_count": 66
+				"execution_count": 16
 			},
 			{
 				"cell_type": "markdown",
@@ -327,7 +342,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def unzip_file(file_path, extract_to, storage_account):\n",
+					"def unzip_file(file_path, extract_to, destiny_container, storage_account):\n",
 					"    \"\"\"Unzip a file to the specified directory with improved error handling\"\"\"\n",
 					"    try:\n",
 					"        print(f\"Attempting to unzip: {file_path}\")\n",
@@ -378,12 +393,12 @@
 					"        for root, dirs, files in os.walk(extract_to):\n",
 					"            for file in files:\n",
 					"                local_file_path = os.path.join(root, file)\n",
-					"                relative_path = os.path.relpath(local_file_path, extract_to)\n",
-					"                remote_dir = os.path.dirname(file_path)\n",
-					"                remote_file_path = f\"{remote_dir}/{relative_path}\"\n",
+					"                # relative_path = os.path.relpath(local_file_path, extract_to)\n",
+					"                # remote_dir = os.path.dirname(file_path)\n",
+					"                remote_file_path = f\"{destiny_container}/{local_file_path}\"\n",
 					"                \n",
 					"                print(f\"Uploading: {local_file_path} to {remote_file_path}\")\n",
-					"                mssparkutils.fs.cp(f\"file://{local_file_path}\", remote_file_path)\n",
+					"                mssparkutils.fs.cp(f\"file://{os.path.abspath(local_file_path)}\", remote_file_path)\n",
 					"        \n",
 					"        print(f\"Successfully unzipped file: {file_path}\")\n",
 					"        return True, None\n",
@@ -400,7 +415,7 @@
 					"        print(f\"Error unzipping file: {file_path} - {str(e)}\")\n",
 					"        return False, str(e)"
 				],
-				"execution_count": 67
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -470,7 +485,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 68
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -526,7 +541,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 69
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -561,7 +576,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 70
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -598,7 +613,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 71
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -639,7 +654,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 72
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -741,7 +756,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 73
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -786,7 +801,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 74
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -851,7 +866,20 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 75
+				"execution_count": 25
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Process folder method"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -904,7 +932,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 76
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -1036,7 +1064,7 @@
 					"        moved_files['failed'].append(f\"{file_path} (processing error)\")\n",
 					"        return False  # Use False"
 				],
-				"execution_count": 77
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -1062,7 +1090,7 @@
 					"    for file in moved_files['quarantine']:\n",
 					"        print(f\"  - {file}\")"
 				],
-				"execution_count": 78
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -1103,7 +1131,7 @@
 					"    \n",
 					"    return path "
 				],
-				"execution_count": 79
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -1126,7 +1154,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": 80
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -1223,7 +1251,7 @@
 					"    \n",
 					"    return processed_files"
 				],
-				"execution_count": 81
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -1293,7 +1321,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": 82
+				"execution_count": 32
 			},
 			{
 				"cell_type": "markdown",
@@ -1703,11 +1731,11 @@
 					"    print(f\"Files quarantined: {len(moved_files['quarantine'])}\")\n",
 					"    print(f\"Files failed: {len(moved_files['failed'])}\")\n",
 					"\n",
-					"if __name__ == \"__main__\":\n",
-					"    main()\n",
+					"# if __name__ == \"__main__\":\n",
+					"#     main()\n",
 					""
 				],
-				"execution_count": 83
+				"execution_count": 33
 			},
 			{
 				"cell_type": "markdown",
@@ -1725,27 +1753,70 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"mssparkutils.fs.ls(\".\")"
+					"zipped_files = mssparkutils.fs.ls(f\"abfss://juror-raw@{storage_account}.dfs.core.windows.net/\")\n",
+					"file_path = zipped_files[0].path\n",
+					"file_path\n",
+					"extract_to = \"unzipped\"\n",
+					"dest_container = \"abfss://qz-test@baubaisadfsastg.dfs.core.windows.net\"\n",
+					"unzip_file(file_path, extract_to, dest_container,storage_account)\n",
+					""
 				],
-				"execution_count": 69
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"extract_to = \"unzipped\"\n",
+					"# mssparkutils.fs.ls(f\"abfss://juror-raw@{storage_account}.dfs.core.windows.net/\")\n",
+					"mssparkutils.fs.ls(\"/\")"
+				],
+				"execution_count": 37
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"file_path"
+				],
+				"execution_count": 45
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"dst_path = 'abfss://qz-test@baubaisadfsastg.dfs.core.windows.net/20251014.zip'\n",
+					"os.path.dirname(dst_path)\n",
+					"remote_dir = 'abfss://qz-test@baubaisadfsastg.dfs.core.windows.net'"
+				],
+				"execution_count": 49
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"remote_dir"
+				],
+				"execution_count": 48
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"local_file_path"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"for root, dirs, files in os.walk(extract_to):\n",
 					"    for file in files:\n",
 					"        local_file_path = os.path.join(root, file)\n",
 					"        relative_path = os.path.relpath(local_file_path, extract_to)\n",
-					"        remote_dir = os.path.dirname(file_path)\n",
-					"        remote_file_path = f\"{remote_dir}/{relative_path}\"\n",
+					"        # remote_dir = os.path.dirname(file_path)\n",
+					"        remote_file_path = f\"{remote_dir}/{extract_to}/{relative_path}\"\n",
 					"        \n",
 					"        print(f\"Uploading: {local_file_path} to {remote_file_path}\")\n",
-					"        mssparkutils.fs.cp(f\"file:/{local_file_path}\", remote_file_path)\n",
+					"        mssparkutils.fs.cp(f\"file://{os.path.abspath(local_file_path)}\", remote_file_path)\n",
 					"    \n",
 					"    print(f\"Successfully unzipped file: {file_path}\")"
 				],
-				"execution_count": 67
+				"execution_count": 52
 			}
 		]
 	}

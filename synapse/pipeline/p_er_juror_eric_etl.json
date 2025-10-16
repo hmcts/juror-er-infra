@@ -20,10 +20,6 @@
 						"type": "NotebookReference"
 					},
 					"parameters": {
-						"env": {
-							"value": "stg",
-							"type": "string"
-						},
 						"debug_mode": {
 							"value": {
 								"value": "@pipeline().parameters.debug_mode",
@@ -54,6 +50,10 @@
 						}
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -88,7 +88,27 @@
 						"referenceName": "L1_Er_Juror_MappingSchema",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -123,7 +143,27 @@
 						"referenceName": "L2_Er_Juror_Mergingfiles",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -158,7 +198,34 @@
 						"referenceName": "L3_Er_Juror_DataLake_ErickSchema",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"eric_voters_tmp_container": {
+							"value": {
+								"value": "@pipeline().parameters.eric_voters_tmp_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -167,29 +234,6 @@
 					},
 					"driverSize": "Small",
 					"numExecutors": null
-				}
-			},
-			{
-				"name": "Execute Postgsql Batch",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "L2_MergingFiles",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "p_AzureApp_Postgresql_Sink",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
 				}
 			}
 		],
@@ -208,7 +252,15 @@
 			},
 			"debug_mode": {
 				"type": "bool",
-				"defaultValue": "True"
+				"defaultValue": true
+			},
+			"config_container": {
+				"type": "string",
+				"defaultValue": "juror-etl"
+			},
+			"eric_voters_tmp_container": {
+				"type": "string",
+				"defaultValue": "dl-juror-eric-voters-temp"
 			}
 		},
 		"annotations": []

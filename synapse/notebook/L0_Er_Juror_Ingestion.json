@@ -21,12 +21,12 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0995d851-59a6-4bd1-8e38-e30e507791d8"
+				"spark.autotune.trackingId": "5ae81b54-7829-4368-aed0-9ac05f997a26"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"enableDebugMode": false,
+			"enableDebugMode": true,
 			"kernelspec": {
 				"name": "synapse_pyspark",
 				"display_name": "Synapse PySpark"
@@ -298,7 +298,7 @@
 					"        if len(prefix) > 0 and prefix.lower() in part.lower():\n",
 					"            file_start_index = i\n",
 					"            break\n",
-					"        elif ingestion_container in part.lower():\n",
+					"        elif source_container in part.lower():\n",
 					"            file_start_index = i\n",
 					"            \n",
 					"    \n",

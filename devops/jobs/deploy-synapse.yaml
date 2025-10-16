@@ -35,7 +35,7 @@ jobs:
   condition: succeeded()
   variables:
     packageWheelName: 'none'
-    ${{ if or(ne(parameters.validateOnly, true),and(succeeded(), eq(variables['isMain'], true), eq(variables['isAutoTriggered'], true)))}}:
+    ${{ if or(ne(parameters.validateOnly, true),and(eq(variables['isMain'], true), eq(variables['isAutoTriggered'], true)))}}:
       operation: 'validateDeploy'
     ${{ else }}:
       operation: 'validate'

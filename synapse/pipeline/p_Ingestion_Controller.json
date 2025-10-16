@@ -1,6 +1,7 @@
 {
 	"name": "p_Ingestion_Controller",
 	"properties": {
+		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
 		"activities": [
 			{
 				"name": "Copy from bais",

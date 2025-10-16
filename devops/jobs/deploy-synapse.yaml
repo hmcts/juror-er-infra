@@ -46,6 +46,8 @@ jobs:
         steps:
         - checkout: self
           clean: true
+        - bash: echo "operation=${{ variables.operation }}"
+          displayName: 'Print operation'
         - task: toggle-triggers-dev@2
           displayName: 'Disable triggers'
           condition: ne(${{ parameters.validateOnly }}, true)

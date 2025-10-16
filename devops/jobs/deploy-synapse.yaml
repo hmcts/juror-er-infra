@@ -35,10 +35,10 @@ jobs:
   condition: succeeded()
   variables:
     packageWheelName: 'none'
-    ${{ if eq(parameters.validateOnly, true) }}:
-      operation: 'validate'
-    ${{ else }}:
+    ${{ if or(ne(parameters.validateOnly, true),and(eq(variables['isMain'], true), eq(variables['isAutoTriggered'], true)))}}:
       operation: 'validateDeploy'
+    ${{ else }}:
+      operation: 'validate'
   environment: ${{ parameters.env }}
   strategy:
     runOnce:
@@ -46,6 +46,8 @@ jobs:
         steps:
         - checkout: self
           clean: true
+        - bash: echo "operation=${{ variables.operation }}"
+          displayName: 'Print operation'
         - task: toggle-triggers-dev@2
           displayName: 'Disable triggers'
           condition: ne(${{ parameters.validateOnly }}, true)

@@ -85,7 +85,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L0_Er_Juror_Ingestion",
+						"referenceName": "L1_Er_Juror_MappingSchema",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

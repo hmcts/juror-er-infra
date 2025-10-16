@@ -20,12 +20,19 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
 						"spark.dynamicAllocation.minExecutors": null,
 						"spark.dynamicAllocation.maxExecutors": null
 					},
-					"numExecutors": null
+					"numExecutors": null,
+					"authentication": {
+						"type": "MSI"
+					}
 				}
 			},
 			{
@@ -49,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L1_MappingSchema",
+						"referenceName": "L1_Er_Juror_MappingSchema",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,

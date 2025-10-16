@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "96e06ce7-3b29-450e-8f6d-38af0d3e332c"
+				"spark.autotune.trackingId": "c9d51bdc-e202-4995-bd0d-5d86fe704b6c"
 			}
 		},
 		"metadata": {
@@ -155,7 +155,6 @@
 					]
 				},
 				"source": [
-					"env = \"stg\"\n",
 					"processing_container = \"qz-test\"#\"juror-etl\"\n",
 					"config_container = \"juror-etl\"\n",
 					"FORCE_CLEAN_RUN = True"
@@ -165,6 +164,8 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"\n",
+					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
 				"execution_count": null

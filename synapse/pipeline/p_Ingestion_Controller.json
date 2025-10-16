@@ -51,7 +51,10 @@
 						"referenceName": "DS_juror_eric_landing",
 						"type": "DatasetReference",
 						"parameters": {
-							"container": "qz-test"
+							"container": {
+								"value": "@pipeline().parameters.source_container",
+								"type": "Expression"
+							}
 						}
 					}
 				]

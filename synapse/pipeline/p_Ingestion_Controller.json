@@ -76,7 +76,33 @@
 						"referenceName": "p_er_juror_eric_etl",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"source_container": {
+							"value": "@pipeline().parameters.source_container",
+							"type": "Expression"
+						},
+						"year_filter": {
+							"value": "@pipeline().parameters.year_filter",
+							"type": "Expression"
+						},
+						"processing_container": {
+							"value": "@pipeline().parameters.processing_container",
+							"type": "Expression"
+						},
+						"debug_mode": {
+							"value": "@pipeline().parameters.debug_mode",
+							"type": "Expression"
+						},
+						"config_container": {
+							"value": "@pipeline().parameters.config_container",
+							"type": "Expression"
+						},
+						"eric_voters_tmp_container": {
+							"value": "@pipeline().parameters.eric_voters_tmp_container",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],

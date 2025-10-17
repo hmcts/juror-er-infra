@@ -7,7 +7,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "sparkprod",
+			"referenceName": "sparkbaubais",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e0578321-5d9f-4860-93bd-26e5d9136325"
+				"spark.autotune.trackingId": "e8b8d089-93d3-4410-b2c6-9dce70946923"
 			}
 		},
 		"metadata": {
@@ -34,10 +34,10 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
-				"name": "sparkprod",
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
 				"type": "Spark",
-				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -144,7 +144,7 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -154,7 +154,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -168,7 +168,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -186,7 +186,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -219,7 +219,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -244,7 +244,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -261,7 +261,7 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -291,7 +291,7 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -309,7 +309,7 @@
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -361,7 +361,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -393,7 +393,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -479,7 +479,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -536,7 +536,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -558,7 +558,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -648,7 +648,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -785,7 +785,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -842,7 +842,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -869,7 +869,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -904,7 +904,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -954,7 +954,7 @@
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -999,7 +999,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -1029,7 +1029,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1088,7 +1088,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -1113,12 +1113,12 @@
 					"        logging.error(f\"Failed to copy file to quarantine: {str(e)}\")\n",
 					"        return None"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None, storage_account=\"baubaisadfsaprod\"):\n",
+					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None, storage_account=\"baubaisadfsastg\"):\n",
 					"    \"\"\"Process a source file and transform it to parquet format\"\"\"\n",
 					"    # Print more detailed debugging info\n",
 					"    print(f\"Debug - Starting to process file: {source_path}\")\n",
@@ -1159,7 +1159,7 @@
 					"            df = resolve_marker_columns(df)\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error reading file: {str(e)}\"\n",
-					"            storage_account = \"baubaisadfsaprod\"  # Or get it from the config\n",
+					"            storage_account = \"baubaisadfsastg\"  # Or get it from the config\n",
 					"            move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
@@ -1235,7 +1235,7 @@
 					"        move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"        return result"
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -1261,7 +1261,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -1298,7 +1298,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -1352,7 +1352,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -1405,7 +1405,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": null
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -1436,7 +1436,7 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": null
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -1453,7 +1453,7 @@
 					"    spark = create_spark_session()\n",
 					"\n",
 					"    # Define paths\n",
-					"    storage_account = \"baubaisadfsaprod\"\n",
+					"    storage_account = \"baubaisadfsastg\"\n",
 					"    files_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
 					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
 					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
@@ -1544,9 +1544,9 @@
 					"    FORCE_CLEAN_RUN = False\n",
 					"\n",
 					"    if FORCE_CLEAN_RUN:\n",
-					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
+					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
 					"            try:\n",
-					"                mssparkutils.fs.rm(\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
+					"                mssparkutils.fs.rm(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
 					"                print(\"Deleted existing log to force fresh processing\")\n",
 					"            except Exception as e:\n",
 					"                print(f\"Error deleting log file: {str(e)}\")\n",
@@ -1554,7 +1554,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": null
+				"execution_count": 31
 			}
 		]
 	}

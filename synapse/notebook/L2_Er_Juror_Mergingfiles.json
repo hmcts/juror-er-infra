@@ -16,11 +16,12 @@
 			"executorMemory": "28g",
 			"executorCores": 4,
 			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": true,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c614642b-fcc2-4922-9c1e-b3c77efb0ad6"
+				"spark.autotune.trackingId": "965a24ab-49ee-4bd9-90f2-cbb503a17948"
 			}
 		},
 		"metadata": {
@@ -34,12 +35,19 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkbaubais",
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
 				"name": "sparkbaubais",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
-				}
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -195,10 +203,27 @@
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"# Define parameters\n",
+					"processing_container = \"qz-test\"#\"juror-etl\"\n",
+					"config_container = \"juror-etl\"\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
 				"source": [
 					"# Define constants\n",
-					"STORAGE_ACCOUNT = \"baubaisadfsaprod\"\n",
-					"L2_LOG_PATH = f\"abfss://juror-etl@{STORAGE_ACCOUNT}.dfs.core.windows.net/l2_process_logs/processed_files_log.txt\""
+					"\n",
+					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
+					"storage_account = f\"baubaisadfsa{env}\"\n",
+					"L2_LOG_PATH = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/l2_process_logs/processed_files_log.txt\""
 				],
 				"execution_count": null
 			},
@@ -246,7 +271,7 @@
 					"    # Check if path is missing container info\n",
 					"    if not path.startswith(\"abfss://\"):\n",
 					"        # Add default storage and container\n",
-					"        path = f\"abfss://juror-etl@baubaisadfsaprod.dfs.core.windows.net/{path}\"\n",
+					"        path = f\"abfss://{processing_container}@baubaisadfsaprod.dfs.core.windows.net/{path}\"\n",
 					"    \n",
 					"    return path"
 				],
@@ -316,12 +341,11 @@
 				"source": [
 					"def load_config():\n",
 					"    \"\"\"Load configuration including storage paths\"\"\"\n",
-					"    storage_account = \"baubaisadfsaprod\"\n",
 					"    config = {\n",
 					"        \"storage_account\": storage_account,\n",
-					"        \"input_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\",\n",
-					"        \"config_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\",\n",
-					"        \"output_path\": f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
+					"        \"input_path\": f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/transformation\",\n",
+					"        \"config_path\": f\"abfss://{config_container}@{storage_account}.dfs.core.windows.net/config/schema\",\n",
+					"        \"output_path\": f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
 					"    }\n",
 					"    \n",
 					"    # Normalize all paths\n",
@@ -592,20 +616,19 @@
 					"        return {}\n",
 					"\n",
 					"# Read configuration files\n",
-					"storage_account = \"baubaisadfsaprod\"\n",
 					"validation_rules = read_json_config(\n",
 					"    storage_account, \n",
-					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/validation_rules.json\"\n",
+					"    f\"abfss://{config_container}@{storage_account}.dfs.core.windows.net/config/rules/validation_rules.json\"\n",
 					")\n",
 					"\n",
 					"validation_handlers = read_json_config(\n",
 					"    storage_account, \n",
-					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/validation_handlers.json\"\n",
+					"    f\"abfss://{config_container}@{storage_account}.dfs.core.windows.net/config/rules/validation_handlers.json\"\n",
 					")\n",
 					"\n",
 					"column_constraints = read_json_config(\n",
 					"    storage_account, \n",
-					"    f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
+					"    f\"abfss://{config_container}@{storage_account}.dfs.core.windows.net/config/rules/column_constraints.json\"\n",
 					")"
 				],
 				"execution_count": null
@@ -2544,7 +2567,7 @@
 					"        config['input_path'],\n",
 					"        config['output_path'],  # Now points to voters_transformed\n",
 					"        \"/\".join(process_log_path.split(\"/\")[:-1]),\n",
-					"        f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"        f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"    ]\n",
 					"    \n",
 					"    for path in required_paths:\n",
@@ -2629,7 +2652,7 @@
 					"                        # Apply PostgreSQL-specific transformations\n",
 					"                        postgresql_data = prepare_postgresql_data(new_data)\n",
 					"                        # Write to PostgreSQL output using append mode and partitioning\n",
-					"                        postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"                        postgresql_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"                     # Ensure creation_date is suitable for partitioning (no slashes, etc.)\n",
 					"                        if \"creation_date\" in postgresql_data.columns: \n",
 					"                            # Ensure creation_date format is consistent for partitioning\n",

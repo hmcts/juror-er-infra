@@ -19,7 +19,41 @@
 						"referenceName": "L0_Er_Juror_Ingestion",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"debug_mode": {
+							"value": {
+								"value": "@pipeline().parameters.debug_mode",
+								"type": "Expression"
+							},
+							"type": "bool"
+						},
+						"source_container": {
+							"value": {
+								"value": "@pipeline().parameters.source_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"year_filter": {
+							"value": {
+								"value": "@pipeline().parameters.year_filter",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -51,10 +85,30 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L0_Er_Juror_Ingestion",
+						"referenceName": "L1_Er_Juror_MappingSchema",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -89,7 +143,27 @@
 						"referenceName": "L2_Er_Juror_Mergingfiles",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -124,7 +198,34 @@
 						"referenceName": "L3_Er_Juror_DataLake_ErickSchema",
 						"type": "NotebookReference"
 					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"eric_voters_tmp_container": {
+							"value": {
+								"value": "@pipeline().parameters.eric_voters_tmp_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
@@ -136,6 +237,32 @@
 				}
 			}
 		],
+		"parameters": {
+			"source_container": {
+				"type": "string",
+				"defaultValue": "juror-raw"
+			},
+			"year_filter": {
+				"type": "string",
+				"defaultValue": "2025"
+			},
+			"processing_container": {
+				"type": "string",
+				"defaultValue": "qz-test"
+			},
+			"debug_mode": {
+				"type": "bool",
+				"defaultValue": true
+			},
+			"config_container": {
+				"type": "string",
+				"defaultValue": "juror-etl"
+			},
+			"eric_voters_tmp_container": {
+				"type": "string",
+				"defaultValue": "dl-juror-eric-voters-temp"
+			}
+		},
 		"annotations": []
 	}
 }

@@ -1,0 +1,147 @@
+{
+	"name": "p_Ingestion_Controller",
+	"properties": {
+		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
+		"activities": [
+			{
+				"name": "Copy from bais",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0:30:00",
+					"retry": 1,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureFileStorageReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": {
+								"value": "@pipeline().parameters.folder",
+								"type": "Expression"
+							},
+							"wildcardFileName": "*",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_bais_binary",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_juror_eric_landing",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": {
+								"value": "@pipeline().parameters.source_container",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Execute ETL",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Copy from bais",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "p_er_juror_eric_etl",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"source_container": {
+							"value": "@pipeline().parameters.source_container",
+							"type": "Expression"
+						},
+						"year_filter": {
+							"value": "@pipeline().parameters.year_filter",
+							"type": "Expression"
+						},
+						"processing_container": {
+							"value": "@pipeline().parameters.processing_container",
+							"type": "Expression"
+						},
+						"debug_mode": {
+							"value": "@pipeline().parameters.debug_mode",
+							"type": "Expression"
+						},
+						"config_container": {
+							"value": "@pipeline().parameters.config_container",
+							"type": "Expression"
+						},
+						"eric_voters_tmp_container": {
+							"value": "@pipeline().parameters.eric_voters_tmp_container",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"folder": {
+				"type": "string",
+				"defaultValue": "BAIS/Sites/External-In-Legacy/Juror_ER"
+			},
+			"last_modified": {
+				"type": "string"
+			},
+			"source_container": {
+				"type": "string",
+				"defaultValue": "juror-raw"
+			},
+			"year_filter": {
+				"type": "string",
+				"defaultValue": "2025"
+			},
+			"processing_container": {
+				"type": "string",
+				"defaultValue": "qz-test"
+			},
+			"debug_mode": {
+				"type": "string",
+				"defaultValue": "true"
+			},
+			"config_container": {
+				"type": "string",
+				"defaultValue": "juror-etl"
+			},
+			"eric_voters_tmp_container": {
+				"type": "string",
+				"defaultValue": "dl-juror-eric-voters-temp"
+			}
+		},
+		"annotations": []
+	}
+}

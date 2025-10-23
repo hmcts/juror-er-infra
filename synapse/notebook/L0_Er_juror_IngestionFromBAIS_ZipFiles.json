@@ -7,7 +7,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "sparkstg",
+			"referenceName": "sparkbaubais",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "759772e3-74d2-4d96-b405-c887ed7836e8"
+				"spark.autotune.trackingId": "00a2d550-487e-49ba-afbc-46352aeb7c22"
 			}
 		},
 		"metadata": {
@@ -34,10 +34,10 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
-				"name": "sparkstg",
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
 				"type": "Spark",
-				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -136,7 +136,7 @@
 					"import shutil\n",
 					"import tempfile"
 				],
-				"execution_count": 64
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -163,7 +163,7 @@
 					"    .config(\"spark.jars.packages\", \"com.crealytics:spark-excel_2.12:0.13.5,org.apache.xmlbeans:xmlbeans:3.1.0,org.apache.poi:poi-ooxml-schemas:4.1.2,org.apache.poi:poi-ooxml:4.1.2,org.apache.poi:poi:4.1.2\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 65
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -466,7 +466,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 66
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -642,7 +642,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 67
+				"execution_count": null
 			}
 		]
 	}

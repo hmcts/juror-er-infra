@@ -1,0 +1,268 @@
+{
+	"name": "p_er_juror_eric_etl",
+	"properties": {
+		"activities": [
+			{
+				"name": "L0_Data_Ingestion",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L0_Er_Juror_Ingestion",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"debug_mode": {
+							"value": {
+								"value": "@pipeline().parameters.debug_mode",
+								"type": "Expression"
+							},
+							"type": "bool"
+						},
+						"source_container": {
+							"value": {
+								"value": "@pipeline().parameters.source_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"year_filter": {
+							"value": {
+								"value": "@pipeline().parameters.year_filter",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "L1_MappingSchema",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L0_Data_Ingestion",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L1_Er_Juror_MappingSchema",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "L2_MergingFiles",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L1_MappingSchema",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L2_Er_Juror_Mergingfiles",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "L3_DataLake_ErickSchema",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L2_MergingFiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L3_Er_Juror_DataLake_ErickSchema",
+						"type": "NotebookReference"
+					},
+					"parameters": {
+						"processing_container": {
+							"value": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"config_container": {
+							"value": {
+								"value": "@pipeline().parameters.config_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						},
+						"eric_voters_tmp_container": {
+							"value": {
+								"value": "@pipeline().parameters.eric_voters_tmp_container",
+								"type": "Expression"
+							},
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
+				}
+			}
+		],
+		"parameters": {
+			"source_container": {
+				"type": "string",
+				"defaultValue": "juror-raw"
+			},
+			"year_filter": {
+				"type": "string",
+				"defaultValue": "2025"
+			},
+			"processing_container": {
+				"type": "string",
+				"defaultValue": "qz-test"
+			},
+			"debug_mode": {
+				"type": "bool",
+				"defaultValue": true
+			},
+			"config_container": {
+				"type": "string",
+				"defaultValue": "juror-etl"
+			},
+			"eric_voters_tmp_container": {
+				"type": "string",
+				"defaultValue": "dl-juror-eric-voters-temp"
+			}
+		},
+		"annotations": []
+	}
+}

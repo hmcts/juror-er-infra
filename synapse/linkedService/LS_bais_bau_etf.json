@@ -1,0 +1,15 @@
+{
+	"name": "LS_bais_bau_etf",
+	"properties": {
+		"annotations": [],
+		"type": "AzureFileStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://baubaisstg.file.core.windows.net/",
+			"fileShare": "eft-share"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

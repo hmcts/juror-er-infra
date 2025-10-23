@@ -7,7 +7,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "sparkstg",
+			"referenceName": "sparkbaubais",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b8ecdd37-687e-4bba-8be2-e7ab5cc4a951"
+				"spark.autotune.trackingId": "fb890ab9-e9d2-48eb-84b6-2b363475430f"
 			}
 		},
 		"metadata": {
@@ -34,10 +34,10 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
-				"name": "sparkstg",
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
 				"type": "Spark",
-				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -57,7 +57,7 @@
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -102,7 +102,7 @@
 				"source": [
 					"display(df_single)"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"else:\n",
 					"    print(\"No duplicates found based on hash_id\")"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -151,7 +151,7 @@
 					"foo_df = df_single.filter(df_single.hash_id==-1001152186509638914)\n",
 					"display(foo_df)"
 				],
-				"execution_count": 12
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -179,7 +179,7 @@
 					"\n",
 					"display(final_count)"
 				],
-				"execution_count": 10
+				"execution_count": null
 			}
 		]
 	}

@@ -49,7 +49,7 @@ resource "azurerm_key_vault_access_policy" "keyvault_bootstrap_access_policy" {
       ]
 }
 
-resource "azurerm_key_vault_access_policy" "keyvault_bootstrap_access_policy" {
+resource "azurerm_key_vault_access_policy" "keyvault_dts_operation_access_policy" {
   key_vault_id   = azurerm_key_vault.baubais_kv.id
   object_id      = "e7ea2042-4ced-45dd-8ae3-e051c6551789" # DTS Platform Operations
   tenant_id      = data.azurerm_client_config.current.tenant_id

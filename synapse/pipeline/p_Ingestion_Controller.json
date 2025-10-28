@@ -5,7 +5,6 @@
 		"activities": [
 			{
 				"name": "Copy from bais",
-				"description": "Copy data from BAIS storage",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {

@@ -199,17 +199,37 @@ resource "azurerm_role_assignment" "rg_3" {
   scope                = azurerm_resource_group.adf_juror_rg.id
 }
 
-# resource "azurerm_role_assignment" "syanpse_kv_reader" {
-#   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
-#   role_definition_name = "Key Vault Reader"
-#   scope                = azurerm_resource_group.adf_juror_rg.id
-# }
+resource "azurerm_key_vault_access_policy" "keyvault_aks_access_policy" {
+  key_vault_id   = azurerm_key_vault.baubais_kv.id
+  object_id      = var.aks_managed_identity_object_id
+  tenant_id      = data.azurerm_client_config.current.tenant_id
+  application_id = null
 
-# resource "azurerm_role_assignment" "aks_kv_reader" {
-#   principal_id         = var.aks_managed_identity_object_id
-#   role_definition_name = "Key Vault Reader"
-#   scope                = azurerm_resource_group.adf_juror_rg.id
-# }
+  certificate_permissions = []
+  key_permissions         = []
+  storage_permissions     = []
+
+  secret_permissions = [
+        "Get",
+        "List"
+      ]
+}
+
+resource "azurerm_key_vault_access_policy" "keyvault_synapse_access_policy" {
+  key_vault_id   = azurerm_key_vault.baubais_kv.id
+  object_id      = azurerm_synapse_workspace.this.identity[0].principal_id
+  tenant_id      = data.azurerm_client_config.current.tenant_id
+  application_id = null
+
+  certificate_permissions = []
+  key_permissions         = []
+  storage_permissions     = []
+
+  secret_permissions = [
+        "Get",
+        "List"
+      ]
+}
 
 resource "azurerm_role_assignment" "bais_bau_reader" {
   for_each = toset(var.env == "stg" ? [var.env] : [])

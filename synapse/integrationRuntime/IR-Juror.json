@@ -1,0 +1,6 @@
+{
+	"name": "IR-Juror",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

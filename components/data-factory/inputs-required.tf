@@ -96,3 +96,9 @@ variable "bootstrap_object_id" {
   type        = string
 
 }
+
+variable "aks_managed_identity_object_id" {
+  description = "The object id of the aks cluster"
+  type        = string
+
+}

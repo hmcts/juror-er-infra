@@ -199,6 +199,12 @@ resource "azurerm_role_assignment" "rg_3" {
   scope                = azurerm_resource_group.adf_juror_rg.id
 }
 
+resource "azurerm_role_assignment" "syanpse_kv_reader" {
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+  role_definition_name = "Key Vault Reader"
+  scope                = azurerm_resource_group.adf_juror_rg.id
+}
+
 resource "azurerm_role_assignment" "bais_bau_reader" {
   for_each = toset(var.env == "stg" ? [var.env] : [])
 

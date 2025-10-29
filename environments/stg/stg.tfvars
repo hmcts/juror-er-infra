@@ -34,3 +34,5 @@ routes = {
 hub_subscription_id = "fb084706-583f-4c9a-bdab-949aac66ba5c" # HMCTS-HUB-NONPROD-INTSVC
 hub_vnet_name       = "hmcts-hub-nonprodi"
 bootstrap_object_id = "9811e238-e068-4802-a13c-f67a5945f03f" # DTS Bootstrap (sub:dts-sharedservices-stg)
+aks_managed_identity_object_id = "af50bed7-9f42-4dbb-8a02-68895999c155" #juror-stg-mi 
+

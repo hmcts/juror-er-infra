@@ -133,29 +133,6 @@
 					},
 					"numExecutors": null
 				}
-			},
-			{
-				"name": "Execute Azure App",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "L2_Er_Juror_Mergingfiles",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "p_AzureApp_Postgresql_Sink",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
-				}
 			}
 		],
 		"annotations": []

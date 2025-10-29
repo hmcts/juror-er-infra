@@ -70,7 +70,7 @@ jobs:
             FailOnMissingOverrides: false
             Environment: 'prod'
             npmpackage: 'prod'
-            OverrideArmParameters: -workspaceName ${{ parameters.synapseName }} ${{ parameters.adfOverrideParameters }}
+            OverrideArmParameters: -workspaceName ${{ parameters.synapseName }} --verbose ${{ parameters.adfOverrideParameters }}
         - task: toggle-triggers-dev@2
           displayName: 'Restart triggers'
           condition: and(eq(${{ parameters.enableTriggers }}, true), ne(${{ parameters.validateOnly }}, true))

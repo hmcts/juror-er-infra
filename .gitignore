@@ -45,3 +45,5 @@ Gemfile.lock
 .DS_Store
 
 backups/
+
+local/

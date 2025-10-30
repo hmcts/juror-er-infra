@@ -64,6 +64,13 @@ stages:
               keyvaultSecret: "azure-devops-sp-token"
               serviceConnection: "azurerm-sandbox"
               overrideAction: ${{ parameters.overrideAction }}
+          - task: PythonScript@0
+            displayName: 'Notebook Validation'
+            inputs:
+              scriptSource: 'filePath' # Options: filePath, inline
+              scriptPath: '$(System.DefaultWorkingDirectory)/$(buildRepoSuffix)/devops/scripts/NotebookValidator.py'
+              arguments: $(System.DefaultWorkingDirectory)/$(buildRepoSuffix)
+              failOnStderr: true # Optional
 
   - ${{ each deployment in parameters.environment_components }}:
       - stage: ${{ deployment.deployment }}
@@ -82,3 +89,15 @@ stages:
                   serviceConnection: ${{ deployment.service_connection }}
                   terraformInitSubscription: ${{ variables.terraformInitSubscription }}
                   product: ${{ variables.product }}
+          - template: devops/jobs/deploy-synapse.yaml
+            parameters:
+              subscriptionEndpoint: ${{ deployment.service_connection }}
+              synapseName:  baubais-synapse-${{ deployment.environment }}
+              resourceGroup: baubais-data-factory-rg-${{ deployment.environment }}
+              triggers: ''
+              enableTriggers: False
+              adfOverrideParameters: '-LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ deployment.environment }}.file.core.windows.net/"'
+              agentPool: ${{ variables.agentPool }}
+              env: ${{ deployment.environment }}
+              validateOnly: ${{ ne(parameters.overrideAction, 'apply')}}
+              dependsOn: TerraformPlanApply

@@ -7,7 +7,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "sparkstg",
+			"referenceName": "sparkbaubais",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -16,16 +16,17 @@
 			"executorMemory": "28g",
 			"executorCores": 4,
 			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": true,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "df7e37bd-e3fb-4942-86d6-5ab0558898d7"
+				"spark.autotune.trackingId": "da4b53b5-9931-4591-a8b2-22215339ef9c"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"enableDebugMode": false,
+			"enableDebugMode": true,
 			"kernelspec": {
 				"name": "synapse_pyspark",
 				"display_name": "Synapse PySpark"
@@ -34,12 +35,19 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "subscriptions/*/resourceGroups/*/providers/Microsoft.Synapse/workspaces/*/bigDataPools/sparkstg",
-				"name": "sparkstg",
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
-				}
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -121,6 +129,19 @@
 				]
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## imports"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"import logging\n",
@@ -141,6 +162,40 @@
 				"execution_count": null
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Paramters"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"env = \"stg\"\n",
+					"storage_account = f\"baubaisadfsa{env}\"\n",
+					"    # CONFIGURATION\n",
+					"debug_mode = True  # Process only new files\n",
+					"# year_filter = \"2025\"  # Only process 2025 files\n",
+					"# source_container = \"juror-ingestion\"\n",
+					"year_filter = \"2025\"  # Only process 2025 files\n",
+					"source_container = \"juror-raw\"\n",
+					"processing_container = \"qz-test\"\n",
+					"ingestion_container = \"juror-raw\" #\"juror-ingestion\""
+				],
+				"execution_count": null
+			},
+			{
 				"cell_type": "code",
 				"source": [
 					"\n",
@@ -156,14 +211,6 @@
 					"# Global counter to track file sequences by folder structure\n",
 					"file_counters = defaultdict(int)\n",
 					""
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"env = \"stg\"\n",
-					"storage_account = f\"baubaisadfsa{env}\""
 				],
 				"execution_count": null
 			},
@@ -222,7 +269,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def is_file_in_year(file_path, year_filter=\"2025\"):\n",
+					"def is_file_in_year(file_path, year_filter=\"2025\", prefix=\"\"):\n",
 					"    \"\"\"\n",
 					"    Check if file is in FIRST LEVEL date folder starting with specified year\n",
 					"    \n",
@@ -246,15 +293,18 @@
 					"    parts = file_path.split('/')\n",
 					"    \n",
 					"    # Find juror-ingestion container index\n",
-					"    container_index = -1\n",
+					"    file_start_index = -1\n",
 					"    for i, part in enumerate(parts):\n",
-					"        if 'juror-ingestion' in part.lower():\n",
-					"            container_index = i\n",
+					"        if len(prefix) > 0 and prefix.lower() in part.lower():\n",
+					"            file_start_index = i\n",
 					"            break\n",
+					"        elif source_container in part.lower():\n",
+					"            file_start_index = i\n",
+					"            \n",
 					"    \n",
 					"    # If found, check the NEXT part (first level folder after container)\n",
-					"    if container_index >= 0 and len(parts) > container_index + 1:\n",
-					"        first_level_folder = parts[container_index + 1]\n",
+					"    if file_start_index >= 0 and len(parts) > file_start_index + 1:\n",
+					"        first_level_folder = parts[file_start_index + 1]\n",
 					"        \n",
 					"        # Check if it's a date folder (8 digits: YYYYMMDD)\n",
 					"        if re.match(r'^\\d{8}$', first_level_folder):\n",
@@ -334,9 +384,22 @@
 				"execution_count": null
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Unzipfile"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
-					"def unzip_file(file_path, extract_to, storage_account, depth=0, max_depth=5, moved_files=None):\n",
+					"def unzip_file(file_path:str, extract_to:str, storage_account:str, depth:int=0, max_depth:int=5, moved_files:dict=None):\n",
 					"    \"\"\"\n",
 					"    Unzip a file to a folder with the same name as the ZIP file\n",
 					"    \n",
@@ -374,7 +437,7 @@
 					"        folder_name = os.path.splitext(zip_filename)[0]  # Remove .zip extension\n",
 					"        \n",
 					"        # Create the extraction folder path\n",
-					"        extraction_folder = f\"{zip_dir}/{folder_name}\"\n",
+					"        extraction_folder = f\"{zip_dir}/{extract_to}/\"\n",
 					"        \n",
 					"        print(f\"{indent}Will extract to folder: {extraction_folder}\")\n",
 					"        \n",
@@ -537,7 +600,7 @@
 					"    \"\"\"Move a file to the overseas folder\"\"\"\n",
 					"    try:\n",
 					"        # Make sure overseas directory exists\n",
-					"        overseas_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/overseas\"\n",
+					"        overseas_dir = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/overseas\"\n",
 					"        if not mssparkutils.fs.exists(overseas_dir):\n",
 					"            print(f\"Creating overseas directory: {overseas_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(overseas_dir)\n",
@@ -580,7 +643,7 @@
 					"                return True, existing_path\n",
 					"        \n",
 					"        # Make sure quarantine directory exists\n",
-					"        quarantine_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/quarantine\"\n",
+					"        quarantine_dir = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/quarantine\"\n",
 					"        if not mssparkutils.fs.exists(quarantine_dir):\n",
 					"            print(f\"Creating quarantine directory: {quarantine_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(quarantine_dir)\n",
@@ -627,12 +690,12 @@
 				"cell_type": "code",
 				"source": [
 					"def process_metadata_file(file_path, file_name, storage_account):\n",
-					"    \"\"\"Process metadata file - corrected to use juror-etl container\"\"\"\n",
+					"    f\"\"\"Process metadata file - corrected to use {processing_container} container\"\"\"\n",
 					"    try:\n",
 					"        # Debug info\n",
 					"        print(f\"  process_metadata_file received: path={file_path}, name={file_name}\")\n",
 					"        # Make sure metadata directory exists in the juror-etl container\n",
-					"        metadata_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/metadata\"\n",
+					"        metadata_dir = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/metadata\"\n",
 					"        if not mssparkutils.fs.exists(metadata_dir):\n",
 					"            print(f\"Creating metadata directory: {metadata_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(metadata_dir)\n",
@@ -665,7 +728,7 @@
 					"    \"\"\"Move an empty file to the empty folder\"\"\"\n",
 					"    try:\n",
 					"        # Make sure empty directory exists\n",
-					"        empty_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/empty\"\n",
+					"        empty_dir = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/empty\"\n",
 					"        if not mssparkutils.fs.exists(empty_dir):\n",
 					"            print(f\"Creating empty files directory: {empty_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(empty_dir)\n",
@@ -751,7 +814,7 @@
 					"            return False, None\n",
 					"        \n",
 					"        # Destination path for Parquet file (same regardless of source type)\n",
-					"        dest_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_key}.parquet\"\n",
+					"        dest_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/files/{folder_key}.parquet\"\n",
 					"        \n",
 					"        # Read the source file using different methods based on file type\n",
 					"        try:\n",
@@ -817,9 +880,9 @@
 					"            # Fallback to simple copy without conversion if there's an error\n",
 					"            print(f\"  Falling back to direct file copy without conversion\")\n",
 					"            if file_type == 'excel':\n",
-					"                fallback_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_key}.xlsx\"\n",
+					"                fallback_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/files/{folder_key}.xlsx\"\n",
 					"            else:  # csv\n",
-					"                fallback_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files/{folder_key}.csv\"\n",
+					"                fallback_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/files/{folder_key}.csv\"\n",
 					"            \n",
 					"            mssparkutils.fs.cp(source_path, fallback_path, True)\n",
 					"            \n",
@@ -947,6 +1010,19 @@
 					"    return date_folder, la_folder, confidence"
 				],
 				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Process folder method"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -1249,7 +1325,7 @@
 				"source": [
 					"def read_processed_files_log(storage_account):\n",
 					"    \"\"\"Read the log of previously processed files\"\"\"\n",
-					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
+					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
 					"    \n",
 					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    print(\"READING PROCESSED FILES LOG\")\n",
@@ -1315,7 +1391,7 @@
 					"        print(f\"\\nProcessing file group: {len(file_group)} files for {date_folder}_{la_folder}\")\n",
 					"        \n",
 					"        # Ensure destination directory exists\n",
-					"        dest_dir = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
+					"        dest_dir = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/files\"\n",
 					"        if not mssparkutils.fs.exists(dest_dir):\n",
 					"            print(f\"Creating destination directory: {dest_dir}\")\n",
 					"            mssparkutils.fs.mkdirs(dest_dir)\n",
@@ -1509,22 +1585,126 @@
 				"execution_count": null
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Main method"
+				]
+			},
+			{
 				"cell_type": "code",
 				"source": [
-					"def main():\n",
-					"    source_path = f\"abfss://juror-ingestion@{storage_account}.dfs.core.windows.net\"\n",
-					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
-					"    \n",
-					"    # CONFIGURATION\n",
-					"    debug_mode = False  # Process only new files\n",
-					"    year_filter = \"2025\"  # Only process 2025 files\n",
-					"    \n",
+					"def print_hearders():\n",
 					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    print(\"L0 JUROR INGESTION PIPELINE\")\n",
 					"    print(\"=\" * 70)\n",
 					"    print(f\"Mode: {'DEBUG (all files)' if debug_mode else 'PRODUCTION (new files only)'}\")\n",
 					"    print(f\"Year filter: {year_filter}\")\n",
 					"    print(\"=\" * 70)\n",
+					"\n",
+					"def print_step1():\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 1: SCANNING & EXTRACTING ZIPS\")\n",
+					"    print(\"=\" * 70)\n",
+					"    print(\"🔍 Scanning folders and extracting ZIP files...\")\n",
+					"    print(\"   (Corrupted/password-protected ZIPs → quarantine)\")\n",
+					"\n",
+					"def print_step1_results(_all_files, _moved_files):\n",
+					"    print(f\"\\n📊 Scan results:\")\n",
+					"    print(f\"   Total files found: {len(_all_files)}\")\n",
+					"    print(f\"   ZIPs extracted: {len(_moved_files.get('zip_extracted', []))}\")\n",
+					"    print(f\"   ZIPs quarantined: {len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
+					"\n",
+					"def print_step2():\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
+					"    print(\"STEP 2: CHECKING FILES FOR EMPTY/CORRUPTED\")\n",
+					"    print(\"=\" * 70)\n",
+					"    print(\"🔍 Checking CSV and Excel files...\")\n",
+					"    print(\"   (Empty/corrupted files → quarantine)\")\n",
+					"\n",
+					"def print_step2_results(_valid_files, _moved_files):\n",
+					"    print(f\"\\n📊 File check results:\")\n",
+					"    print(f\"   Valid files: {len(_valid_files)}\")\n",
+					"    print(f\"   Files quarantined: {len(_moved_files['quarantine']) - len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
+					"    "
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def process_raw_zip(path, storage_account, sink_path, moved_files):\n",
+					"    files = mssparkutils.fs.ls(path)\n",
+					"    indent = \"\"\n",
+					"    print(f\"{indent}Found {len(files)} items in {path}\")\n",
+					"        \n",
+					"    for file_info in files:\n",
+					"        # We are expecting only zip files on this levle\n",
+					"        if file_info.path.lower().endswith('.zip'):\n",
+					"            print(f\"{indent}Found ZIP file: {file_info.path}\")\n",
+					"            success, error_reason = unzip_file(\n",
+					"                        file_info.path,\n",
+					"                        sink_path,\n",
+					"                        storage_account,\n",
+					"                        depth=0,  # Pass current depth (IMPORTANT!)\n",
+					"                        max_depth=5,\n",
+					"                        moved_files=moved_files\n",
+					"                    )\n",
+					"                    \n",
+					"            if success:\n",
+					"                print(f\"{indent}Successfully extracted ZIP file\")\n",
+					"                if 'zip_extracted' not in moved_files:\n",
+					"                    moved_files['zip_extracted'] = []\n",
+					"                moved_files['zip_extracted'].append(file_info.path)\n",
+					"            else:\n",
+					"                # Failed to extract - move to quarantine with specific error reason\n",
+					"                print(f\"{indent}Moving ZIP to quarantine due to: {error_reason}\")\n",
+					"                \n",
+					"                success_q, quarantine_path = move_to_quarantine(\n",
+					"                    file_info.path,\n",
+					"                    storage_account,\n",
+					"                    moved_files,\n",
+					"                    error_reason  # password_protected, zip_corrupted, etc.\n",
+					"                )\n",
+					"                \n",
+					"                if success_q:\n",
+					"                    print(f\"{indent}Successfully moved ZIP to quarantine: {quarantine_path}\")\n",
+					"                else:\n",
+					"                    print(f\"{indent}Failed to move ZIP to quarantine\")\n",
+					"                    if 'failed' not in moved_files:\n",
+					"                        moved_files['failed'] = []\n",
+					"                    moved_files['failed'].append(f\"{file_info.path} (quarantine failed)\")\n",
+					"        else:\n",
+					"            success_q, quarantine_path = move_to_quarantine(\n",
+					"                    file_info.path,\n",
+					"                    storage_account,\n",
+					"                    moved_files,\n",
+					"                    error_reason  # password_protected, zip_corrupted, etc.\n",
+					"                )\n",
+					"                \n",
+					"            if success_q:\n",
+					"                print(f\"{indent}Successfully moved ZIP to quarantine: {quarantine_path}\")\n",
+					"            else:\n",
+					"                print(f\"{indent}Failed to move ZIP to quarantine\")\n",
+					"                if 'failed' not in moved_files:\n",
+					"                    moved_files['failed'] = []\n",
+					"                moved_files['failed'].append(f\"{file_info.path} (quarantine failed)\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def main():\n",
+					"    source_path = f\"abfss://{source_container}@{storage_account}.dfs.core.windows.net\"\n",
+					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
+					"    print_hearders()\n",
 					"    \n",
 					"    # Initialize tracking\n",
 					"    moved_files = {\n",
@@ -1533,40 +1713,30 @@
 					"        'empty': [],\n",
 					"        'overseas': [],\n",
 					"        'failed': [],\n",
-					"        'quarantine': [],\n",
-					"        'zip_extracted': [],\n",
-					"        'zip_skipped': []\n",
+					"        'quarantine': []\n",
 					"    }\n",
 					"    \n",
-					"    # Verify source path exists\n",
-					"    if not mssparkutils.fs.exists(source_path):\n",
-					"        print(f\"ERROR: Source path does not exist: {source_path}\")\n",
-					"        return\n",
+					"    sink_path = \"extracted\"\n",
+					"\n",
+					"    process_raw_zip(source_path, storage_account, sink_path, moved_files)\n",
+					"\n",
 					"    \n",
 					"    # ========================================================================\n",
 					"    # STEP 1: Scan for all files AND extract ZIPs\n",
 					"    # ========================================================================\n",
-					"    print(\"\\n\" + \"=\" * 70)\n",
-					"    print(\"STEP 1: SCANNING & EXTRACTING ZIPS\")\n",
-					"    print(\"=\" * 70)\n",
-					"    print(\"🔍 Scanning folders and extracting ZIP files...\")\n",
-					"    print(\"   (Corrupted/password-protected ZIPs → quarantine)\")\n",
-					"    \n",
+					"        # Verify source path exists\n",
+					"    if not mssparkutils.fs.exists(source_path):\n",
+					"        print(f\"ERROR: Source path does not exist: {source_path}\")\n",
+					"        return\n",
+					"    source_path = f\"{source_path}/{sink_path}\"\n",
+					"    print_step1()\n",
 					"    all_files = process_folder(source_path, storage_account, moved_files)\n",
 					"    \n",
-					"    print(f\"\\n📊 Scan results:\")\n",
-					"    print(f\"   Total files found: {len(all_files)}\")\n",
-					"    print(f\"   ZIPs extracted: {len(moved_files.get('zip_extracted', []))}\")\n",
-					"    print(f\"   ZIPs quarantined: {len([f for f in moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
-					"    \n",
+					"    print_step1_results(all_files, moved_files)\n",
 					"    # ========================================================================\n",
 					"    # STEP 2: Check each file for empty/corrupted (quarantine bad ones)\n",
 					"    # ========================================================================\n",
-					"    print(\"\\n\" + \"=\" * 70)\n",
-					"    print(\"STEP 2: CHECKING FILES FOR EMPTY/CORRUPTED\")\n",
-					"    print(\"=\" * 70)\n",
-					"    print(\"🔍 Checking CSV and Excel files...\")\n",
-					"    print(\"   (Empty/corrupted files → quarantine)\")\n",
+					"    print_step2()\n",
 					"    \n",
 					"    valid_files = []\n",
 					"    \n",
@@ -1591,10 +1761,7 @@
 					"            # Not CSV/Excel - just add to valid files\n",
 					"            valid_files.append(file_path)\n",
 					"    \n",
-					"    print(f\"\\n📊 File check results:\")\n",
-					"    print(f\"   Valid files: {len(valid_files)}\")\n",
-					"    print(f\"   Files quarantined: {len(moved_files['quarantine']) - len([f for f in moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
-					"    \n",
+					"    print_step2_results(valid_files, moved_files)\n",
 					"    # ========================================================================\n",
 					"    # STEP 3: Create file index (only for valid, non-quarantined files)\n",
 					"    # ========================================================================\n",
@@ -1642,7 +1809,7 @@
 					"    files_wrong_year = []\n",
 					"    \n",
 					"    for file_info in file_index[\"files\"]:\n",
-					"        if is_file_in_year(file_info[\"path\"], year_filter):\n",
+					"        if is_file_in_year(file_info[\"path\"], year_filter, prefix=sink_path):\n",
 					"            files_in_year.append(file_info)\n",
 					"        else:\n",
 					"            files_wrong_year.append(file_info[\"path\"])\n",
@@ -1794,10 +1961,15 @@
 					"\n",
 					"\n",
 					"\n",
-					"\n",
-					"if __name__ == \"__main__\":\n",
-					"    main()\n",
 					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"if __name__ == \"__main__\":\n",
+					"    main()"
 				],
 				"execution_count": null
 			}

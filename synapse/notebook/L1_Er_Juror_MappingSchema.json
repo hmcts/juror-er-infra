@@ -16,11 +16,12 @@
 			"executorMemory": "28g",
 			"executorCores": 4,
 			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": true,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e8b8d089-93d3-4410-b2c6-9dce70946923"
+				"spark.autotune.trackingId": "70537c3a-e06f-4fa1-800c-2a3022cded78"
 			}
 		},
 		"metadata": {
@@ -144,7 +145,30 @@
 					"from pyspark.sql.types import StringType, StructType, StructField\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 1
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"processing_container = \"qz-test\"#\"juror-etl\"\n",
+					"config_container = \"juror-etl\"\n",
+					"FORCE_CLEAN_RUN = True"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"\n",
+					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
+					"storage_account = f\"baubaisadfsa{env}\""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -154,7 +178,7 @@
 					"    level=logging.INFO, format=\"%(asctime)s - %(levelname)s - %(message)s\"\n",
 					")"
 				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -168,7 +192,7 @@
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -186,7 +210,7 @@
 					"        logging.error(f\"Error creating folder {folder_path}: {str(e)}\")\n",
 					"        return False"
 				],
-				"execution_count": 4
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -219,7 +243,7 @@
 					"        # Return a default mapping to prevent complete failure\n",
 					"        return {}"
 				],
-				"execution_count": 5
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -244,7 +268,7 @@
 					"\n",
 					"    return reverse_map"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -261,12 +285,12 @@
 					"        logging.error(f\"Error listing files: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def read_excel_file(spark, file_path):\n",
+					"def read_excel_file(file_path):\n",
 					"    \"\"\"Read an Excel file using pandas and convert to Spark DataFrame\"\"\"\n",
 					"    import pandas as pd\n",
 					"    import tempfile\n",
@@ -291,12 +315,12 @@
 					"        # Convert to Spark DataFrame\n",
 					"        return spark.createDataFrame(excel_df)"
 				],
-				"execution_count": 8
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def read_file(spark, file_path):\n",
+					"def read_file(file_path):\n",
 					"    \"\"\"Read a file based on its extension\"\"\"\n",
 					"    file_ext = os.path.splitext(file_path.lower())[1]\n",
 					"    \n",
@@ -305,11 +329,11 @@
 					"        return spark.read.parquet(file_path)\n",
 					"    elif file_ext in ['.xlsx', '.xls']:\n",
 					"        logging.info(f\"Reading Excel file with pandas: {file_path}\")\n",
-					"        return read_excel_file(spark, file_path)  # Use the function from above\n",
+					"        return read_excel_file(file_path)  # Use the function from above\n",
 					"    else:\n",
 					"        raise ValueError(f\"Unsupported file type: {file_ext}\")"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -361,7 +385,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -393,7 +417,7 @@
 					"    return df\n",
 					""
 				],
-				"execution_count": 11
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -479,7 +503,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 12
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -536,7 +560,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 13
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -558,7 +582,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 14
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -648,7 +672,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 15
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -785,7 +809,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 16
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -842,7 +866,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 17
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -869,7 +893,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 18
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -904,7 +928,7 @@
 					"    return current_date, filename_without_ext\n",
 					""
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -954,7 +978,7 @@
 					"    logging.info(f\"Remaining record count after filtering: {df.count()}\")\n",
 					"    return df"
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -999,7 +1023,7 @@
 					"\n",
 					"    return df"
 				],
-				"execution_count": 21
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1029,7 +1053,7 @@
 					"        return df.select(existing_columns)\n",
 					""
 				],
-				"execution_count": 22
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1088,7 +1112,7 @@
 					"    \n",
 					"    return df"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1113,7 +1137,20 @@
 					"        logging.error(f\"Failed to copy file to quarantine: {str(e)}\")\n",
 					"        return None"
 				],
-				"execution_count": 24
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Process file"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -1152,15 +1189,14 @@
 					"\n",
 					"        # Read the file\n",
 					"        try:\n",
-					"            df = read_file(spark, source_path)\n",
+					"            df = read_file(source_path)\n",
 					"            logging.info(\n",
 					"                f\"Successfully read file with {df.count()} rows and {len(df.columns)} columns\"\n",
 					"            )\n",
 					"            df = resolve_marker_columns(df)\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error reading file: {str(e)}\"\n",
-					"            storage_account = \"baubaisadfsastg\"  # Or get it from the config\n",
-					"            move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
+					"            move_to_quarantine(source_path, f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"        # Standardize column names using mapping\n",
@@ -1203,7 +1239,7 @@
 					"        \n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error transforming data: {str(e)}\"\n",
-					"            move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
+					"            move_to_quarantine(source_path, f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"        logging.info(\n",
@@ -1227,15 +1263,15 @@
 					"            return result\n",
 					"        except Exception as e:\n",
 					"            result[\"message\"] = f\"Error writing output file: {str(e)}\"\n",
-					"            move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
+					"            move_to_quarantine(source_path, f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"            return result\n",
 					"\n",
 					"    except Exception as e:\n",
 					"        result[\"message\"] = f\"Unexpected error: {str(e)}\"\n",
-					"        move_to_quarantine(source_path, f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
+					"        move_to_quarantine(source_path, f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_quarantine\", \"transform_error\")\n",
 					"        return result"
 				],
-				"execution_count": 25
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1261,7 +1297,7 @@
 					"        logging.warning(f\"Could not read processed files log: {str(e)}\")\n",
 					"        return []"
 				],
-				"execution_count": 26
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1298,7 +1334,7 @@
 					"        return False\n",
 					""
 				],
-				"execution_count": 27
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1352,7 +1388,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 28
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1405,7 +1441,7 @@
 					"    print(f\"Found {len(new_files)} new files to process out of {len(all_files)} total files\")\n",
 					"    return new_files, all_files"
 				],
-				"execution_count": 29
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1436,7 +1472,20 @@
 					"\n",
 					"    print(\"=======================================\\n\")"
 				],
-				"execution_count": 30
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## MAIN"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -1450,16 +1499,15 @@
 					"def main():\n",
 					"    \"\"\"Main function for the transformation process\"\"\"\n",
 					"    # Initialize Spark session\n",
-					"    spark = create_spark_session()\n",
+					"    # spark = create_spark_session()\n",
 					"\n",
 					"    # Define paths\n",
-					"    storage_account = \"baubaisadfsastg\"\n",
-					"    files_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/files\"\n",
-					"    config_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/config/schema\"\n",
-					"    transform_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation\"\n",
-					"    error_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/transformation_errors\"\n",
-					"    log_file_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
-					"    summary_folder = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/L1_process_log\"\n",
+					"    files_folder = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/files\"\n",
+					"    config_folder = f\"abfss://{config_container}@{storage_account}.dfs.core.windows.net/config/schema\"\n",
+					"    transform_folder = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/transformation\"\n",
+					"    error_folder = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/transformation_errors\"\n",
+					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"\n",
+					"    summary_folder = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_process_log\"\n",
 					"\n",
 					"    # Check for inconsistent state (log exists but folder doesn't)\n",
 					"    transform_folder_exists = mssparkutils.fs.exists(transform_folder)\n",
@@ -1541,12 +1589,11 @@
 					"# Execute the main function\n",
 					"if __name__ == \"__main__\":\n",
 					"    # Enable only for initail load\n",
-					"    FORCE_CLEAN_RUN = False\n",
 					"\n",
 					"    if FORCE_CLEAN_RUN:\n",
-					"        if mssparkutils.fs.exists(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
+					"        if mssparkutils.fs.exists(f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\"):\n",
 					"            try:\n",
-					"                mssparkutils.fs.rm(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
+					"                mssparkutils.fs.rm(f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L1_process_log/processed_files_log.json\", True)\n",
 					"                print(\"Deleted existing log to force fresh processing\")\n",
 					"            except Exception as e:\n",
 					"                print(f\"Error deleting log file: {str(e)}\")\n",
@@ -1554,7 +1601,7 @@
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
 				],
-				"execution_count": 31
+				"execution_count": null
 			}
 		]
 	}

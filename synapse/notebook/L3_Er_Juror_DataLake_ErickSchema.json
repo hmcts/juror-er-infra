@@ -7,7 +7,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "sparkprod",
+			"referenceName": "sparkbaubais",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -16,11 +16,12 @@
 			"executorMemory": "28g",
 			"executorCores": 4,
 			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": true,
 			"conf": {
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "29358a1c-8ed8-4e34-a064-4e1669fcaa47"
+				"spark.autotune.trackingId": "6ca882da-aa83-45e4-8c88-5e48c3c458dc"
 			}
 		},
 		"metadata": {
@@ -34,10 +35,10 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/5ca62022-6aa2-4cee-aaa7-e7536c8d566c/resourceGroups/baubais-data-factory-rg-prod/providers/Microsoft.Synapse/workspaces/baubais-synapse-prod/bigDataPools/sparkprod",
-				"name": "sparkprod",
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
 				"type": "Spark",
-				"endpoint": "https://baubais-synapse-prod.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkprod",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -153,7 +154,31 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": 30
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"# Define parameters\n",
+					"processing_container = \"qz-test\"#\"juror-etl\"\n",
+					"config_container = \"juror-etl\"\n",
+					"eric_voters_tmp_container = \"dl-juror-eric-voters-temp\""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
+					"storage_account = f\"baubaisadfsa{env}\"\n",
+					"power_bi_container = \"dl-juror-eric-power-bi\""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -169,7 +194,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 31
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -192,8 +217,7 @@
 					"    \"\"\"\n",
 					"    try:\n",
 					"        # Define the output path for the Power BI delta table\n",
-					"        storage_account = \"baubaisadfsaprod\"\n",
-					"        powerbi_delta_path = f\"abfss://dl-juror-eric-power-bi@{storage_account}.dfs.core.windows.net/er_juror_report\"\n",
+					"        powerbi_delta_path = f\"abfss://{power_bi_container}@{storage_account}.dfs.core.windows.net/er_juror_report\"\n",
 					"        \n",
 					"        logger.info(f\"Creating aggregated view for Power BI from {delta_table_path}\")\n",
 					"        \n",
@@ -263,7 +287,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None"
 				],
-				"execution_count": 45
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -282,9 +306,8 @@
 					"    \"\"\"\n",
 					"    try:\n",
 					"        # Initialize storage paths\n",
-					"        storage_account = \"baubaisadfsaprod\"\n",
-					"        source_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
-					"        delta_table_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
+					"        source_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"        delta_table_path = f\"abfss://{eric_voters_tmp_container}@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
 					"        \n",
 					"        # Read source data\n",
 					"        logger.info(f\"Reading voter data from {source_path}\")\n",
@@ -616,7 +639,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None"
 				],
-				"execution_count": 46
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -703,7 +726,7 @@
 					"        print(f\"\\n❌ CRITICAL ERROR: {str(e)}\")\n",
 					"        print(\"Check the logs for detailed stack trace\")"
 				],
-				"execution_count": 47
+				"execution_count": null
 			}
 		]
 	}

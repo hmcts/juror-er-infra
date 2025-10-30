@@ -74,7 +74,7 @@ resource "azurerm_synapse_sql_pool" "this" {
 
 resource "azurerm_synapse_spark_pool" "this" {
   count                = var.enable_synapse_spark_pool ? 1 : 0
-  name                 = "spark${var.env}"
+  name                 = "spark${var.product}"
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"
@@ -197,6 +197,38 @@ resource "azurerm_role_assignment" "rg_3" {
   principal_id         = data.azuread_group.dlrm_group.object_id # DTS DLRM Synapse workspace contributors
   role_definition_name = "Key Vault Reader"
   scope                = azurerm_resource_group.adf_juror_rg.id
+}
+
+resource "azurerm_key_vault_access_policy" "keyvault_aks_access_policy" {
+  key_vault_id   = azurerm_key_vault.baubais_kv.id
+  object_id      = var.aks_managed_identity_object_id
+  tenant_id      = data.azurerm_client_config.current.tenant_id
+  application_id = null
+
+  certificate_permissions = []
+  key_permissions         = []
+  storage_permissions     = []
+
+  secret_permissions = [
+        "Get",
+        "List"
+      ]
+}
+
+resource "azurerm_key_vault_access_policy" "keyvault_synapse_access_policy" {
+  key_vault_id   = azurerm_key_vault.baubais_kv.id
+  object_id      = azurerm_synapse_workspace.this.identity[0].principal_id
+  tenant_id      = data.azurerm_client_config.current.tenant_id
+  application_id = null
+
+  certificate_permissions = []
+  key_permissions         = []
+  storage_permissions     = []
+
+  secret_permissions = [
+        "Get",
+        "List"
+      ]
 }
 
 resource "azurerm_role_assignment" "bais_bau_reader" {

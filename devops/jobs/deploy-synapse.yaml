@@ -1,0 +1,82 @@
+parameters:
+- name: subscriptionEndpoint
+  type: string
+- name: synapseName
+  type: string
+- name: resourceGroup
+  type: string
+  default: mi-$(environment)-rg
+- name: env
+  type: string
+  default: $(environment)
+- name: agentPool
+  type: string
+  default: hmcts-ss-$(environment)
+- name: adfOverrideParameters
+  type: string
+  default: ''
+- name: triggers
+  type: string
+  default: '*'
+- name: dependsOn
+  type: string
+  default: ''
+- name: enableTriggers
+  default: false
+- name: validateOnly
+  type: boolean
+  default: true
+jobs:
+- deployment: deploy_synapse
+  displayName: 'Deploy Synapse Workspace'
+  pool:
+    vmImage: ubuntu-latest
+  dependsOn: ${{ parameters.dependsOn }}
+  condition: succeeded()
+  variables:
+    packageWheelName: 'none'
+    ${{ if or(ne(parameters.validateOnly, true),and(eq(variables['isMain'], true), eq(variables['isAutoTriggered'], true)))}}:
+      operation: 'validateDeploy'
+    ${{ else }}:
+      operation: 'validate'
+  environment: ${{ parameters.env }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+          clean: true
+        - bash: echo "operation=${{ variables.operation }}"
+          displayName: 'Print operation'
+        - task: toggle-triggers-dev@2
+          displayName: 'Disable triggers'
+          condition: ne(${{ parameters.validateOnly }}, true)
+          inputs:
+            azureSubscription: ${{ parameters.subscriptionEndpoint }}
+            ResourceGroupName: ${{ parameters.resourceGroup }}
+            WorkspaceName: ${{ parameters.synapseName }}
+            ToggleOn: false
+            Triggers: '*'
+        - task: Synapse workspace deployment@2
+          displayName: 'Synapse deployment task for workspace: ${{ parameters.synapseName }}'
+          inputs:
+            azureSubscription: ${{ parameters.subscriptionEndpoint }}
+            ResourceGroupName: ${{ parameters.resourceGroup }}
+            operation: ${{ variables.operation }}
+            ArtifactsFolder: 'synapse'
+            TargetWorkspaceName: ${{ parameters.synapseName }}
+            DeleteArtifactsNotInTemplate: false
+            DeployManagedPrivateEndpoints: false
+            FailOnMissingOverrides: false
+            Environment: 'prod'
+            npmpackage: 'prod'
+            OverrideArmParameters: -workspaceName ${{ parameters.synapseName }} --verbose ${{ parameters.adfOverrideParameters }}
+        - task: toggle-triggers-dev@2
+          displayName: 'Restart triggers'
+          condition: and(eq(${{ parameters.enableTriggers }}, true), ne(${{ parameters.validateOnly }}, true))
+          inputs:
+            azureSubscription: ${{ parameters.subscriptionEndpoint }}
+            ResourceGroupName: ${{ parameters.resourceGroup }}
+            WorkspaceName: ${{ parameters.synapseName }}
+            ToggleOn: true
+            Triggers: ${{ parameters.triggers }}

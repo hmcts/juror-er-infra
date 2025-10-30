@@ -20,12 +20,19 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
 					"conf": {
 						"spark.dynamicAllocation.enabled": null,
 						"spark.dynamicAllocation.minExecutors": null,
 						"spark.dynamicAllocation.maxExecutors": null
 					},
-					"numExecutors": null
+					"numExecutors": null,
+					"authentication": {
+						"type": "MSI"
+					}
 				}
 			},
 			{
@@ -49,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "L1_MappingSchema",
+						"referenceName": "L1_Er_Juror_MappingSchema",
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
@@ -125,29 +132,6 @@
 						"spark.dynamicAllocation.maxExecutors": null
 					},
 					"numExecutors": null
-				}
-			},
-			{
-				"name": "Execute Azure App",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "L2_Er_Juror_Mergingfiles",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "p_AzureApp_Postgresql_Sink",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
 				}
 			}
 		],

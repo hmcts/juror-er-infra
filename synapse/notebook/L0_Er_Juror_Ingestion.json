@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7c9a8697-1567-45d3-b334-ada9b533731b"
+				"spark.autotune.trackingId": "df7e37bd-e3fb-4942-86d6-5ab0558898d7"
 			}
 		},
 		"metadata": {
@@ -34,19 +34,12 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkstg",
+				"id": "subscriptions/*/resourceGroups/*/providers/Microsoft.Synapse/workspaces/*/bigDataPools/sparkstg",
 				"name": "sparkstg",
-				"type": "Spark",
-				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkstg",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
-				},
-				"sparkVersion": "3.4",
-				"nodeCount": 3,
-				"cores": 4,
-				"memory": 28,
-				"automaticScaleJobs": false
+				}
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -145,7 +138,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 94
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +157,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 95
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -172,7 +165,7 @@
 					"env = \"stg\"\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": 96
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -202,7 +195,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 97
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -224,7 +217,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 98
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -282,7 +275,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 99
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -338,7 +331,7 @@
 					"        print(f\"Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": 100
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -502,7 +495,7 @@
 					"        print(f\"{indent}Traceback: {traceback.format_exc()}\")\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": 101
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -572,7 +565,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 102
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -628,7 +621,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 103
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -663,7 +656,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 104
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -700,7 +693,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 105
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -741,7 +734,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 106
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -843,7 +836,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 107
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -888,7 +881,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 108
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -953,7 +946,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 109
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1032,7 +1025,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 110
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1120,7 +1113,7 @@
 					"        move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
 					"        return False"
 				],
-				"execution_count": 111
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1226,7 +1219,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": 113
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1249,7 +1242,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": 114
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1311,7 +1304,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": 115
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1381,7 +1374,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": 116
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1433,7 +1426,7 @@
 					"    \n",
 					"    return file_index"
 				],
-				"execution_count": 117
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1513,7 +1506,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 118
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1806,7 +1799,7 @@
 					"    main()\n",
 					""
 				],
-				"execution_count": 119
+				"execution_count": null
 			}
 		]
 	}

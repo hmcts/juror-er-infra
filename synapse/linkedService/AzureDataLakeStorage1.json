@@ -7,7 +7,7 @@
 			"url": "https://baubaisadfsastg.dfs.core.windows.net/"
 		},
 		"connectVia": {
-			"referenceName": "IR-Juror",
+			"referenceName": "AutoResolveIntegrationRuntime",
 			"type": "IntegrationRuntimeReference"
 		}
 	},

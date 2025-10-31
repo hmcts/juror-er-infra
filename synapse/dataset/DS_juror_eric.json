@@ -149,7 +149,7 @@
 		],
 		"typeProperties": {
 			"schema": "juror_eric",
-			"table": "voters_temp"
+			"table": "staging_voters"
 		}
 	}
 }

@@ -1,16 +1,15 @@
 {
 	"name": "AzureDataLakeStorage1",
-	"type": "Microsoft.Synapse/workspaces/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://baubaisadfsastg.dfs.core.windows.net/",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIlNZTkFQU0VAOTY4M0FEQjYtRkIwMy00NEYzLTg1NjMtOURENjU1RUMyMDM3XzczMzVhOTViLTJlMjAtNGE1Zi04ZjJlLTMwOGU5Y2MwZGVjOSINCn0="
+			"url": "https://baubaisadfsastg.dfs.core.windows.net/"
 		},
 		"connectVia": {
-			"referenceName": "AutoResolveIntegrationRuntime",
+			"referenceName": "IR-Juror",
 			"type": "IntegrationRuntimeReference"
 		}
-	}
+	},
+	"type": "Microsoft.Synapse/workspaces/linkedservices"
 }

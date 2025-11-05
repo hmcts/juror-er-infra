@@ -154,20 +154,9 @@
 				"typeProperties": {
 					"source": {
 						"type": "JsonSource",
-						"additionalColumns": [
-							{
-								"name": "lastExecution",
-								"value": {
-									"value": "@utcNow()",
-									"type": "Expression"
-								}
-							}
-						],
 						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"wildcardFileName": "landing.json",
-							"enablePartitionDiscovery": false
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
 						},
 						"formatSettings": {
 							"type": "JsonReadSettings"
@@ -187,11 +176,8 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_datalake_json",
-						"type": "DatasetReference",
-						"parameters": {
-							"container": "metadata"
-						}
+						"referenceName": "DS_Dummy",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [

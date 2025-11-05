@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "hmcts/juror-er-infra/refs/heads/dummy-json/dummy.json"
+				"relativeUrl": "/hmcts/juror-er-infra/refs/heads/dummy-json/publish_config.json"
 			}
 		},
 		"schema": {}

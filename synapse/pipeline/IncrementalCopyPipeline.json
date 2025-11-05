@@ -65,7 +65,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "debug",
-								"value": "false"
+								"value": "1900-01-01"
 							}
 						}
 					],
@@ -154,6 +154,12 @@
 				"typeProperties": {
 					"source": {
 						"type": "JsonSource",
+						"additionalColumns": [
+							{
+								"name": "lastExecution",
+								"value": "@variables('debug')"
+							}
+						],
 						"storeSettings": {
 							"type": "HttpReadSettings",
 							"requestMethod": "GET"

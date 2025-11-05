@@ -89,7 +89,7 @@
 							"typeProperties": {
 								"variableName": "debug",
 								"value": {
-									"value": "@activity('Get Last Modified').output.firstRow.lastExecution",
+									"value": "@activity('Get Last Modified').output.value[0].lastExecution",
 									"type": "Expression"
 								}
 							}

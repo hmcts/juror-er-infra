@@ -16,18 +16,23 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "DS_metadata",
-						"type": "DatasetReference"
+						"referenceName": "DS_metadata_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": "landing.json",
+							"container": "metadata"
+						}
 					},
 					"fieldList": [
 						"exists"
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
-						"type": "ParquetReadSettings"
+						"type": "JsonReadSettings"
 					}
 				}
 			},
@@ -103,24 +108,25 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "ParquetSource",
+									"type": "JsonSource",
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true,
-										"wildcardFileName": "landing.parquet",
 										"enablePartitionDiscovery": false
 									},
 									"formatSettings": {
-										"type": "ParquetReadSettings"
+										"type": "JsonReadSettings"
 									}
 								},
 								"dataset": {
-									"referenceName": "DS_Lake_parquet",
+									"referenceName": "DS_metadata_json",
 									"type": "DatasetReference",
 									"parameters": {
+										"fileName": "landing.json",
 										"container": "metadata"
 									}
-								}
+								},
+								"firstRowOnly": false
 							}
 						}
 					]
@@ -129,8 +135,6 @@
 			{
 				"name": "update watermark",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "If file exist",
@@ -170,13 +174,13 @@
 						}
 					},
 					"sink": {
-						"type": "ParquetSink",
+						"type": "JsonSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings",
 							"copyBehavior": "PreserveHierarchy"
 						},
 						"formatSettings": {
-							"type": "ParquetWriteSettings"
+							"type": "JsonWriteSettings"
 						}
 					},
 					"enableStaging": false
@@ -192,9 +196,10 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_Lake_parquet",
+						"referenceName": "DS_metadata_json",
 						"type": "DatasetReference",
 						"parameters": {
+							"fileName": "landing.json",
 							"container": "metadata"
 						}
 					}

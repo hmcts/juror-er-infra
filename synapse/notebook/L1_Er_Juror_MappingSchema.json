@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "70537c3a-e06f-4fa1-800c-2a3022cded78"
+				"spark.autotune.trackingId": "cf6c03dc-9821-416f-b8f1-dea0451a7472"
 			}
 		},
 		"metadata": {
@@ -595,6 +595,7 @@
 					"    name_cols = [\n",
 					"        \"Elector Title\",\n",
 					"        \"Elector Forename\",\n",
+					"        \"Elector Name\",\n",
 					"        \"Elector Surname\",\n",
 					"        \"Elector Middlename\",\n",
 					"        \"Suffix\",\n",

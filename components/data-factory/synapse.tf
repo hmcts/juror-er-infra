@@ -239,10 +239,11 @@ resource "azurerm_role_assignment" "bais_bau_reader" {
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
 
-resource "azurerm_role_assignment" "bais_bau_synapse_contributor" {
+resource "azurerm_synapse_role_assignment" "bais_bau_synapse_admin" {
   for_each = toset(var.env == "stg" ? [var.env] : [])
 
-  scope                = azurerm_synapse_workspace.this.id
-  role_definition_name = "Contributor"
+  synapse_workspace_id = azurerm_synapse_workspace.this.id
+  role_name            = "Synapse Administrator"
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+  depends_on           = [azurerm_synapse_firewall_rule.allowall]
 }

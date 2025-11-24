@@ -30,8 +30,101 @@
 						"resource": "https://management.azure.com"
 					}
 				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetIrStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetIrStatus').output.properties.typeProperties.nodes",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Append variable1",
+							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "statuses",
+								"value": {
+									"value": "@concat(item().nodeName, item().status, ' ')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Append variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(item().status, 'Offline')",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "DeleteNode",
+										"type": "WebActivity",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"method": "DELETE",
+											"headers": {
+												"Content-Type": "application/json"
+											},
+											"url": {
+												"value": "https://management.azure.com/subscriptions/3eec5bde-7feb-4566-bfb6-805df6e10b90/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/integrationRuntimes/IR-Juror/nodes/@{item().nodeName}?api-version=2021-06-01",
+												"type": "Expression"
+											},
+											"connectVia": {
+												"referenceName": "AutoResolveIntegrationRuntime",
+												"type": "IntegrationRuntimeReference"
+											},
+											"body": " ",
+											"authentication": {
+												"type": "MSI",
+												"resource": "https://management.azure.com"
+											}
+										}
+									}
+								]
+							}
+						}
+					]
+				}
 			}
 		],
+		"variables": {
+			"statuses": {
+				"type": "Array"
+			}
+		},
 		"annotations": []
 	}
 }

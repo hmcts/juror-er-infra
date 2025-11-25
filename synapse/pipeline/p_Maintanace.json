@@ -106,7 +106,7 @@
 												"referenceName": "AutoResolveIntegrationRuntime",
 												"type": "IntegrationRuntimeReference"
 											},
-											"body": " ",
+											"body": "",
 											"authentication": {
 												"type": "MSI",
 												"resource": "https://management.azure.com"

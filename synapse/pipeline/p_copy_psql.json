@@ -335,6 +335,10 @@
 							"container": {
 								"value": "@pipeline().parameters.source_container",
 								"type": "Expression"
+							},
+							"folder": {
+								"value": "''",
+								"type": "Expression"
 							}
 						}
 					}

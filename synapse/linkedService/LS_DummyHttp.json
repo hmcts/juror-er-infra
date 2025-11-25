@@ -1,15 +1,16 @@
 {
-	"name": "AzureDataLakeStorage1",
+	"name": "LS_DummyHttp",
 	"properties": {
 		"annotations": [],
-		"type": "AzureBlobFS",
+		"type": "HttpServer",
 		"typeProperties": {
-			"url": "https://baubaisadfsastg.dfs.core.windows.net/"
+			"url": "https://raw.githubusercontent.com",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
 		},
 		"connectVia": {
 			"referenceName": "AutoResolveIntegrationRuntime",
 			"type": "IntegrationRuntimeReference"
 		}
-	},
-	"type": "Microsoft.Synapse/workspaces/linkedservices"
+	}
 }

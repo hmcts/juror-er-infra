@@ -1,0 +1,25 @@
+{
+	"name": "DS_metadata",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "landing.parquet",
+				"fileSystem": "metadata"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "lastExecution",
+				"type": "UTF8"
+			}
+		]
+	}
+}

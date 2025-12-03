@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a01dd092-dc72-43e3-9613-f3ae9deeed04"
+				"spark.autotune.trackingId": "15064078-0241-4b40-836c-7a3cac7f91df"
 			}
 		},
 		"metadata": {
@@ -1536,7 +1536,7 @@
 				"source": [
 					"def read_processed_files_log(storage_account):\n",
 					"    \"\"\"Read the log of previously processed files\"\"\"\n",
-					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
+					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L0_process_log/processed_files_log.json\"\n",
 					"    \n",
 					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    print(\"READING PROCESSED FILES LOG\")\n",
@@ -1914,7 +1914,7 @@
 				"source": [
 					"def main():\n",
 					"    source_path = f\"abfss://{source_container}@{storage_account}.dfs.core.windows.net\"\n",
-					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/processed_files_log.json\"\n",
+					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L0_process_log/processed_files_log.json\"\n",
 					"    print_hearders()\n",
 					"    \n",
 					"    # Initialize tracking\n",

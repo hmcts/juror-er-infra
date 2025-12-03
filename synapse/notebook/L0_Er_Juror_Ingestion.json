@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e71fdf56-bf4f-4ca7-b9c2-a99d2f056502"
+				"spark.autotune.trackingId": "a01dd092-dc72-43e3-9613-f3ae9deeed04"
 			}
 		},
 		"metadata": {
@@ -2164,10 +2164,12 @@
 					"    print(f\"📊 Files scanned: {len(all_files)}\")\n",
 					"    print(f\"✅ Files processed: {len(successfully_processed_files)}\")\n",
 					"    print(f\"📦 ZIPs extracted: {len(moved_files.get('zip_extracted', []))}\")\n",
-					"    print(f\"❌ Files quarantined: {len(moved_files['quarantine'])}\")\n",
+					"    print(f\"❌ Files quarantined (this run): {len(newly_quarantined_entries)}\")\n",
+					"    print(f\"✅ Files already in quarantine log: {len(quarantine_log_data['quarantine_files'])}\")\n",
 					"    print(f\"⏭️  Files skipped (wrong year): {len(files_wrong_year)}\")\n",
 					"    print(f\"⏭️  Files skipped (already processed): {len(already_processed)}\")\n",
 					"    print(\"=\" * 70)\n",
+					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    \n",
 					"    # Show quarantine details\n",
 					"    print_quarantine_summary(moved_files)\n",

@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "07ac5859-4e9f-4a4a-9105-2cff279dee01"
+				"spark.autotune.trackingId": "e10c0d36-44ca-463d-8cf4-b32f4b8f9293"
 			}
 		},
 		"metadata": {
@@ -159,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 1
+				"execution_count": 64
 			},
 			{
 				"cell_type": "markdown",
@@ -189,11 +189,11 @@
 					"# year_filter = \"2025\"  # Only process 2025 files\n",
 					"# source_container = \"juror-ingestion\"\n",
 					"year_filter = \"2025\"  # Only process 2025 files\n",
-					"source_container = \"juror-raw\"\n",
-					"processing_container = \"qz-test\"\n",
-					"ingestion_container = \"juror-raw\" #\"juror-ingestion\""
+					"source_container = \"juror-ingestion\"\n",
+					"processing_container = \"juror-etl\"\n",
+					"ingestion_container = \"juror-ingestion\" #\"juror-ingestion\""
 				],
-				"execution_count": 2
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -212,7 +212,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 3
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -242,7 +242,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 4
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -264,7 +264,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 5
+				"execution_count": 68
 			},
 			{
 				"cell_type": "code",
@@ -325,7 +325,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 6
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
@@ -381,7 +381,7 @@
 					"        print(f\"Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": 7
+				"execution_count": 70
 			},
 			{
 				"cell_type": "markdown",
@@ -558,7 +558,7 @@
 					"        print(f\"{indent}Traceback: {traceback.format_exc()}\")\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": 8
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -628,7 +628,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 9
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -647,7 +647,7 @@
 					"            'quarantine_details': list of detailed quarantine records\n",
 					"        }\n",
 					"    \"\"\"\n",
-					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/quarantine_log.json\"\n",
+					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L0_process_log/quarantine_log.json\"\n",
 					"    \n",
 					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    print(\"READING QUARANTINE LOG\")\n",
@@ -722,7 +722,7 @@
 					"        print(\"  No new files to add to quarantine log\")\n",
 					"        return True\n",
 					"    \n",
-					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/quarantine_log.json\"\n",
+					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L0_process_log/quarantine_log.json\"\n",
 					"    \n",
 					"    print(\"\\n\" + \"=\" * 70)\n",
 					"    print(\"UPDATING QUARANTINE LOG\")\n",
@@ -791,7 +791,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 11
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -813,7 +813,7 @@
 					"    return (file_path_lower in quarantine_log_data['quarantine_files'] or \n",
 					"            norm_path in quarantine_log_data['quarantine_files'])"
 				],
-				"execution_count": 12
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -895,7 +895,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None, None  # Changed return signature"
 				],
-				"execution_count": 13
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -930,7 +930,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 14
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -967,7 +967,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 15
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -1008,7 +1008,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 16
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -1110,7 +1110,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 17
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -1155,7 +1155,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 18
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -1220,7 +1220,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 19
+				"execution_count": 81
 			},
 			{
 				"cell_type": "markdown",
@@ -1312,7 +1312,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 20
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -1400,7 +1400,7 @@
 					"        move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
 					"        return False"
 				],
-				"execution_count": 21
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -1485,7 +1485,7 @@
 					"    print(f\"Total quarantined: {len(quarantined)} files\")\n",
 					"    print(\"=\" * 70)"
 				],
-				"execution_count": 22
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -1506,7 +1506,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": 23
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -1529,7 +1529,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": 24
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -1591,7 +1591,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": 25
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -1661,7 +1661,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": 26
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -1713,7 +1713,7 @@
 					"    \n",
 					"    return file_index"
 				],
-				"execution_count": 27
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -1793,7 +1793,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 28
+				"execution_count": 90
 			},
 			{
 				"cell_type": "markdown",
@@ -1845,7 +1845,7 @@
 					"    print(f\"   Files quarantined: {len(_moved_files['quarantine']) - len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
 					"    "
 				],
-				"execution_count": 29
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
@@ -2014,7 +2014,7 @@
 					"    print(f\"{indent}   Quarantine entries tracked: {len(newly_quarantined_entries)}\")\n",
 					"    print(f\"{indent}   Failed operations: {len([f for f in moved_files.get('failed', []) if any(os.path.basename(f) in os.path.basename(fi.path) for fi in files)])}\")"
 				],
-				"execution_count": 30
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
@@ -2343,7 +2343,7 @@
 					"    # Show quarantine details\n",
 					"    print_quarantine_summary(moved_files)"
 				],
-				"execution_count": 31
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -2351,7 +2351,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 32
+				"execution_count": 94
 			}
 		]
 	}

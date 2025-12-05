@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d0e2870d-f9e7-4787-a7b6-7ce560ae9418"
+				"spark.autotune.trackingId": "07ac5859-4e9f-4a4a-9105-2cff279dee01"
 			}
 		},
 		"metadata": {
@@ -159,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -193,7 +193,7 @@
 					"processing_container = \"qz-test\"\n",
 					"ingestion_container = \"juror-raw\" #\"juror-ingestion\""
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -212,7 +212,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -242,7 +242,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -264,7 +264,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -325,7 +325,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -381,7 +381,7 @@
 					"        print(f\"Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -558,7 +558,7 @@
 					"        print(f\"{indent}Traceback: {traceback.format_exc()}\")\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -628,7 +628,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -654,7 +654,7 @@
 					"    print(\"=\" * 70)\n",
 					"    \n",
 					"    if not mssparkutils.fs.exists(log_file_path):\n",
-					"        print(\"â„¹ï¸  No existing quarantine log found\")\n",
+					"        print(\"  No existing quarantine log found\")\n",
 					"        print(\"   All files will be checked for quarantine\")\n",
 					"        return {\n",
 					"            'quarantine_files': set(),\n",
@@ -681,12 +681,12 @@
 					"                    quarantine_files.add(file_path.lower())\n",
 					"                    quarantine_files.add(normalize_file_path(file_path))\n",
 					"        \n",
-					"        print(f\"âœ… Successfully loaded {len(quarantine_files)} quarantined file entries\")\n",
+					"        print(f\" Successfully loaded {len(quarantine_files)} quarantined file entries\")\n",
 					"        \n",
 					"        # Show sample\n",
 					"        sample = list(quarantine_details)[:3]\n",
 					"        if sample:\n",
-					"            print(\"\\nðŸ\"‹ Sample quarantine entries:\")\n",
+					"            print(\" Sample quarantine entries:\")\n",
 					"            for i, entry in enumerate(sample, 1):\n",
 					"                file_name = os.path.basename(entry.get('file', 'Unknown'))\n",
 					"                reason = entry.get('reason', 'No reason')\n",
@@ -698,7 +698,7 @@
 					"        }\n",
 					"        \n",
 					"    except Exception as e:\n",
-					"        print(f\"âŒ ERROR reading quarantine log: {str(e)}\")\n",
+					"        print(f\" ERROR reading quarantine log: {str(e)}\")\n",
 					"        import traceback\n",
 					"        print(traceback.format_exc())\n",
 					"        return {\n",
@@ -719,7 +719,7 @@
 					"        bool: True if successful, False otherwise\n",
 					"    \"\"\"\n",
 					"    if len(newly_quarantined_files) == 0:\n",
-					"        print(\"\\nâ„¹ï¸  No new files to add to quarantine log\")\n",
+					"        print(\"  No new files to add to quarantine log\")\n",
 					"        return True\n",
 					"    \n",
 					"    log_file_path = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/quarantine_log.json\"\n",
@@ -786,12 +786,12 @@
 					"        return True\n",
 					"        \n",
 					"    except Exception as e:\n",
-					"        print(f\"âŒ ERROR updating quarantine log: {str(e)}\")\n",
+					"        print(f\" ERROR updating quarantine log: {str(e)}\")\n",
 					"        import traceback\n",
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -813,7 +813,7 @@
 					"    return (file_path_lower in quarantine_log_data['quarantine_files'] or \n",
 					"            norm_path in quarantine_log_data['quarantine_files'])"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -895,7 +895,7 @@
 					"        print(f\"Error in quarantine processing: {str(e)}\")\n",
 					"        return False, None, None  # Changed return signature"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -930,7 +930,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -967,7 +967,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -1008,7 +1008,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -1110,7 +1110,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -1155,7 +1155,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -1220,7 +1220,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "markdown",
@@ -1312,7 +1312,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -1400,7 +1400,7 @@
 					"        move_to_quarantine(file_path, storage_account, moved_files, quarantine_reason)\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -1485,7 +1485,7 @@
 					"    print(f\"Total quarantined: {len(quarantined)} files\")\n",
 					"    print(\"=\" * 70)"
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -1506,7 +1506,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": null
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -1529,7 +1529,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -1591,7 +1591,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -1661,7 +1661,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -1713,7 +1713,7 @@
 					"    \n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -1793,7 +1793,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "markdown",
@@ -1845,69 +1845,176 @@
 					"    print(f\"   Files quarantined: {len(_moved_files['quarantine']) - len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
 					"    "
 				],
-				"execution_count": null
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def process_raw_zip(path, storage_account, sink_path, moved_files):\n",
+					"def process_raw_zip(path, storage_account, sink_path, moved_files, newly_quarantined_entries=None):\n",
+					"    \"\"\"\n",
+					"    Process raw ZIP files from the source path\n",
+					"    \n",
+					"    This function:\n",
+					"    - Scans the source path for ZIP files\n",
+					"    - Extracts valid ZIP files to the sink path\n",
+					"    - Quarantines problematic ZIPs (password-protected, corrupted)\n",
+					"    - Quarantines non-ZIP files found in raw folder\n",
+					"    - Tracks quarantine entries for logging\n",
+					"    \n",
+					"    Args:\n",
+					"        path: Source path containing ZIP files\n",
+					"        storage_account: Azure storage account name\n",
+					"        sink_path: Destination path for extracted files (e.g., \"extracted\")\n",
+					"        moved_files: Dictionary tracking moved files with categories:\n",
+					"            - 'zip_extracted': Successfully extracted ZIPs\n",
+					"            - 'quarantine': Quarantined files\n",
+					"            - 'failed': Files that failed to process\n",
+					"        newly_quarantined_entries: List to track new quarantine entries for log updates\n",
+					"            If None, a local list is created (entries won't be tracked)\n",
+					"    \n",
+					"    Returns:\n",
+					"        None (modifies moved_files and newly_quarantined_entries in place)\n",
+					"    \n",
+					"    Example:\n",
+					"        moved_files = {'quarantine': [], 'zip_extracted': [], 'failed': []}\n",
+					"        newly_quarantined_entries = []\n",
+					"        process_raw_zip(\n",
+					"            \"abfss://juror-raw@storage.dfs.core.windows.net\",\n",
+					"            \"storage_account\",\n",
+					"            \"extracted\",\n",
+					"            moved_files,\n",
+					"            newly_quarantined_entries\n",
+					"        )\n",
+					"    \"\"\"\n",
 					"    files = mssparkutils.fs.ls(path)\n",
 					"    indent = \"\"\n",
 					"    print(f\"{indent}Found {len(files)} items in {path}\")\n",
+					"    \n",
+					"    # Initialize quarantine tracking if not provided\n",
+					"    # This allows the function to work standalone or as part of larger pipeline\n",
+					"    if newly_quarantined_entries is None:\n",
+					"        newly_quarantined_entries = []\n",
+					"        print(f\"{indent}ℹ️  Quarantine tracking initialized locally (won't persist)\")\n",
 					"        \n",
 					"    for file_info in files:\n",
-					"        # We are expecting only zip files on this levle\n",
+					"        file_name = os.path.basename(file_info.path)\n",
+					"        \n",
+					"        # ====================================================================\n",
+					"        # Process ZIP files\n",
+					"        # ====================================================================\n",
 					"        if file_info.path.lower().endswith('.zip'):\n",
-					"            print(f\"{indent}Found ZIP file: {file_info.path}\")\n",
+					"            print(f\"{indent}Found ZIP file: {file_name}\")\n",
+					"            \n",
+					"            # Attempt to extract the ZIP file\n",
 					"            success, error_reason = unzip_file(\n",
-					"                        file_info.path,\n",
-					"                        sink_path,\n",
-					"                        storage_account,\n",
-					"                        depth=0,  # Pass current depth (IMPORTANT!)\n",
-					"                        max_depth=5,\n",
-					"                        moved_files=moved_files\n",
-					"                    )\n",
-					"                    \n",
+					"                file_info.path,\n",
+					"                sink_path,\n",
+					"                storage_account,\n",
+					"                depth=0,  # Starting depth (important for nested ZIP handling)\n",
+					"                max_depth=5,  # Maximum nesting level allowed\n",
+					"                moved_files=moved_files\n",
+					"            )\n",
+					"            \n",
 					"            if success:\n",
-					"                print(f\"{indent}Successfully extracted ZIP file\")\n",
+					"                # ZIP extracted successfully\n",
+					"                print(f\"{indent}✅ Successfully extracted ZIP file\")\n",
+					"                \n",
+					"                # Track as successfully extracted\n",
 					"                if 'zip_extracted' not in moved_files:\n",
 					"                    moved_files['zip_extracted'] = []\n",
 					"                moved_files['zip_extracted'].append(file_info.path)\n",
-					"            else:\n",
-					"                # Failed to extract - move to quarantine with specific error reason\n",
-					"                print(f\"{indent}Moving ZIP to quarantine due to: {error_reason}\")\n",
 					"                \n",
-					"                success_q, quarantine_path = move_to_quarantine(\n",
+					"            else:\n",
+					"                # ZIP extraction failed - quarantine it\n",
+					"                print(f\"{indent}❌ Failed to extract ZIP\")\n",
+					"                print(f\"{indent}   Reason: {error_reason}\")\n",
+					"                print(f\"{indent}   Moving to quarantine...\")\n",
+					"                \n",
+					"                # Move to quarantine with specific error reason\n",
+					"                # Returns: (success, quarantine_path, quarantine_entry)\n",
+					"                success_q, quarantine_path, qentry = move_to_quarantine(\n",
 					"                    file_info.path,\n",
 					"                    storage_account,\n",
 					"                    moved_files,\n",
-					"                    error_reason  # password_protected, zip_corrupted, etc.\n",
+					"                    error_reason  # e.g., \"password_protected\", \"zip_corrupted\"\n",
 					"                )\n",
 					"                \n",
 					"                if success_q:\n",
-					"                    print(f\"{indent}Successfully moved ZIP to quarantine: {quarantine_path}\")\n",
+					"                    print(f\"{indent}✅ Successfully moved ZIP to quarantine\")\n",
+					"                    print(f\"{indent}   Location: {os.path.basename(quarantine_path)}\")\n",
+					"                    \n",
+					"                    # Track quarantine entry for log update\n",
+					"                    # qentry will be None if file type not eligible (but ZIPs are always eligible)\n",
+					"                    if qentry:\n",
+					"                        newly_quarantined_entries.append(qentry)\n",
+					"                        print(f\"{indent}📝 Added to quarantine log queue\")\n",
 					"                else:\n",
-					"                    print(f\"{indent}Failed to move ZIP to quarantine\")\n",
+					"                    # Quarantine failed - track as failed\n",
+					"                    print(f\"{indent}❌ Failed to move ZIP to quarantine\")\n",
 					"                    if 'failed' not in moved_files:\n",
 					"                        moved_files['failed'] = []\n",
 					"                    moved_files['failed'].append(f\"{file_info.path} (quarantine failed)\")\n",
+					"        \n",
+					"        # ====================================================================\n",
+					"        # Process non-ZIP files (unexpected in raw folder)\n",
+					"        # ====================================================================\n",
 					"        else:\n",
-					"            success_q, quarantine_path = move_to_quarantine(\n",
-					"                    file_info.path,\n",
-					"                    storage_account,\n",
-					"                    moved_files,\n",
-					"                    error_reason  # password_protected, zip_corrupted, etc.\n",
-					"                )\n",
-					"                \n",
-					"            if success_q:\n",
-					"                print(f\"{indent}Successfully moved ZIP to quarantine: {quarantine_path}\")\n",
+					"            print(f\"{indent}⚠️  Found non-ZIP file in raw folder: {file_name}\")\n",
+					"            \n",
+					"            # Determine appropriate error reason based on file characteristics\n",
+					"            if file_name.startswith('._'):\n",
+					"                # macOS metadata files (._filename)\n",
+					"                error_reason = \"file_unreadable\"\n",
+					"                print(f\"{indent}   Type: macOS metadata file\")\n",
+					"            elif file_name.lower() in ['.ds_store', 'thumbs.db', 'desktop.ini']:\n",
+					"                # Common system files\n",
+					"                error_reason = \"file_unreadable\"\n",
+					"                print(f\"{indent}   Type: System metadata file\")\n",
 					"            else:\n",
-					"                print(f\"{indent}Failed to move ZIP to quarantine\")\n",
+					"                # Any other non-ZIP file\n",
+					"                error_reason = \"unexpected_file_type\"\n",
+					"                print(f\"{indent}   Type: Unexpected file type in raw folder\")\n",
+					"            \n",
+					"            print(f\"{indent}   Moving to quarantine...\")\n",
+					"            \n",
+					"            # Move to quarantine\n",
+					"            # Returns: (success, quarantine_path, quarantine_entry)\n",
+					"            success_q, quarantine_path, qentry = move_to_quarantine(\n",
+					"                file_info.path,\n",
+					"                storage_account,\n",
+					"                moved_files,\n",
+					"                error_reason\n",
+					"            )\n",
+					"            \n",
+					"            if success_q:\n",
+					"                print(f\"{indent}✅ Successfully moved non-ZIP file to quarantine\")\n",
+					"                print(f\"{indent}   Location: {os.path.basename(quarantine_path) if quarantine_path else 'N/A'}\")\n",
+					"                \n",
+					"                # Track quarantine entry for log update\n",
+					"                # qentry will be None if file type not eligible for quarantine log\n",
+					"                if qentry:\n",
+					"                    newly_quarantined_entries.append(qentry)\n",
+					"                    print(f\"{indent}📝 Added to quarantine log queue\")\n",
+					"                else:\n",
+					"                    print(f\"{indent}ℹ️  File type not tracked in quarantine log\")\n",
+					"            else:\n",
+					"                # Quarantine failed - track as failed\n",
+					"                print(f\"{indent}❌ Failed to move non-ZIP file to quarantine\")\n",
 					"                if 'failed' not in moved_files:\n",
 					"                    moved_files['failed'] = []\n",
-					"                moved_files['failed'].append(f\"{file_info.path} (quarantine failed)\")"
+					"                moved_files['failed'].append(f\"{file_info.path} (quarantine failed)\")\n",
+					"    \n",
+					"    # ====================================================================\n",
+					"    # Summary\n",
+					"    # ====================================================================\n",
+					"    print(f\"\\n{indent}📊 Process Raw ZIP Summary:\")\n",
+					"    print(f\"{indent}   Total items scanned: {len(files)}\")\n",
+					"    print(f\"{indent}   ZIPs extracted: {len(moved_files.get('zip_extracted', []))}\")\n",
+					"    print(f\"{indent}   Files quarantined: {len([f for f in moved_files.get('quarantine', []) if any(os.path.basename(f) in os.path.basename(fi.path) for fi in files)])}\")\n",
+					"    print(f\"{indent}   Quarantine entries tracked: {len(newly_quarantined_entries)}\")\n",
+					"    print(f\"{indent}   Failed operations: {len([f for f in moved_files.get('failed', []) if any(os.path.basename(f) in os.path.basename(fi.path) for fi in files)])}\")"
 				],
-				"execution_count": null
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -2236,7 +2343,7 @@
 					"    # Show quarantine details\n",
 					"    print_quarantine_summary(moved_files)"
 				],
-				"execution_count": null
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -2244,7 +2351,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 32
 			}
 		]
 	}

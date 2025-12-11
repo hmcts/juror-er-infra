@@ -6,7 +6,14 @@
 			{
 				"name": "Execute ETL",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set Year Filter",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -23,7 +30,7 @@
 							"type": "Expression"
 						},
 						"year_filter": {
-							"value": "@pipeline().parameters.year_filter",
+							"value": "@variables('yearFilter')",
 							"type": "Expression"
 						},
 						"processing_container": {
@@ -464,6 +471,23 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Set Year Filter",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "yearFilter",
+					"value": {
+						"value": "@if(\n   greater(int(formatDateTime(utcNow(), 'MM')), 9),\n   string(add(int(formatDateTime(utcNow(), 'yyyy')), 1)),\n   string(formatDateTime(utcNow(), 'yyyy'))\n)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -501,6 +525,9 @@
 		},
 		"variables": {
 			"lastModified": {
+				"type": "String"
+			},
+			"yearFilter": {
 				"type": "String"
 			}
 		},

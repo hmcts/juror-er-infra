@@ -95,7 +95,7 @@ stages:
               synapseName:  baubais-synapse-${{ deployment.environment }}
               resourceGroup: baubais-data-factory-rg-${{ deployment.environment }}
               triggers: ''
-              enableTriggers: False
+              enableTriggers: True
               adfOverrideParameters: '-LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ deployment.environment }}.file.core.windows.net/"'
               agentPool: ${{ variables.agentPool }}
               env: ${{ deployment.environment }}

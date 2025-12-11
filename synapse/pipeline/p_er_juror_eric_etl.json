@@ -248,7 +248,7 @@
 			},
 			"processing_container": {
 				"type": "string",
-				"defaultValue": "qz-test"
+				"defaultValue": "juror-etl"
 			},
 			"debug_mode": {
 				"type": "bool",

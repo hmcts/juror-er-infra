@@ -94,7 +94,7 @@ stages:
               subscriptionEndpoint: ${{ deployment.service_connection }}
               synapseName:  baubais-synapse-${{ deployment.environment }}
               resourceGroup: baubais-data-factory-rg-${{ deployment.environment }}
-              triggers: ''
+              triggers: '*'
               enableTriggers: True
               adfOverrideParameters: '-LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ deployment.environment }}.file.core.windows.net/"'
               agentPool: ${{ variables.agentPool }}

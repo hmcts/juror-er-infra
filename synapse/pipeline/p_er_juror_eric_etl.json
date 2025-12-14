@@ -69,7 +69,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "Set has error",
+						"activity": "L0_Data_Ingestion",
 						"dependencyConditions": [
 							"Succeeded"
 						]

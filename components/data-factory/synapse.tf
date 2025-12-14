@@ -238,3 +238,11 @@ resource "azurerm_role_assignment" "bais_bau_reader" {
   role_definition_name = "Storage File Data Privileged Reader"
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
+
+resource "azurerm_role_assignment" "bais_bau_synapse_contributor" {
+  for_each = toset(var.env == "stg" ? [var.env] : [])
+
+  scope                = azurerm_resource_group.adf_juror_rg.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+}

@@ -69,7 +69,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "L0_Data_Ingestion",
+						"activity": "Set has error",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -235,6 +235,30 @@
 					"driverSize": "Small",
 					"numExecutors": null
 				}
+			},
+			{
+				"name": "Set has error",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "L0_Data_Ingestion",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "has_error",
+					"value": {
+						"value": "@equals(json(activity('L0_Data_Ingestion').output.status.Output.result.exitValue).status, 'failed')",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -261,6 +285,11 @@
 			"eric_voters_tmp_container": {
 				"type": "string",
 				"defaultValue": "dl-juror-eric-voters-temp"
+			}
+		},
+		"variables": {
+			"has_error": {
+				"type": "Boolean"
 			}
 		},
 		"annotations": []

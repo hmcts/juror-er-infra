@@ -12,6 +12,12 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					},
+					{
+						"activity": "If file exist",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"policy": {
@@ -488,8 +494,139 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Get metadata files",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_metadata_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": "landing.json",
+							"container": "metadata"
+						}
+					},
+					"fieldList": [
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
+			},
+			{
+				"name": "If file exist",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get metadata files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@activity('Get metadata files').output.exists",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set default time",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastModified",
+								"value": "1900-01-01T00:00:00+01:00"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set last modified",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get Last Modified",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastModified",
+								"value": {
+									"value": "@activity('Get Last Modified').output.value[0].lastExecution",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Get Last Modified",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"dataset": {
+									"referenceName": "DS_metadata_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": "landing.json",
+										"container": "metadata"
+									}
+								},
+								"firstRowOnly": false
+							}
+						}
+					]
+				}
 			}
 		],
+		"concurrency": 1,
 		"parameters": {
 			"folder": {
 				"type": "string",

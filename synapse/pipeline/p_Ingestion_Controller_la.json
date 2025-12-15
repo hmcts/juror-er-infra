@@ -490,7 +490,7 @@
 				"typeProperties": {
 					"variableName": "yearFilter",
 					"value": {
-						"value": "@if(\n   greater(int(formatDateTime(utcNow(), 'MM')), 9),\n   string(add(int(formatDateTime(utcNow(), 'yyyy')), 1)),\n   string(formatDateTime(utcNow(), 'yyyy'))\n)",
+						"value": "@if(empty(pipeline().parameters.year_filter), if(\n   greater(int(formatDateTime(utcNow(), 'MM')), 9),\n   string(add(int(formatDateTime(utcNow(), 'yyyy')), 1)),\n   string(formatDateTime(utcNow(), 'yyyy'))\n), pipeline().parameters.year_filter)",
 						"type": "Expression"
 					}
 				}
@@ -543,7 +543,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@activity('Get metadata files').output.exists",
+						"value": "@and(activity('Get metadata files').output.exists, empty(pipeline().parameters.last_modified))",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -558,7 +558,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "lastModified",
-								"value": "1900-01-01T00:00:00+01:00"
+								"value": {
+									"value": "@if(empty(pipeline().parameters.last_modified),'1900-01-01T00:00:00+01:00', pipeline().parameters.last_modified)",
+									"type": "Expression"
+								}
 							}
 						}
 					],

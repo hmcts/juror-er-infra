@@ -1,0 +1,676 @@
+{
+	"name": "p_Ingestion_Controller_la",
+	"properties": {
+		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
+		"activities": [
+			{
+				"name": "Execute ETL",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Set Year Filter",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "If file exist",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "p_er_juror_eric_etl",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"source_container": {
+							"value": "juror-la-landing",
+							"type": "Expression"
+						},
+						"year_filter": {
+							"value": "@variables('yearFilter')",
+							"type": "Expression"
+						},
+						"processing_container": {
+							"value": "@pipeline().parameters.processing_container",
+							"type": "Expression"
+						},
+						"debug_mode": {
+							"value": "@pipeline().parameters.debug_mode",
+							"type": "Expression"
+						},
+						"config_container": {
+							"value": "@pipeline().parameters.config_container",
+							"type": "Expression"
+						},
+						"eric_voters_tmp_container": {
+							"value": "@pipeline().parameters.eric_voters_tmp_container",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Copy to JurorDB",
+				"description": "Copy data to Juror DB",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Execute ETL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0:30:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"modifiedDatetimeStart": {
+								"value": "@variables('lastModified')",
+								"type": "Expression"
+							},
+							"wildcardFolderPath": "voters_postgresql/creation_date_partition=*/",
+							"wildcardFileName": "*",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "ParquetReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzurePostgreSqlSink",
+						"writeBatchSize": 1000000,
+						"writeBatchTimeout": "00:30:00",
+						"writeMethod": "CopyCommand"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "part_no",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "part_no",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "register_lett",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "register_lett",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "poll_number",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "poll_number",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "new_marker",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "new_marker",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "title",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "title",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "lname",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "lname",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "fname",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "fname",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "dob",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "dob",
+									"type": "DateTime",
+									"physicalType": "date"
+								}
+							},
+							{
+								"source": {
+									"name": "flags",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "flags",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "address",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "address",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "address2",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "address2",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "address3",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "address3",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "address4",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "address4",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "address5",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "address5",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "address6",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "address6",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "zip",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "zip",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "date_selected1",
+									"type": "DateTime",
+									"physicalType": "INT96"
+								},
+								"sink": {
+									"name": "date_selected1",
+									"type": "DateTime",
+									"physicalType": "date"
+								}
+							},
+							{
+								"source": {
+									"name": "date_selected2",
+									"type": "DateTime",
+									"physicalType": "INT96"
+								},
+								"sink": {
+									"name": "date_selected2",
+									"type": "DateTime",
+									"physicalType": "date"
+								}
+							},
+							{
+								"source": {
+									"name": "date_selected3",
+									"type": "DateTime",
+									"physicalType": "INT96"
+								},
+								"sink": {
+									"name": "date_selected3",
+									"type": "DateTime",
+									"physicalType": "date"
+								}
+							},
+							{
+								"source": {
+									"name": "rec_num",
+									"type": "Int32",
+									"physicalType": "INT32"
+								},
+								"sink": {
+									"name": "rec_num",
+									"type": "Int32",
+									"physicalType": "integer"
+								}
+							},
+							{
+								"source": {
+									"name": "perm_disqual",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "perm_disqual",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "source_id",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "source_id",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "hash_id",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "hash_id",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Lake_parquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": {
+								"value": "@pipeline().parameters.processing_container",
+								"type": "Expression"
+							},
+							"folder": " "
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_juror_eric",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "update watermark",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Copy to JurorDB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"additionalColumns": [
+							{
+								"name": "lastExecution",
+								"value": {
+									"value": "@utcNow()",
+									"type": "Expression"
+								}
+							}
+						],
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "PreserveHierarchy"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Dummy",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_metadata_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": "landing.json",
+							"container": "metadata"
+						}
+					}
+				]
+			},
+			{
+				"name": "Set Year Filter",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "yearFilter",
+					"value": {
+						"value": "@if(empty(pipeline().parameters.year_filter), if(\n   greater(int(formatDateTime(utcNow(), 'MM')), 9),\n   string(add(int(formatDateTime(utcNow(), 'yyyy')), 1)),\n   string(formatDateTime(utcNow(), 'yyyy'))\n), pipeline().parameters.year_filter)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get metadata files",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_metadata_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": "landing.json",
+							"container": "metadata"
+						}
+					},
+					"fieldList": [
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
+			},
+			{
+				"name": "If file exist",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get metadata files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@and(activity('Get metadata files').output.exists, empty(pipeline().parameters.last_modified))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set default time",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastModified",
+								"value": {
+									"value": "@if(empty(pipeline().parameters.last_modified),'1900-01-01T00:00:00+01:00', pipeline().parameters.last_modified)",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set last modified",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get Last Modified",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastModified",
+								"value": {
+									"value": "@activity('Get Last Modified').output.value[0].lastExecution",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Get Last Modified",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"dataset": {
+									"referenceName": "DS_metadata_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": "landing.json",
+										"container": "metadata"
+									}
+								},
+								"firstRowOnly": false
+							}
+						}
+					]
+				}
+			}
+		],
+		"concurrency": 1,
+		"parameters": {
+			"folder": {
+				"type": "string",
+				"defaultValue": "BAIS/Sites/External-In-Legacy/Juror_ER"
+			},
+			"last_modified": {
+				"type": "string"
+			},
+			"source_container": {
+				"type": "string",
+				"defaultValue": "juror-raw"
+			},
+			"year_filter": {
+				"type": "string",
+				"defaultValue": "2025"
+			},
+			"processing_container": {
+				"type": "string",
+				"defaultValue": "qz-test"
+			},
+			"debug_mode": {
+				"type": "string",
+				"defaultValue": "true"
+			},
+			"config_container": {
+				"type": "string",
+				"defaultValue": "juror-etl"
+			},
+			"eric_voters_tmp_container": {
+				"type": "string",
+				"defaultValue": "dl-juror-eric-voters-temp"
+			}
+		},
+		"variables": {
+			"lastModified": {
+				"type": "String"
+			},
+			"yearFilter": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}

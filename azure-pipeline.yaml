@@ -97,7 +97,6 @@ stages:
               resourceGroup: baubais-data-factory-rg-${{ deployment.environment }}
               triggers: '*'
               enableTriggers: True
-              adfOverrideParameters: 
               agentPool: ${{ variables.agentPool }}
               env: ${{ deployment.environment }}
               validateOnly: ${{ ne(parameters.overrideAction, 'apply')}}

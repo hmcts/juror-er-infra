@@ -4,6 +4,16 @@ This document contains Mermaid diagrams for the **p_Ingestion_Controller_la** an
 
 ---
 
+## Gliffy format
+
+A **Gliffy-native diagram** is provided for use in Gliffy (Confluence, Jira, Gliffy Online) or in draw.io (File → Import from → Device):
+
+| File | Description |
+|------|--------------|
+| **[juror-er-data-flow.gliffy](juror-er-data-flow.gliffy)** | Data flow: Sources → ETL (L0–L3) → processing_container → Sinks. Left-to-right layout with labeled shapes. Open in Gliffy or import into draw.io; add connectors between shapes as needed. |
+
+---
+
 ## 1. End-to-end data flow (ETL + controller)
 
 Shows how data moves from source containers through the four ETL stages to Delta, PostgreSQL, and Power BI.

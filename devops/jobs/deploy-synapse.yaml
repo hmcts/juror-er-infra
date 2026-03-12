@@ -76,9 +76,12 @@ jobs:
             FailOnMissingOverrides: false
             Environment: 'prod'
             npmpackage: 'prod'
-            OverrideArmParameters: '-workspaceName ${{ parameters.synapseName }} --verbose -LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ parameters.env }}.file.core.windows.net/"
-                                      -LS_juror_eric_kv_properties_typeProperties_baseUrl "https://baubais-${{ parameters.env }}-kv.vault.azure.net/"
-                                      -TR_new_file_properties_typeProperties_scope "/subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/baubais-data-factory-rg-${{ parameters.env }}/providers/Microsoft.Storage/storageAccounts/baubaisadfsa${{ parameters.env }}"'
+            OverrideArmParameters:  >
+              -workspaceName ${{ parameters.synapseName }} 
+              -LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ parameters.env }}.file.core.windows.net/"
+              -LS_juror_eric_kv_properties_typeProperties_baseUrl "https://baubais-${{ parameters.env }}-kv.vault.azure.net/"
+              -TR_new_file_properties_typeProperties_scope "/subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/baubais-data-factory-rg-${{ parameters.env }}/providers/Microsoft.Storage/storageAccounts/baubaisadfsa${{ parameters.env }}"
+              --verbose 
         - task: toggle-triggers-dev@2
           displayName: 'Restart triggers'
           condition: and(eq(${{ parameters.enableTriggers }}, true), ne(${{ parameters.validateOnly }}, true))

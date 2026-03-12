@@ -55,8 +55,9 @@ variable "github_main_branch" {
 variable "github_repository_name" {
   description = "Name of the GitHub repository"
   type        = string
-  default     = "juror-er-infra"
+  default     = ""
 }
+
 variable "github_root_folder" {
   description = "Root folder of the GitHub repository"
   type        = string

@@ -45,13 +45,18 @@ resource "azurerm_synapse_workspace" "this" {
     delete = "2h"
   }
 
-  github_repo {
-    account_name    = "hmcts"
-    branch_name     = var.github_main_branch
-    repository_name = var.github_repository_name
-    root_folder     = var.github_root_folder
-    git_url         = "https://github.com"
+  dynamic "github_repo" {
+    for_each = length(var.github_repository_name) > 0 ? [1] : []
+    content {
+      account_name    = "hmcts"
+      branch_name     = var.github_main_branch
+      repository_name = var.github_repository_name
+      root_folder     = var.github_root_folder
+      git_url         = "https://github.com"
+    }
   }
+
+  # tags = merge(module.tags.common_tags, { "exemptFromAutoLock" = "true" })
   tags = module.tags.common_tags
 }
 

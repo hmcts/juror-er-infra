@@ -35,6 +35,7 @@
   "Microsoft.Synapse/workspaces/triggers": {
       "properties": {
           "typeProperties": {
+              "scope": "=",
               "recurrence": {
                   "*": "=",
                   "interval": "=:triggerSuffix:int",

@@ -35,7 +35,12 @@ parameters:
       - plan
       - apply
       - destroy
-
+  - name: secretName
+    type: string
+    default: juror-shir-key
+  - name: azureVault
+    type: string
+    default: baubais-prod-kv
   - name: environment_components
     type: object
     default:
@@ -71,6 +76,24 @@ stages:
               scriptPath: '$(System.DefaultWorkingDirectory)/$(buildRepoSuffix)/devops/scripts/NotebookValidator.py'
               arguments: $(System.DefaultWorkingDirectory)/$(buildRepoSuffix)
               failOnStderr: true # Optional
+          - task: AzureCLI@1
+            displayName: "Set vault secrets "
+            inputs:
+              azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                seachedSecret=$(az keyvault secret list --vault-name ${{ parameters.azureVault }}  --query "[?name=='${{ parameters.secretName }}'].name" -o tsv)
+                if [ -z "$seachedSecret" ]; then
+                      echo  "This is a new secret"
+                      az keyvault secret set --name ${{ parameters.secretName }} --vault-name ${{ parameters.azureVault }}  --value "$(secret_value)"
+                else
+                    currentValue=$(az keyvault secret show --vault-name ${{ parameters.azureVault }} --name ${{ parameters.secretName }} --query 'value' -o tsv)
+                    if [ "$(secret_value)" = "$currentValue" ]; then
+                        echo "Secret has not changed. Skipped"
+                    else
+                        az keyvault secret set --name ${{ parameters.secretName }} --vault-name ${{ parameters.azureVault }}  --value "$(secret_value)"
+                    fi
+                fi
 
   - ${{ each deployment in parameters.environment_components }}:
       - stage: ${{ deployment.deployment }}

@@ -79,7 +79,7 @@ stages:
           - task: AzureCLI@1
             displayName: "Set vault secrets "
             inputs:
-              azureSubscription: ${{ parameters.azureSubscriptionEndpoint }}
+              azureSubscription: "DTS-SHAREDSERVICES-PROD"
               scriptLocation: "inlineScript"
               inlineScript: |
                 seachedSecret=$(az keyvault secret list --vault-name ${{ parameters.azureVault }}  --query "[?name=='${{ parameters.secretName }}'].name" -o tsv)

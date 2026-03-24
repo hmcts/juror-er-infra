@@ -26,5 +26,7 @@ provider "azurerm" {
 resource "azurerm_resource_group" "adf_juror_rg" {
   name     = var.resource_group_name
   location = var.location
-  tags     = module.tags.common_tags
+  tags = merge(module.tags.common_tags, {
+    exemptFromAutoLock = "true"
+  })
 }

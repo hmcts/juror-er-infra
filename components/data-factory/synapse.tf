@@ -143,8 +143,8 @@ data "azurerm_storage_account" "bais_bau" {
 }
 
 data "azurerm_storage_account" "juror_bau" {
-  name                = "jurorsa${local.integration_env}"
-  resource_group_name = "juror-${local.integration_env}-rg"
+  name                = "jurorsa${var.env}"
+  resource_group_name = "juror-${var.env}-rg"
 }
 
 resource "azurerm_synapse_role_assignment" "dlrm" {

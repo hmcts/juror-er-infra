@@ -101,7 +101,9 @@ resource "azurerm_synapse_spark_pool" "this" {
 locals {
   deploy_pe        = false
   dlrm_admin_group = "DTS DLRM Synapse workspace contributors"
+  integration_env = var.env == "stg" ? "demo" : var.env
 }
+
 module "synapse_pe" {
   for_each = local.deploy_pe ? toset(["sql", "sqlOnDemand", "dev"]) : []
   source   = "../../modules/azure-private-endpoint"
@@ -140,6 +142,10 @@ data "azurerm_storage_account" "bais_bau" {
   resource_group_name = "bau-bais_${var.env}_resource_group"
 }
 
+data "azurerm_storage_account" "juror_bau" {
+  name                = "jurorsa${locals.integration_env}"
+  resource_group_name = "juror-${locals.integration_env}-rg"
+}
 
 resource "azurerm_synapse_role_assignment" "dlrm" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
@@ -234,6 +240,12 @@ resource "azurerm_key_vault_access_policy" "keyvault_synapse_access_policy" {
         "Get",
         "List"
       ]
+}
+
+resource "azurerm_role_assignment" "juror_bau_reader" {
+  scope                = data.azurerm_storage_account.juror_bau.id
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "bais_bau_reader" {

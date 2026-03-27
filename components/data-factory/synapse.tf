@@ -147,6 +147,19 @@ data "azurerm_storage_account" "juror_bau" {
   resource_group_name = "juror-${var.env}-rg"
 }
 
+
+data "azurerm_storage_account" "juror_bau_demo" {
+  provider = azurerm.dts-ss-demo
+  name                = "jurorsademo"
+  resource_group_name = "juror-demo-rg"
+}
+
+resource "azurerm_role_assignment" "juror_demo_reader" {
+  principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+  role_definition_name = "Storage Blob Data Reader"
+  scope                = azurerm_storage_account.juror_bau_demo.id
+}
+
 resource "azurerm_synapse_role_assignment" "dlrm" {
   synapse_workspace_id = azurerm_synapse_workspace.this.id
   role_name            = "Synapse Contributor"
@@ -262,4 +275,11 @@ resource "azurerm_role_assignment" "bais_bau_synapse_contributor" {
   scope                = azurerm_resource_group.adf_juror_rg.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
+}
+
+resource "azurerm_synapse_managed_private_endpoint" "juror_synapse__storage_private_endpoint" {
+  name                 = "juror_synapse_storage_private_endpoint"
+  subresource_name     = "blob"
+  synapse_workspace_id = azurerm_synapse_workspace.this.synapse_workspace_id
+  target_resource_id   = data.azurerm_storage_account.juror_bau.id
 }

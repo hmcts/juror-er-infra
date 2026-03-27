@@ -277,9 +277,9 @@ resource "azurerm_role_assignment" "bais_bau_synapse_contributor" {
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
 }
 
-resource "azurerm_synapse_managed_private_endpoint" "juror_synapse__storage_private_endpoint" {
-  name                 = "juror_synapse_storage_private_endpoint"
-  subresource_name     = "blob"
-  synapse_workspace_id = azurerm_synapse_workspace.this.synapse_workspace_id
-  target_resource_id   = data.azurerm_storage_account.juror_bau.id
-}
+# resource "azurerm_synapse_managed_private_endpoint" "juror_synapse__storage_private_endpoint" {
+#   name                 = "juror_synapse_storage_private_endpoint"
+#   subresource_name     = "blob"
+#   synapse_workspace_id = azurerm_synapse_workspace.this.synapse_workspace_id
+#   target_resource_id   = data.azurerm_storage_account.juror_bau.id
+# }

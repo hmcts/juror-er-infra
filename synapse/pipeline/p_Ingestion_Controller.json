@@ -27,7 +27,7 @@
 					"source": {
 						"type": "BinarySource",
 						"storeSettings": {
-							"type": "AzureFileStorageReadSettings",
+							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"modifiedDatetimeStart": {
 								"value": "@variables('lastModified')",
@@ -37,8 +37,7 @@
 								"value": "@pipeline().parameters.folder",
 								"type": "Expression"
 							},
-							"wildcardFileName": "*",
-							"deleteFilesAfterCompletion": false
+							"wildcardFileName": "*"
 						},
 						"formatSettings": {
 							"type": "BinaryReadSettings"
@@ -54,7 +53,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_bais_binary",
+						"referenceName": "DS_juror_binary",
 						"type": "DatasetReference"
 					}
 				],
@@ -627,7 +626,10 @@
 						"additionalColumns": [
 							{
 								"name": "lastExecution",
-								"value": "@utcNow()"
+								"value": {
+									"value": "@utcNow()",
+									"type": "Expression"
+								}
 							}
 						],
 						"storeSettings": {

@@ -4,8 +4,8 @@
 		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
 		"activities": [
 			{
-				"name": "Copy from bais",
-				"description": "Copy data from BAIS storage",
+				"name": "Copy from storage",
+				"description": "Copy data from storage",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -75,7 +75,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Copy from bais",
+						"activity": "Copy from storage",
 						"dependencyConditions": [
 							"Succeeded"
 						]

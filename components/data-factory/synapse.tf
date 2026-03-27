@@ -157,7 +157,7 @@ data "azurerm_storage_account" "juror_bau_demo" {
 resource "azurerm_role_assignment" "juror_demo_reader" {
   principal_id         = azurerm_synapse_workspace.this.identity[0].principal_id
   role_definition_name = "Storage Blob Data Reader"
-  scope                = azurerm_storage_account.juror_bau_demo.id
+  scope                = data.azurerm_storage_account.juror_bau_demo.id
 }
 
 resource "azurerm_synapse_role_assignment" "dlrm" {

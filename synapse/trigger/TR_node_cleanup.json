@@ -1,0 +1,17 @@
+{
+	"name": "TR_node_cleanup",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 15,
+				"startTime": "2026-03-30T16:10:00",
+				"timeZone": "GMT Standard Time"
+			}
+		}
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"name": "TestStorage",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://baubaisadfsastg.blob.core.windows.net/",
+			"accountKind": "BlockBlobStorage"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

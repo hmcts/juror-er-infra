@@ -4,8 +4,8 @@
 		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
 		"activities": [
 			{
-				"name": "Copy from bais",
-				"description": "Copy data from BAIS storage",
+				"name": "Copy from storage",
+				"description": "Copy data from storage",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -27,7 +27,7 @@
 					"source": {
 						"type": "BinarySource",
 						"storeSettings": {
-							"type": "AzureFileStorageReadSettings",
+							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"modifiedDatetimeStart": {
 								"value": "@variables('lastModified')",
@@ -37,8 +37,7 @@
 								"value": "@pipeline().parameters.folder",
 								"type": "Expression"
 							},
-							"wildcardFileName": "*",
-							"deleteFilesAfterCompletion": false
+							"wildcardFileName": "*"
 						},
 						"formatSettings": {
 							"type": "BinaryReadSettings"
@@ -54,7 +53,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_bais_binary",
+						"referenceName": "DS_juror_binary",
 						"type": "DatasetReference"
 					}
 				],
@@ -76,7 +75,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Copy from bais",
+						"activity": "Copy from storage",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -627,7 +626,10 @@
 						"additionalColumns": [
 							{
 								"name": "lastExecution",
-								"value": "@utcNow()"
+								"value": {
+									"value": "@utcNow()",
+									"type": "Expression"
+								}
 							}
 						],
 						"storeSettings": {
@@ -682,11 +684,11 @@
 			},
 			"year_filter": {
 				"type": "string",
-				"defaultValue": "2025"
+				"defaultValue": "2026"
 			},
 			"processing_container": {
 				"type": "string",
-				"defaultValue": "qz-test"
+				"defaultValue": "juror-etl"
 			},
 			"debug_mode": {
 				"type": "string",

@@ -32,6 +32,10 @@ jobs:
   condition: succeeded()
   variables:
     packageWheelName: 'none'
+    ${{ if eq(parameters.env, 'stg') }}:
+      postgresServer: 'juror-api-demo.postgres.database.azure.com'
+    ${{ else }}:
+      postgresServer: 'juror-api-${{ parameters.env }}.postgres.database.azure.com'
     ${{ if or(ne(parameters.validateOnly, true),and(eq(variables['isMain'], true), eq(variables['isAutoTriggered'], true)))}}:
       operation: 'validateDeploy'
     ${{ else }}:
@@ -78,6 +82,7 @@ jobs:
             npmpackage: 'prod'
             OverrideArmParameters:  >
               -workspaceName ${{ parameters.synapseName }} 
+              -AzurePostgreSqlEricSchema_properties_typeProperties_server "${{ variables.postgresServer }}"
               -LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ parameters.env }}.file.core.windows.net/"
               -LS_juror_eric_kv_properties_typeProperties_baseUrl "https://baubais-${{ parameters.env }}-kv.vault.azure.net/"
               -TR_new_file_properties_typeProperties_scope "/subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/baubais-data-factory-rg-${{ parameters.env }}/providers/Microsoft.Storage/storageAccounts/baubaisadfsa${{ parameters.env }}"

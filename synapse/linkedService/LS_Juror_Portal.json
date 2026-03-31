@@ -1,0 +1,15 @@
+{
+	"name": "LS_Juror_Portal",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://jurorsastg.blob.core.windows.net/",
+			"accountKind": "StorageV2"
+		},
+		"connectVia": {
+			"referenceName": "IR-Juror",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

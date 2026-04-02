@@ -1,81 +1,20 @@
 {
-	"name": "p_Ingestion_Controller",
+	"name": "p_Ingestion_Controller_la",
 	"properties": {
 		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
 		"activities": [
-			{
-				"name": "Copy from storage",
-				"description": "Copy data from storage",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "If file exist",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0:30:00",
-					"retry": 1,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "BinarySource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"modifiedDatetimeStart": {
-								"value": "@variables('lastModified')",
-								"type": "Expression"
-							},
-							"wildcardFolderPath": {
-								"value": "@pipeline().parameters.folder",
-								"type": "Expression"
-							},
-							"wildcardFileName": "*"
-						},
-						"formatSettings": {
-							"type": "BinaryReadSettings"
-						}
-					},
-					"sink": {
-						"type": "BinarySink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_juror_binary",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DS_juror_eric_landing",
-						"type": "DatasetReference",
-						"parameters": {
-							"container": {
-								"value": "@pipeline().parameters.source_container",
-								"type": "Expression"
-							}
-						}
-					}
-				]
-			},
 			{
 				"name": "Execute ETL",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Copy from storage",
+						"activity": "Set Year Filter",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "If file exist",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -93,11 +32,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"source_container": {
-							"value": "@pipeline().parameters.source_container",
+							"value": "juror-la-landing",
 							"type": "Expression"
 						},
 						"year_filter": {
-							"value": "@pipeline().parameters.year_filter",
+							"value": "@variables('yearFilter')",
 							"type": "Expression"
 						},
 						"processing_container": {
@@ -472,136 +411,6 @@
 				]
 			},
 			{
-				"name": "Get metadata files",
-				"type": "GetMetadata",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "DS_metadata_json",
-						"type": "DatasetReference",
-						"parameters": {
-							"fileName": "landing.json",
-							"container": "metadata"
-						}
-					},
-					"fieldList": [
-						"exists"
-					],
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					},
-					"formatSettings": {
-						"type": "JsonReadSettings"
-					}
-				}
-			},
-			{
-				"name": "If file exist",
-				"type": "IfCondition",
-				"dependsOn": [
-					{
-						"activity": "Get metadata files",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@activity('Get metadata files').output.exists",
-						"type": "Expression"
-					},
-					"ifFalseActivities": [
-						{
-							"name": "Set default time",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "lastModified",
-								"value": "1900-01-01T00:00:00+01:00"
-							}
-						}
-					],
-					"ifTrueActivities": [
-						{
-							"name": "Set last modified",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Get Last Modified",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "lastModified",
-								"value": {
-									"value": "@activity('Get Last Modified').output.value[0].lastExecution",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Get Last Modified",
-							"type": "Lookup",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.00:10:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "JsonSource",
-									"storeSettings": {
-										"type": "AzureBlobFSReadSettings",
-										"recursive": true,
-										"enablePartitionDiscovery": false
-									},
-									"formatSettings": {
-										"type": "JsonReadSettings"
-									}
-								},
-								"dataset": {
-									"referenceName": "DS_metadata_json",
-									"type": "DatasetReference",
-									"parameters": {
-										"fileName": "landing.json",
-										"container": "metadata"
-									}
-								},
-								"firstRowOnly": false
-							}
-						}
-					]
-				}
-			},
-			{
 				"name": "update watermark",
 				"type": "Copy",
 				"dependsOn": [
@@ -668,8 +477,159 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Set Year Filter",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "yearFilter",
+					"value": {
+						"value": "@if(empty(pipeline().parameters.year_filter), if(\n   greater(int(formatDateTime(utcNow(), 'MM')), 9),\n   string(add(int(formatDateTime(utcNow(), 'yyyy')), 1)),\n   string(formatDateTime(utcNow(), 'yyyy'))\n), pipeline().parameters.year_filter)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get metadata files",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_metadata_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": "landing.json",
+							"container": "metadata"
+						}
+					},
+					"fieldList": [
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
+			},
+			{
+				"name": "If file exist",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get metadata files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@and(activity('Get metadata files').output.exists, empty(pipeline().parameters.last_modified))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set default time",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastModified",
+								"value": {
+									"value": "@if(empty(pipeline().parameters.last_modified),'1900-01-01T00:00:00+01:00', pipeline().parameters.last_modified)",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set last modified",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get Last Modified",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastModified",
+								"value": {
+									"value": "@activity('Get Last Modified').output.value[0].lastExecution",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Get Last Modified",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"dataset": {
+									"referenceName": "DS_metadata_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": "landing.json",
+										"container": "metadata"
+									}
+								},
+								"firstRowOnly": false
+							}
+						}
+					]
+				}
 			}
 		],
+		"concurrency": 1,
 		"parameters": {
 			"folder": {
 				"type": "string",
@@ -684,11 +644,11 @@
 			},
 			"year_filter": {
 				"type": "string",
-				"defaultValue": "2026"
+				"defaultValue": "2025"
 			},
 			"processing_container": {
 				"type": "string",
-				"defaultValue": "juror-etl"
+				"defaultValue": "qz-test"
 			},
 			"debug_mode": {
 				"type": "string",
@@ -705,6 +665,9 @@
 		},
 		"variables": {
 			"lastModified": {
+				"type": "String"
+			},
+			"yearFilter": {
 				"type": "String"
 			}
 		},

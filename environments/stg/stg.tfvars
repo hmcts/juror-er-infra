@@ -36,3 +36,4 @@ hub_vnet_name       = "hmcts-hub-nonprodi"
 bootstrap_object_id = "9811e238-e068-4802-a13c-f67a5945f03f" # DTS Bootstrap (sub:dts-sharedservices-stg)
 aks_managed_identity_object_id = "af50bed7-9f42-4dbb-8a02-68895999c155" #juror-stg-mi 
 
+github_repository_name = "juror-er-infra"

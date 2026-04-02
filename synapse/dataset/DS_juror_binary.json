@@ -1,0 +1,17 @@
+{
+	"name": "DS_juror_binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Juror_Portal",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "er-portal"
+			}
+		}
+	}
+}

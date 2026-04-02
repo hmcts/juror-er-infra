@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "90ef43b2-62b7-4dfb-9701-f592c0b814fb"
+				"spark.autotune.trackingId": "ed2af7b2-cd60-4600-9240-f30a99e86d7f"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"df = spark.sql(\"SELECT * FROM `Database1`.`voters_postgresql`\")\n",
 					"df.show(10)"
 				],
-				"execution_count": 1
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -70,7 +70,7 @@
 					"# 1 — Check how the table is defined in the metastore\n",
 					"spark.sql(\"DESCRIBE EXTENDED `Database1`.`voters_postgresql`\").show(100, truncate=False)"
 				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -93,7 +93,7 @@
 					"count = spark.sql(\"SELECT COUNT(*) FROM `Database1`.`voters_postgresql`\").collect()[0][0]\n",
 					"print(f\"✅ Row count: {count}\")"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +115,7 @@
 					"# Show sample\n",
 					"spark.sql(\"SELECT * FROM `Database1`.`voters_deduplicated_delta` LIMIT 5\").show(truncate=False)"
 				],
-				"execution_count": 4
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -126,7 +126,7 @@
 					"# Confirm it's registered\n",
 					"spark.sql(\"SHOW TABLES IN `Database1`\").show(truncate=False)"
 				],
-				"execution_count": 5
+				"execution_count": null
 			}
 		]
 	}

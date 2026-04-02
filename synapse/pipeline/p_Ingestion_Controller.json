@@ -673,7 +673,7 @@
 		"parameters": {
 			"folder": {
 				"type": "string",
-				"defaultValue": "BAIS/Sites/External-In-Legacy/Juror_ER"
+				"defaultValue": "*/LA_Data"
 			},
 			"last_modified": {
 				"type": "string"

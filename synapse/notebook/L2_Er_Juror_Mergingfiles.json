@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7a3a5112-23ac-47cb-b194-bf1f7ccb48f5"
+				"spark.autotune.trackingId": "a5d22920-0358-4ab0-b41c-536373311048"
 			}
 		},
 		"metadata": {
@@ -210,7 +210,7 @@
 				},
 				"source": [
 					"# Define parameters\n",
-					"processing_container = \"qz-test\"#\"juror-etl\"\n",
+					"processing_container = \"juror-etl\"#\"juror-etl\"\n",
 					"config_container = \"juror-etl\"\n",
 					""
 				],
@@ -223,7 +223,7 @@
 					"\n",
 					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
 					"storage_account = f\"baubaisadfsa{env}\"\n",
-					"L2_LOG_PATH = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/l2_process_logs/processed_files_log.txt\""
+					"L2_LOG_PATH = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L2_process_logs/processed_files_log.txt\""
 				],
 				"execution_count": null
 			},

@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cf6c03dc-9821-416f-b8f1-dea0451a7472"
+				"spark.autotune.trackingId": "059fed97-52c1-4d79-8628-466e7560193e"
 			}
 		},
 		"metadata": {
@@ -155,7 +155,7 @@
 					]
 				},
 				"source": [
-					"processing_container = \"qz-test\"#\"juror-etl\"\n",
+					"processing_container = \"juror-etl\"#\"juror-etl\"\n",
 					"config_container = \"juror-etl\"\n",
 					"FORCE_CLEAN_RUN = True"
 				],
@@ -184,10 +184,15 @@
 				"cell_type": "code",
 				"source": [
 					"def create_spark_session():\n",
-					"    \"\"\"Create and return a Spark session with Excel support\"\"\"\n",
+					"    \"\"\"Create and return a Spark session\n",
+					"    \n",
+					"    Note: spark-excel JAR (0.13.7) is installed at Synapse pool level.\n",
+					"    Excel files are read via pandas in read_excel_file() so no\n",
+					"    spark.jars.packages config is needed.\n",
+					"    Memory settings kept for large dataset processing.\n",
+					"    \"\"\"\n",
 					"    return SparkSession.builder \\\n",
 					"        .appName(\"Electoral Data ETL\") \\\n",
-					"        .config(\"spark.jars.packages\", \"com.crealytics:spark-excel_2.12:0.13.7\") \\\n",
 					"        .config(\"spark.executor.memory\", \"4g\") \\\n",
 					"        .config(\"spark.driver.memory\", \"4g\") \\\n",
 					"        .getOrCreate()"

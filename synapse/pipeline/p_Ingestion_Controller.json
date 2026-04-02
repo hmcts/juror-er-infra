@@ -627,7 +627,10 @@
 						"additionalColumns": [
 							{
 								"name": "lastExecution",
-								"value": "@utcNow()"
+								"value": {
+									"value": "@utcNow()",
+									"type": "Expression"
+								}
 							}
 						],
 						"storeSettings": {
@@ -671,7 +674,7 @@
 		"parameters": {
 			"folder": {
 				"type": "string",
-				"defaultValue": "BAIS/Sites/External-In-Legacy/Juror_ER"
+				"defaultValue": "*/LA_Data"
 			},
 			"last_modified": {
 				"type": "string"
@@ -686,7 +689,7 @@
 			},
 			"processing_container": {
 				"type": "string",
-				"defaultValue": "qz-test"
+				"defaultValue": "juror-etl"
 			},
 			"debug_mode": {
 				"type": "string",

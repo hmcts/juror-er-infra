@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d0443f33-a2d9-436a-a784-5a081dc46225"
+				"spark.autotune.trackingId": "482c1b93-424c-47f1-909b-ae22702b418a"
 			}
 		},
 		"metadata": {
@@ -159,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 64
 			},
 			{
 				"cell_type": "markdown",
@@ -188,12 +188,12 @@
 					"debug_mode = True  # Process only new files\n",
 					"# year_filter = \"2025\"  # Only process 2025 files\n",
 					"# source_container = \"juror-ingestion\"\n",
-					"year_filter = \"2025\"  # Only process 2025 files\n",
-					"source_container = \"juror-ingestion\"\n",
+					"year_filter = \"2026\"  # Only process 2025 files\n",
+					"source_container = \"juror-raw\" #juror-raw\n",
 					"processing_container = \"juror-etl\"\n",
 					"ingestion_container = \"juror-ingestion\" #\"juror-ingestion\""
 				],
-				"execution_count": null
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -203,16 +203,22 @@
 					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
 					"\n",
 					"# Initialize Spark session with the required packages\n",
+					"# Initialize Spark session\n",
+					"# Note: spark-excel JAR (0.13.7) is installed at Synapse pool level\n",
+					"# Excel files are read via pandas in both is_empty_file() and process_file()\n",
+					"# so no spark.jars.packages config is needed here\n",
 					"spark = SparkSession.builder \\\n",
 					"    .appName(\"JurorIngestion\") \\\n",
-					"    .config(\"spark.jars.packages\", \"com.crealytics:spark-excel_2.12:0.13.5,org.apache.xmlbeans:xmlbeans:3.1.0,org.apache.poi:poi-ooxml-schemas:4.1.2,org.apache.poi:poi-ooxml:4.1.2,org.apache.poi:poi:4.1.2\") \\\n",
 					"    .getOrCreate()\n",
+					"\n",
+					"# Global counter to track file sequences by folder structure\n",
+					"file_counters = defaultdict(int)\n",
 					"\n",
 					"# Global counter to track file sequences by folder structure\n",
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -230,19 +236,23 @@
 					"        'guide'\n",
 					"    ]\n",
 					"    \n",
-					"    # Case-insensitive check for indicators in filename\n",
 					"    file_name_lower = os.path.basename(file_path).lower()\n",
+					"    \n",
+					"    # Any .txt file in LA_Data structure is metadata\n",
+					"    # e.g. 45UB.xlsx_metadata.txt, Court_001.csv.metadata.txt, ReadMe.txt\n",
+					"    if file_name_lower.endswith('.txt'):\n",
+					"        return True\n",
+					"    \n",
 					"    if any(indicator in file_name_lower for indicator in metadata_indicators):\n",
 					"        return True\n",
 					"        \n",
-					"    # Check for files in metadata-like folders\n",
 					"    path_lower = file_path.lower()\n",
 					"    if 'metadata' in path_lower or 'docs' in path_lower or 'documentation' in path_lower:\n",
 					"        return True\n",
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -264,12 +274,12 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 68
 			},
 			{
 				"cell_type": "code",
 				"source": [
-					"def is_file_in_year(file_path, year_filter=\"2025\", prefix=\"\"):\n",
+					"def is_file_in_year(file_path, year_filter=\"2026\", prefix=\"\"):\n",
 					"    \"\"\"\n",
 					"    Check if file is in FIRST LEVEL date folder starting with specified year\n",
 					"    \n",
@@ -325,7 +335,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
@@ -333,150 +343,149 @@
 					"def is_empty_file(file_path):\n",
 					"    \"\"\"\n",
 					"    Check if a file is empty and return specific error reason\n",
-					"    \n",
+					"\n",
 					"    IMPROVED: Now properly detects files with only null/blank rows\n",
-					"    \n",
+					"\n",
 					"    Empty files include:\n",
 					"    1. Files with 0 bytes\n",
 					"    2. Files with only header row (no data)\n",
 					"    3. Files with header + rows containing only nulls/blanks\n",
-					"    \n",
+					"\n",
 					"    Returns:\n",
 					"        tuple: (is_empty: bool, error_reason: str or None)\n",
 					"    \"\"\"\n",
 					"    try:\n",
 					"        file_ext = os.path.splitext(file_path)[1].lower()\n",
-					"        \n",
+					"\n",
 					"        if file_ext == '.csv':\n",
 					"            # ================================================================\n",
-					"            # IMPROVED CSV VALIDATION\n",
+					"            # CSV VALIDATION — via Spark (unchanged)\n",
 					"            # ================================================================\n",
 					"            try:\n",
 					"                # Read CSV with header\n",
 					"                df = spark.read.option(\"header\", \"true\").csv(file_path)\n",
-					"                \n",
+					"\n",
 					"                # Get initial row count\n",
 					"                initial_count = df.count()\n",
-					"                \n",
+					"\n",
 					"                if initial_count == 0:\n",
 					"                    # No rows at all (not even blank rows)\n",
 					"                    return True, \"file_empty_header_only\"\n",
-					"                \n",
+					"\n",
 					"                # ============================================================\n",
 					"                # CRITICAL: Filter out rows where ALL columns are null/empty\n",
 					"                # ============================================================\n",
-					"                # Get all column names\n",
 					"                columns = df.columns\n",
-					"                \n",
+					"\n",
 					"                # Create filter condition: at least one column must be non-null and non-empty\n",
 					"                from pyspark.sql.functions import col, trim\n",
-					"                \n",
-					"                # Build condition: (col1 is not null AND trim(col1) != '') OR (col2 is not null AND trim(col2) != '') ...\n",
+					"\n",
 					"                non_empty_conditions = []\n",
 					"                for column in columns:\n",
-					"                    # Column is not null AND when trimmed is not empty\n",
 					"                    condition = (col(column).isNotNull()) & (trim(col(column)) != \"\")\n",
 					"                    non_empty_conditions.append(condition)\n",
-					"                \n",
+					"\n",
 					"                # Combine conditions with OR - at least one column must have real data\n",
 					"                if non_empty_conditions:\n",
 					"                    from pyspark.sql.functions import lit\n",
 					"                    combined_condition = non_empty_conditions[0]\n",
 					"                    for condition in non_empty_conditions[1:]:\n",
 					"                        combined_condition = combined_condition | condition\n",
-					"                    \n",
+					"\n",
 					"                    # Filter to rows with at least one non-empty column\n",
 					"                    df_filtered = df.filter(combined_condition)\n",
 					"                    filtered_count = df_filtered.count()\n",
 					"                else:\n",
 					"                    # No columns? File is empty\n",
 					"                    return True, \"file_empty_header_only\"\n",
-					"                \n",
+					"\n",
 					"                if filtered_count == 0:\n",
 					"                    # Has rows but all are null/blank\n",
 					"                    print(f\"   ℹ️  File has {initial_count} rows but all are null/blank\")\n",
 					"                    return True, \"file_empty_header_only\"\n",
-					"                \n",
+					"\n",
 					"                # File has real data\n",
 					"                return False, None\n",
-					"                \n",
+					"\n",
 					"            except Exception as e:\n",
 					"                print(f\"   ⚠️  Error reading CSV: {str(e)}\")\n",
-					"                # Check if it's a corruption vs infrastructure error\n",
 					"                error_msg = str(e).lower()\n",
-					"                \n",
+					"\n",
 					"                # Corruption indicators\n",
 					"                corruption_keywords = ['corrupt', 'parse', 'invalid', 'malformed', 'damaged']\n",
 					"                if any(keyword in error_msg for keyword in corruption_keywords):\n",
 					"                    return True, \"file_unreadable\"\n",
-					"                \n",
+					"\n",
 					"                # Infrastructure/permission errors - don't quarantine\n",
 					"                infra_keywords = ['permission', 'timeout', 'network', 'memory']\n",
 					"                if any(keyword in error_msg for keyword in infra_keywords):\n",
 					"                    return False, None\n",
-					"                \n",
+					"\n",
 					"                # Unknown error - treat as unreadable\n",
 					"                return True, \"file_unreadable\"\n",
-					"                \n",
+					"\n",
 					"        elif file_ext in ['.xlsx', '.xls']:\n",
 					"            # ================================================================\n",
-					"            # IMPROVED EXCEL VALIDATION\n",
+					"            # EXCEL VALIDATION — pandas (replaces com.crealytics.spark.excel\n",
+					"            # which is not installed on this cluster)\n",
+					"            # Same approach as process_file() which already uses pandas\n",
 					"            # ================================================================\n",
 					"            try:\n",
-					"                # Read Excel with header\n",
-					"                df = spark.read.format(\"com.crealytics.spark.excel\") \\\n",
-					"                    .option(\"header\", \"true\") \\\n",
-					"                    .load(file_path)\n",
-					"                \n",
-					"                # Get initial row count\n",
-					"                initial_count = df.count()\n",
-					"                \n",
-					"                if initial_count == 0:\n",
+					"                import pandas as pd\n",
+					"\n",
+					"                # Download file to local temp — same pattern as process_file()\n",
+					"                temp_dir  = tempfile.mkdtemp()\n",
+					"                temp_file = os.path.join(temp_dir, f\"check{file_ext}\")\n",
+					"                mssparkutils.fs.cp(file_path, f\"file://{temp_file}\")\n",
+					"\n",
+					"                excel_df = pd.read_excel(temp_file)\n",
+					"\n",
+					"                # Clean up temp file\n",
+					"                try:\n",
+					"                    os.remove(temp_file)\n",
+					"                    os.rmdir(temp_dir)\n",
+					"                except:\n",
+					"                    pass\n",
+					"\n",
+					"                # No rows at all\n",
+					"                if len(excel_df) == 0:\n",
 					"                    return True, \"file_empty_header_only\"\n",
-					"                \n",
-					"                # ============================================================\n",
-					"                # Filter out rows where ALL columns are null/empty\n",
-					"                # ============================================================\n",
-					"                columns = df.columns\n",
-					"                \n",
-					"                from pyspark.sql.functions import col, trim\n",
-					"                \n",
-					"                non_empty_conditions = []\n",
-					"                for column in columns:\n",
-					"                    condition = (col(column).isNotNull()) & (trim(col(column).cast(\"string\")) != \"\")\n",
-					"                    non_empty_conditions.append(condition)\n",
-					"                \n",
-					"                if non_empty_conditions:\n",
-					"                    combined_condition = non_empty_conditions[0]\n",
-					"                    for condition in non_empty_conditions[1:]:\n",
-					"                        combined_condition = combined_condition | condition\n",
-					"                    \n",
-					"                    df_filtered = df.filter(combined_condition)\n",
-					"                    filtered_count = df_filtered.count()\n",
-					"                else:\n",
+					"\n",
+					"                # Drop rows where ALL columns are null\n",
+					"                df_filtered = excel_df.dropna(how='all')\n",
+					"\n",
+					"                # Drop rows where ALL columns are blank strings\n",
+					"                df_filtered = df_filtered[\n",
+					"                    df_filtered.apply(\n",
+					"                        lambda row: row.astype(str).str.strip().ne('').any(), axis=1\n",
+					"                    )\n",
+					"                ]\n",
+					"\n",
+					"                if len(df_filtered) == 0:\n",
+					"                    print(f\"   ℹ️  File has {len(excel_df)} rows but all are null/blank\")\n",
 					"                    return True, \"file_empty_header_only\"\n",
-					"                \n",
-					"                if filtered_count == 0:\n",
-					"                    print(f\"   ℹ️  File has {initial_count} rows but all are null/blank\")\n",
-					"                    return True, \"file_empty_header_only\"\n",
-					"                \n",
+					"\n",
+					"                print(f\"   ✅ Excel OK: {len(df_filtered)} valid rows, {len(excel_df.columns)} columns\")\n",
 					"                return False, None\n",
-					"                \n",
+					"\n",
 					"            except Exception as e:\n",
 					"                print(f\"   ⚠️  Error reading Excel: {str(e)}\")\n",
 					"                error_msg = str(e).lower()\n",
-					"                \n",
-					"                corruption_keywords = ['corrupt', 'parse', 'invalid', 'malformed', 'damaged']\n",
+					"\n",
+					"                # Corruption indicators — file is genuinely broken\n",
+					"                corruption_keywords = ['corrupt', 'parse', 'invalid', 'malformed', 'damaged', 'xlrd', 'openpyxl', 'zipfile']\n",
 					"                if any(keyword in error_msg for keyword in corruption_keywords):\n",
 					"                    return True, \"file_unreadable\"\n",
-					"                \n",
+					"\n",
+					"                # Infrastructure/permission errors — don't quarantine\n",
 					"                infra_keywords = ['permission', 'timeout', 'network', 'memory']\n",
 					"                if any(keyword in error_msg for keyword in infra_keywords):\n",
 					"                    return False, None\n",
-					"                \n",
-					"                return True, \"file_unreadable\"\n",
-					"                \n",
-					"        # Default approach for other file types\n",
+					"\n",
+					"                # Unknown error — don't quarantine, let process_file() decide\n",
+					"                return False, None\n",
+					"\n",
+					"        # Default approach for other file types (unchanged)\n",
 					"        try:\n",
 					"            test_df = spark.read.text(file_path).limit(5)\n",
 					"            if test_df.count() == 0:\n",
@@ -485,12 +494,12 @@
 					"        except Exception as e:\n",
 					"            print(f\"   ⚠️  Error checking if file is empty: {str(e)}\")\n",
 					"            return True, \"file_unreadable\"\n",
-					"            \n",
+					"\n",
 					"    except Exception as e:\n",
 					"        print(f\"   ⚠️  Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": null
+				"execution_count": 70
 			},
 			{
 				"cell_type": "markdown",
@@ -714,7 +723,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": null
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -784,7 +793,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -947,7 +956,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -969,7 +978,7 @@
 					"    return (file_path_lower in quarantine_log_data['quarantine_files'] or \n",
 					"            norm_path in quarantine_log_data['quarantine_files'])"
 				],
-				"execution_count": null
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -1150,7 +1159,7 @@
 					"- 20251106/LA/364-North West/Jury.csv\n",
 					"\"\"\""
 				],
-				"execution_count": null
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -1185,7 +1194,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -1222,7 +1231,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -1263,7 +1272,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -1365,7 +1374,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -1411,7 +1420,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -1477,7 +1486,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": null
+				"execution_count": 81
 			},
 			{
 				"cell_type": "markdown",
@@ -1569,7 +1578,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -1644,7 +1653,27 @@
 					"        \n",
 					"        print(f\"\\nProcessing file: {file_path}\")\n",
 					"        print(f\"  Metadata: date={date_folder}, la={la_folder}, confidence={confidence}\")\n",
-					"        \n",
+					"         # ====================================================================\n",
+					"        # NEW: Early metadata exit — before any other checks\n",
+					"        # Catches .txt files like \"45UB.xlsx_metadata.txt\" which have\n",
+					"        # no processable extension so get_file_type() returns None\n",
+					"        # Without this they fall into process_file() and fail with\n",
+					"        # \"Cannot determine file type\"\n",
+					"        # ====================================================================\n",
+					"        if file_info[\"is_metadata\"]:\n",
+					"            print(f\"  📋 Metadata file — routing to metadata folder\")\n",
+					"            if not mssparkutils.fs.exists(file_path):\n",
+					"                print(f\"  ⚠️  Metadata file no longer exists: {file_path}\")\n",
+					"                return False\n",
+					"            success, dest = process_metadata_file(file_path, file_name, storage_account)\n",
+					"            if success:\n",
+					"                moved_files['metadata_success'].append(dest)\n",
+					"                print(f\"  ✅ Metadata file moved to: {dest}\")\n",
+					"            else:\n",
+					"                print(f\"  ❌ Failed to move metadata file\")\n",
+					"                moved_files['failed'].append(file_path)\n",
+					"            return success\n",
+					"\n",
 					"        # ====================================================================\n",
 					"        # Check 1: File Still Exists\n",
 					"        # ====================================================================\n",
@@ -2098,7 +2127,7 @@
 					"\n",
 					"\"\"\""
 				],
-				"execution_count": null
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -2183,7 +2212,7 @@
 					"    print(f\"Total quarantined: {len(quarantined)} files\")\n",
 					"    print(\"=\" * 70)"
 				],
-				"execution_count": null
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -2204,7 +2233,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": null
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -2227,7 +2256,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": null
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -2289,7 +2318,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": null
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -2359,7 +2388,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": null
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -2411,7 +2440,7 @@
 					"    \n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -2491,7 +2520,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 90
 			},
 			{
 				"cell_type": "markdown",
@@ -2543,91 +2572,140 @@
 					"    print(f\"   Files quarantined: {len(_moved_files['quarantine']) - len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
 					"    "
 				],
-				"execution_count": null
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"def process_raw_zip(path, storage_account, sink_path, moved_files, newly_quarantined_entries=None):\n",
 					"    \"\"\"\n",
-					"    Process raw ZIP files from the source path\n",
-					"    \n",
+					"    Process raw ZIP files and pre-extracted date folders from the source path\n",
+					"\n",
 					"    This function:\n",
-					"    - Scans the source path for ZIP files\n",
-					"    - Extracts valid ZIP files to the sink path\n",
+					"    - Creates extracted/ folder if it doesn't exist\n",
+					"    - Skips zero-byte Azure placeholder blobs\n",
+					"    - Copies pre-extracted date folders (e.g. 20260327/) → extracted/\n",
+					"    - Extracts valid ZIP files → extracted/\n",
 					"    - Quarantines problematic ZIPs (password-protected, corrupted)\n",
-					"    - Quarantines non-ZIP files found in raw folder\n",
+					"    - Quarantines unexpected non-ZIP files\n",
 					"    - Tracks quarantine entries for logging\n",
-					"    \n",
+					"\n",
 					"    Args:\n",
-					"        path: Source path containing ZIP files\n",
+					"        path: Source path containing ZIP files and/or date folders\n",
 					"        storage_account: Azure storage account name\n",
-					"        sink_path: Destination path for extracted files (e.g., \"extracted\")\n",
+					"        sink_path: Destination folder name (e.g., \"extracted\")\n",
 					"        moved_files: Dictionary tracking moved files with categories:\n",
-					"            - 'zip_extracted': Successfully extracted ZIPs\n",
+					"            - 'zip_extracted': Successfully extracted ZIPs or copied folders\n",
 					"            - 'quarantine': Quarantined files\n",
 					"            - 'failed': Files that failed to process\n",
 					"        newly_quarantined_entries: List to track new quarantine entries for log updates\n",
 					"            If None, a local list is created (entries won't be tracked)\n",
-					"    \n",
+					"\n",
 					"    Returns:\n",
 					"        None (modifies moved_files and newly_quarantined_entries in place)\n",
-					"    \n",
-					"    Example:\n",
-					"        moved_files = {'quarantine': [], 'zip_extracted': [], 'failed': []}\n",
-					"        newly_quarantined_entries = []\n",
-					"        process_raw_zip(\n",
-					"            \"abfss://juror-raw@storage.dfs.core.windows.net\",\n",
-					"            \"storage_account\",\n",
-					"            \"extracted\",\n",
-					"            moved_files,\n",
-					"            newly_quarantined_entries\n",
-					"        )\n",
 					"    \"\"\"\n",
-					"    files = mssparkutils.fs.ls(path)\n",
 					"    indent = \"\"\n",
-					"    print(f\"{indent}Found {len(files)} items in {path}\")\n",
-					"    \n",
+					"\n",
 					"    # Initialize quarantine tracking if not provided\n",
-					"    # This allows the function to work standalone or as part of larger pipeline\n",
 					"    if newly_quarantined_entries is None:\n",
 					"        newly_quarantined_entries = []\n",
 					"        print(f\"{indent}ℹ️  Quarantine tracking initialized locally (won't persist)\")\n",
-					"        \n",
+					"\n",
+					"    # ========================================================================\n",
+					"    # Ensure extracted/ folder exists before any copy or scan operations\n",
+					"    # Without this, fs.cp into extracted/ fails if no ZIP was processed first\n",
+					"    # ========================================================================\n",
+					"    extracted_root = f\"{path}/{sink_path}\"\n",
+					"    if not mssparkutils.fs.exists(extracted_root):\n",
+					"        print(f\"{indent}📁 Creating extracted/ folder: {extracted_root}\")\n",
+					"        mssparkutils.fs.mkdirs(extracted_root)\n",
+					"\n",
+					"    files = mssparkutils.fs.ls(path)\n",
+					"    print(f\"{indent}Found {len(files)} items in {path}\")\n",
+					"\n",
 					"    for file_info in files:\n",
-					"        file_name = os.path.basename(file_info.path)\n",
-					"        \n",
+					"        file_name = file_info.name.rstrip('/')\n",
+					"\n",
+					"        # ====================================================================\n",
+					"        # Skip zero-byte Azure placeholder blobs\n",
+					"        # Azure creates these as folder markers — they are not real files\n",
+					"        # e.g. a blob named \"20260327\" with size=0 alongside the real folder\n",
+					"        # ====================================================================\n",
+					"        if not file_info.isDir and file_info.size == 0:\n",
+					"            print(f\"{indent}⏭️  Skipping zero-byte placeholder blob: {file_name}\")\n",
+					"            continue\n",
+					"\n",
+					"        # ====================================================================\n",
+					"        # Handle FOLDERS — either date folders or the extracted/ folder itself\n",
+					"        # ====================================================================\n",
+					"        if file_info.isDir:\n",
+					"\n",
+					"            # Skip the extracted/ folder to avoid infinite loop\n",
+					"            if file_name == sink_path:\n",
+					"                print(f\"{indent}⏭️  Skipping extracted/ folder\")\n",
+					"                continue\n",
+					"\n",
+					"            # Only process 8-digit date folders (YYYYMMDD format)\n",
+					"            if re.match(r'^\\d{8}$', file_name):\n",
+					"                dest = f\"{path}/{sink_path}/{file_name}\"\n",
+					"                print(f\"{indent}📁 Found pre-extracted date folder: {file_name}\")\n",
+					"                print(f\"{indent}   Copying → extracted/{file_name} ...\")\n",
+					"\n",
+					"                try:\n",
+					"                    # Copy entire folder structure including all CSV/Excel/ZIP files\n",
+					"                    mssparkutils.fs.cp(file_info.path, dest, recurse=True)\n",
+					"\n",
+					"                    if mssparkutils.fs.exists(dest):\n",
+					"                        contents = mssparkutils.fs.ls(dest)\n",
+					"                        print(f\"{indent}✅ Copied {file_name} → extracted/ ({len(contents)} items)\")\n",
+					"                        if 'zip_extracted' not in moved_files:\n",
+					"                            moved_files['zip_extracted'] = []\n",
+					"                        moved_files['zip_extracted'].append(file_info.path)\n",
+					"                    else:\n",
+					"                        print(f\"{indent}❌ Copy failed — extracted/{file_name} not found after copy\")\n",
+					"                        moved_files['failed'].append(file_info.path)\n",
+					"\n",
+					"                except Exception as e:\n",
+					"                    print(f\"{indent}❌ Error copying {file_name}: {str(e).splitlines()[0]}\")\n",
+					"                    moved_files['failed'].append(file_info.path)\n",
+					"\n",
+					"            else:\n",
+					"                # Non-date folder (e.g. system folders) — skip silently\n",
+					"                print(f\"{indent}⏭️  Skipping non-date folder: {file_name}\")\n",
+					"\n",
+					"            continue  # All folder cases handled — skip ZIP/non-ZIP checks below\n",
+					"\n",
 					"        # ====================================================================\n",
 					"        # Process ZIP files\n",
 					"        # ====================================================================\n",
 					"        if file_info.path.lower().endswith('.zip'):\n",
 					"            print(f\"{indent}Found ZIP file: {file_name}\")\n",
-					"            \n",
+					"\n",
 					"            # Attempt to extract the ZIP file\n",
 					"            success, error_reason = unzip_file(\n",
 					"                file_info.path,\n",
 					"                sink_path,\n",
 					"                storage_account,\n",
-					"                depth=0,  # Starting depth (important for nested ZIP handling)\n",
-					"                max_depth=5,  # Maximum nesting level allowed\n",
+					"                depth=0,       # Starting depth (important for nested ZIP handling)\n",
+					"                max_depth=5,   # Maximum nesting level allowed\n",
 					"                moved_files=moved_files\n",
 					"            )\n",
-					"            \n",
+					"\n",
 					"            if success:\n",
 					"                # ZIP extracted successfully\n",
 					"                print(f\"{indent}✅ Successfully extracted ZIP file\")\n",
-					"                \n",
+					"\n",
 					"                # Track as successfully extracted\n",
 					"                if 'zip_extracted' not in moved_files:\n",
 					"                    moved_files['zip_extracted'] = []\n",
 					"                moved_files['zip_extracted'].append(file_info.path)\n",
-					"                \n",
+					"\n",
 					"            else:\n",
 					"                # ZIP extraction failed - quarantine it\n",
 					"                print(f\"{indent}❌ Failed to extract ZIP\")\n",
 					"                print(f\"{indent}   Reason: {error_reason}\")\n",
 					"                print(f\"{indent}   Moving to quarantine...\")\n",
-					"                \n",
+					"\n",
 					"                # Move to quarantine with specific error reason\n",
 					"                # Returns: (success, quarantine_path, quarantine_entry)\n",
 					"                success_q, quarantine_path, qentry = move_to_quarantine(\n",
@@ -2636,13 +2714,12 @@
 					"                    moved_files,\n",
 					"                    error_reason  # e.g., \"password_protected\", \"zip_corrupted\"\n",
 					"                )\n",
-					"                \n",
+					"\n",
 					"                if success_q:\n",
 					"                    print(f\"{indent}✅ Successfully moved ZIP to quarantine\")\n",
 					"                    print(f\"{indent}   Location: {os.path.basename(quarantine_path)}\")\n",
-					"                    \n",
+					"\n",
 					"                    # Track quarantine entry for log update\n",
-					"                    # qentry will be None if file type not eligible (but ZIPs are always eligible)\n",
 					"                    if qentry:\n",
 					"                        newly_quarantined_entries.append(qentry)\n",
 					"                        print(f\"{indent}📝 Added to quarantine log queue\")\n",
@@ -2652,13 +2729,13 @@
 					"                    if 'failed' not in moved_files:\n",
 					"                        moved_files['failed'] = []\n",
 					"                    moved_files['failed'].append(f\"{file_info.path} (quarantine failed)\")\n",
-					"        \n",
+					"\n",
 					"        # ====================================================================\n",
 					"        # Process non-ZIP files (unexpected in raw folder)\n",
 					"        # ====================================================================\n",
 					"        else:\n",
 					"            print(f\"{indent}⚠️  Found non-ZIP file in raw folder: {file_name}\")\n",
-					"            \n",
+					"\n",
 					"            # Determine appropriate error reason based on file characteristics\n",
 					"            if file_name.startswith('._'):\n",
 					"                # macOS metadata files (._filename)\n",
@@ -2672,9 +2749,9 @@
 					"                # Any other non-ZIP file\n",
 					"                error_reason = \"unexpected_file_type\"\n",
 					"                print(f\"{indent}   Type: Unexpected file type in raw folder\")\n",
-					"            \n",
+					"\n",
 					"            print(f\"{indent}   Moving to quarantine...\")\n",
-					"            \n",
+					"\n",
 					"            # Move to quarantine\n",
 					"            # Returns: (success, quarantine_path, quarantine_entry)\n",
 					"            success_q, quarantine_path, qentry = move_to_quarantine(\n",
@@ -2683,13 +2760,12 @@
 					"                moved_files,\n",
 					"                error_reason\n",
 					"            )\n",
-					"            \n",
+					"\n",
 					"            if success_q:\n",
 					"                print(f\"{indent}✅ Successfully moved non-ZIP file to quarantine\")\n",
 					"                print(f\"{indent}   Location: {os.path.basename(quarantine_path) if quarantine_path else 'N/A'}\")\n",
-					"                \n",
+					"\n",
 					"                # Track quarantine entry for log update\n",
-					"                # qentry will be None if file type not eligible for quarantine log\n",
 					"                if qentry:\n",
 					"                    newly_quarantined_entries.append(qentry)\n",
 					"                    print(f\"{indent}📝 Added to quarantine log queue\")\n",
@@ -2701,18 +2777,18 @@
 					"                if 'failed' not in moved_files:\n",
 					"                    moved_files['failed'] = []\n",
 					"                moved_files['failed'].append(f\"{file_info.path} (quarantine failed)\")\n",
-					"    \n",
-					"    # ====================================================================\n",
+					"\n",
+					"    # ========================================================================\n",
 					"    # Summary\n",
-					"    # ====================================================================\n",
+					"    # ========================================================================\n",
 					"    print(f\"\\n{indent}📊 Process Raw ZIP Summary:\")\n",
 					"    print(f\"{indent}   Total items scanned: {len(files)}\")\n",
-					"    print(f\"{indent}   ZIPs extracted: {len(moved_files.get('zip_extracted', []))}\")\n",
+					"    print(f\"{indent}   ZIPs/folders processed: {len(moved_files.get('zip_extracted', []))}\")\n",
 					"    print(f\"{indent}   Files quarantined: {len([f for f in moved_files.get('quarantine', []) if any(os.path.basename(f) in os.path.basename(fi.path) for fi in files)])}\")\n",
 					"    print(f\"{indent}   Quarantine entries tracked: {len(newly_quarantined_entries)}\")\n",
 					"    print(f\"{indent}   Failed operations: {len([f for f in moved_files.get('failed', []) if any(os.path.basename(f) in os.path.basename(fi.path) for fi in files)])}\")"
 				],
-				"execution_count": null
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
@@ -2773,9 +2849,13 @@
 					"        print(f\"ERROR: Source path does not exist: {source_path}\")\n",
 					"        return\n",
 					"    source_path = f\"{source_path}/{sink_path}\"\n",
+					"    # Safety check — create extracted/ if missing\n",
+					"    if not mssparkutils.fs.exists(source_path):\n",
+					"        print(f\"📁 extracted/ not found — creating: {source_path}\")\n",
+					"        mssparkutils.fs.mkdirs(source_path)\n",
+					"\n",
 					"    print_step1()\n",
 					"    all_files = process_folder(source_path, storage_account, moved_files)\n",
-					"    \n",
 					"    print_step1_results(all_files, moved_files)\n",
 					"    \n",
 					"    # ========================================================================\n",
@@ -3042,7 +3122,7 @@
 					"    # Show quarantine details\n",
 					"    print_quarantine_summary(moved_files)"
 				],
-				"execution_count": null
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -3050,7 +3130,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 94
 			}
 		]
 	}

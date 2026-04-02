@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c7d6f959-7f86-4c41-b7c5-d2a137ea1f19"
+				"spark.autotune.trackingId": "b8f6a221-caa2-4ff5-953c-8bfde9121f62"
 			}
 		},
 		"metadata": {
@@ -154,7 +154,7 @@
 					"from pyspark.sql.window import Window\n",
 					"from pyspark.sql.functions import row_number, col, desc"
 				],
-				"execution_count": 15
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -175,7 +175,7 @@
 					"    print(f\"❌ Container missing: {eric_voters_tmp_container}\")\n",
 					"    print(f\"   Create it in Azure Portal first, then re-run\")"
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -184,7 +184,7 @@
 					"storage_account = f\"baubaisadfsa{env}\"\n",
 					"power_bi_container = \"dl-juror-eric-power-bi\""
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -200,7 +200,7 @@
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 21
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -293,7 +293,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None"
 				],
-				"execution_count": 22
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -627,7 +627,7 @@
 					"        logger.error(traceback.format_exc())\n",
 					"        return False, None"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -714,7 +714,7 @@
 					"        print(f\"\\n❌ CRITICAL ERROR: {str(e)}\")\n",
 					"        print(\"Check the logs for detailed stack trace\")"
 				],
-				"execution_count": 24
+				"execution_count": null
 			}
 		]
 	}

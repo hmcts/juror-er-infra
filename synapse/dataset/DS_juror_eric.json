@@ -145,11 +145,17 @@
 				"type": "character varying",
 				"precision": 0,
 				"scale": 0
+			},
+			{
+				"name": "hash_id",
+				"type": "bigint",
+				"precision": 0,
+				"scale": 0
 			}
 		],
 		"typeProperties": {
 			"schema": "juror_eric",
-			"table": "staging_voters"
+			"table": "voters_temp"
 		}
 	}
 }

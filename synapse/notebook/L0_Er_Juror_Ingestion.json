@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1af12b4c-6bc2-46f4-9dc2-e2a50b684e2a"
+				"spark.autotune.trackingId": "49f20d69-e776-4f60-ad4e-69ace4d15156"
 			}
 		},
 		"metadata": {
@@ -2414,7 +2414,7 @@
 					"            \n",
 					"            try:\n",
 					"                # Process the file to Parquet using the process_file function\n",
-					"                success, new_path = process_file(file_path, date_folder, la_folder, file_name, storage_account)\n",
+					"                success, new_path = process_file(file_path, date_folder, la_folder, file_name, storage_account,file_index=idx)\n",
 					"                \n",
 					"                if success:\n",
 					"                    print(f\"  Successfully processed file to: {new_path}\")\n",

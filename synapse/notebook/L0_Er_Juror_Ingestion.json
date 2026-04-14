@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8ada8292-4c95-4afb-826b-0ceb77c62511"
+				"spark.autotune.trackingId": "c568dd4c-f76b-4a8d-abf9-0044abd3d3e1"
 			}
 		},
 		"metadata": {
@@ -1873,7 +1873,8 @@
 					"            date_folder, \n",
 					"            la_folder, \n",
 					"            file_name, \n",
-					"            storage_account\n",
+					"            storage_account,\n",
+					"            file_index=0\n",
 					"        )\n",
 					"        \n",
 					"        if success:\n",

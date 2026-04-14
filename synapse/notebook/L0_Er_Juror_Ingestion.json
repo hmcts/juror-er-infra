@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ec7b9b65-0e86-40fa-8ee9-aea49046189f"
+				"spark.autotune.trackingId": "80341081-bfe8-4ffb-8394-9bf61a613ec0"
 			}
 		},
 		"metadata": {
@@ -159,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 67
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -193,7 +193,7 @@
 					"processing_container = \"juror-etl\"\n",
 					"ingestion_container = \"juror-ingestion\" #\"juror-ingestion\""
 				],
-				"execution_count": 68
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -226,7 +226,7 @@
 					"print(f\"   openpyxl: {openpyxl.__version__}\")\n",
 					"print(f\"   pandas:   {pandas.__version__}\")"
 				],
-				"execution_count": 69
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -248,7 +248,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 70
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -282,7 +282,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 71
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 72
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -365,7 +365,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 73
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -533,7 +533,7 @@
 					"        print(f\"   ⚠️  Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": 74
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -757,7 +757,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": 75
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -827,7 +827,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 76
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -990,7 +990,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 77
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1012,7 +1012,7 @@
 					"    return (file_path_lower in quarantine_log_data['quarantine_files'] or \n",
 					"            norm_path in quarantine_log_data['quarantine_files'])"
 				],
-				"execution_count": 78
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1193,7 +1193,7 @@
 					"- 20251106/LA/364-North West/Jury.csv\n",
 					"\"\"\""
 				],
-				"execution_count": 79
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1228,7 +1228,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 80
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1265,7 +1265,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 81
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1306,7 +1306,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 82
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1432,7 +1432,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 83
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1478,7 +1478,7 @@
 					"    \n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 84
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1544,7 +1544,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
-				"execution_count": 85
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -1636,7 +1636,7 @@
 					"    \n",
 					"    return all_files"
 				],
-				"execution_count": 86
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2185,7 +2185,7 @@
 					"\n",
 					"\"\"\""
 				],
-				"execution_count": 87
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2270,7 +2270,7 @@
 					"    print(f\"Total quarantined: {len(quarantined)} files\")\n",
 					"    print(\"=\" * 70)"
 				],
-				"execution_count": 88
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2291,7 +2291,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": 89
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2314,7 +2314,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": 90
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2376,7 +2376,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": 91
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2446,7 +2446,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None  # Use False, not Fals"
 				],
-				"execution_count": 92
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2498,7 +2498,7 @@
 					"    \n",
 					"    return file_index"
 				],
-				"execution_count": 93
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2578,7 +2578,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 94
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -2630,7 +2630,7 @@
 					"    print(f\"   Files quarantined: {len(_moved_files['quarantine']) - len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
 					"    "
 				],
-				"execution_count": 95
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -2846,7 +2846,7 @@
 					"    print(f\"{indent}   Quarantine entries tracked: {len(newly_quarantined_entries)}\")\n",
 					"    print(f\"{indent}   Failed operations: {len([f for f in moved_files.get('failed', []) if any(os.path.basename(f) in os.path.basename(fi.path) for fi in files)])}\")"
 				],
-				"execution_count": 96
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -3180,7 +3180,7 @@
 					"    # Show quarantine details\n",
 					"    print_quarantine_summary(moved_files)"
 				],
-				"execution_count": 97
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -3188,59 +3188,44 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 98
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
 				"source": [
+					"import subprocess\n",
 					"import sys\n",
 					"import time\n",
 					"import os\n",
 					"\n",
-					"class OutputCapture:\n",
-					"    def __init__(self, local_path):\n",
-					"        self.terminal = sys.stdout\n",
-					"        self.local_path = local_path\n",
-					"        self.file = open(local_path, \"w\", encoding=\"utf-8\", buffering=8192)  # buffered write\n",
-					"    \n",
-					"    def write(self, message):\n",
-					"        self.file.write(message)  # write directly to disk — no memory buildup\n",
-					"    \n",
-					"    def flush(self):\n",
-					"        self.file.flush()\n",
-					"    \n",
-					"    def close(self):\n",
-					"        self.file.close()\n",
-					"\n",
-					"# Setup paths\n",
 					"timestamp  = time.strftime(\"%Y%m%d_%H%M%S\")\n",
 					"local_path = f\"/tmp/L0_run_{timestamp}.txt\"\n",
 					"log_path   = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L0_run_logs/L0_run_{timestamp}.txt\"\n",
 					"\n",
-					"# Start capturing directly to local file\n",
-					"capture = OutputCapture(local_path)\n",
-					"sys.stdout = capture\n",
-					"\n",
-					"try:\n",
-					"    main()\n",
-					"finally:\n",
-					"    # Restore stdout\n",
-					"    capture.close()\n",
-					"    sys.stdout = capture.terminal\n",
-					"    \n",
-					"    # Check file size\n",
-					"    size_mb = os.path.getsize(local_path) / (1024 * 1024)\n",
-					"    print(f\"📄 Log size: {size_mb:.2f} MB\")\n",
-					"    \n",
+					"# Redirect stdout/stderr directly to file at OS level\n",
+					"with open(local_path, \"w\", encoding=\"utf-8\") as log_file:\n",
+					"    sys.stdout = log_file\n",
+					"    sys.stderr = log_file\n",
 					"    try:\n",
-					"        # Single fast file copy to ADLS\n",
-					"        mssparkutils.fs.cp(f\"file://{local_path}\", log_path)\n",
-					"        os.remove(local_path)\n",
-					"        print(f\"✅ Log saved: {log_path}\")\n",
-					"    except Exception as e:\n",
-					"        print(f\"❌ Failed to save log: {str(e)}\")"
+					"        main()\n",
+					"    finally:\n",
+					"        sys.stdout = sys.__stdout__   # restore using Python's original stdout\n",
+					"        sys.stderr = sys.__stderr__\n",
+					"\n",
+					"# Copy to ADLS\n",
+					"size_mb = os.path.getsize(local_path) / (1024 * 1024)\n",
+					"print(f\"📄 Log size: {size_mb:.2f} MB\")\n",
+					"mssparkutils.fs.cp(f\"file://{local_path}\", log_path)\n",
+					"os.remove(local_path)\n",
+					"print(f\"✅ Log saved: {log_path}\")"
 				],
-				"execution_count": 99
+				"execution_count": null
 			}
 		]
 	}

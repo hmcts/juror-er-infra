@@ -1,0 +1,32 @@
+{
+	"name": "TR_main_controller",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "p_Ingestion_Controller",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2026-04-02T15:55:00",
+				"timeZone": "GMT Standard Time",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						17
+					]
+				}
+			}
+		}
+	}
+}

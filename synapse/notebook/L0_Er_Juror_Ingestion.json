@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3db25d15-dc8d-4c58-8db2-c231483485ca"
+				"spark.autotune.trackingId": "7d37184e-f429-4fbe-89bb-92559c02bd0b"
 			}
 		},
 		"metadata": {
@@ -1332,7 +1332,11 @@
 					"        file_stem  = os.path.splitext(file_name)[0]          # \"Swindon\" from \"Swindon.xlsx\"\n",
 					"        file_ext   = os.path.splitext(source_path)[1].lower() # \".xls\" / \".xlsx\" / \".csv\"\n",
 					"        suffix     = f\"_{file_index}\" if file_index > 0 else \"\"\n",
-					"        folder_key = f\"{date_folder}_{la_folder}_{file_stem}{suffix}\"\n",
+					"        file_ext_clean = file_ext.replace(\".\", \"\")  # \"xls\" / \"xlsx\" / \"csv\"\n",
+					"        folder_key = f\"{date_folder}_{la_folder}_{file_stem}_{file_ext_clean}{suffix}\"\n",
+					"        # → 20260413_Islington_Islington_csv\n",
+					"        # → 20260413_Islington_Islington_xlsx\n",
+					"\n",
 					"\n",
 					"        file_type = get_file_type(source_path)\n",
 					"        if not file_type:\n",

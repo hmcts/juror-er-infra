@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "01488198-713e-4028-a533-b19db93ec707"
+				"spark.autotune.trackingId": "2e52091c-704f-4506-9a30-94be7a2406bd"
 			}
 		},
 		"metadata": {
@@ -1052,6 +1052,8 @@
 					"\n",
 					"    # Filter out records with empty critical fields\n",
 					"    df = filter_records_with_empty_fields(df)\n",
+					"    #verify None guard is present (it is)\n",
+					"    #numeric_la_code = \"\".join(c for c in la_code if c.isdigit())\n",
 					"\n",
 					"    return df"
 				],

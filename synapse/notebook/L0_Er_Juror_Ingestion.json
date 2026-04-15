@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c946dd21-6c49-42cb-bd6b-ed1cfcc4aeaa"
+				"spark.autotune.trackingId": "1803cadd-7ae5-450e-b60c-3d762896bdc1"
 			}
 		},
 		"metadata": {
@@ -1544,8 +1544,19 @@
 					"        # e.g. \"45_Brighton\"   → \"Brighton\"\n",
 					"        if len(parts) > la_index + 1:\n",
 					"            raw_la_folder = parts[la_index + 1]\n",
-					"            la_folder = re.sub(r'^\\d+[-_]', '', raw_la_folder)\n",
-					"            print(f\"   LA folder: {raw_la_folder} → {la_folder}\")\n",
+					"            # Extract numeric LA code e.g. \"006-Folkestone & Hythe\" → \"006\"\n",
+					"            la_code_match = re.match(r'^(\\d+)[-_]', raw_la_folder)\n",
+					"            la_code = la_code_match.group(1) if la_code_match else None\n",
+					"\n",
+					"            # Strip numeric prefix for folder naming\n",
+					"            la_name = re.sub(r'^\\d+[-_]', '', raw_la_folder)\n",
+					"\n",
+					"            # Clean special characters for safe file naming\n",
+					"            # \"Folkestone & Hythe\" → \"Folkestone_Hythe\"\n",
+					"            la_folder = re.sub(r'[^\\w]', '_', la_name).strip('_')\n",
+					"            la_folder = re.sub(r'_+', '_', la_folder)  # collapse multiple underscores\n",
+					"\n",
+					"            print(f\"   LA folder: {raw_la_folder} → {la_folder} (code: {la_code})\")\n",
 					"\n",
 					"        confidence = \"high\" if date_folder and la_folder else \"low\"\n",
 					"\n",

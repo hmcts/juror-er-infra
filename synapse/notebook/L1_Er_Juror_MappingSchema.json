@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7e478331-6204-49e3-be62-b14919a2a48a"
+				"spark.autotune.trackingId": "c8b137a3-8c45-442a-9527-dc82c0cc93a8"
 			}
 		},
 		"metadata": {
@@ -916,7 +916,6 @@
 					"    if la_index != -1:\n",
 					"        if la_index > 0:\n",
 					"            date_folder = parts[la_index - 1]\n",
-					"\n",
 					"        if len(parts) > la_index + 1:\n",
 					"            raw_la_folder = parts[la_index + 1]\n",
 					"            la_code_match = re.match(r'^(\\d+)[-_]', raw_la_folder)\n",
@@ -924,19 +923,16 @@
 					"            la_name = re.sub(r'^\\d+[-_]', '', raw_la_folder)\n",
 					"            la_folder = re.sub(r'[^\\w]', '_', la_name).strip('_')\n",
 					"            la_folder = re.sub(r'_+', '_', la_folder)\n",
-					"\n",
 					"        confidence = \"high\" if date_folder and la_folder else \"low\"\n",
 					"\n",
 					"    if not date_folder:\n",
 					"        date_folder = datetime.now().strftime(\"%Y%m%d\")\n",
 					"        confidence = \"very_low\"\n",
 					"    if not la_folder:\n",
-					"        filename_without_ext = os.path.splitext(os.path.basename(file_path))[0]\n",
-					"        la_folder = filename_without_ext\n",
+					"        la_folder = os.path.splitext(os.path.basename(file_path))[0]\n",
 					"        confidence = \"very_low\"\n",
 					"\n",
-					"    return date_folder, la_folder, la_code, confidence\n",
-					""
+					"    return date_folder, la_folder, la_code, confidence"
 				],
 				"execution_count": null
 			},

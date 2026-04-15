@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1803cadd-7ae5-450e-b60c-3d762896bdc1"
+				"spark.autotune.trackingId": "b407402f-148e-4084-b9b4-27084838f6ea"
 			}
 		},
 		"metadata": {
@@ -1589,7 +1589,7 @@
 					"        la_folder = f\"unknown_{clean_name}\"\n",
 					"        confidence = \"very_low\"\n",
 					"\n",
-					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, confidence={confidence}\")\n",
+					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, la_code={la_code}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, confidence"
 				],
 				"execution_count": null

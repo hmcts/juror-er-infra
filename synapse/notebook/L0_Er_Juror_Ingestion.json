@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b407402f-148e-4084-b9b4-27084838f6ea"
+				"spark.autotune.trackingId": "66f8a517-6750-49d2-8b97-054f3a7c4b2c"
 			}
 		},
 		"metadata": {
@@ -1340,7 +1340,8 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def process_file(source_path, date_folder, la_folder, file_name, storage_account, file_index=0):\n",
+					"def process_file(source_path, date_folder, la_folder,\n",
+					"                 file_name, storage_account, file_index=0, la_code=None):\n",
 					"    \"\"\"\n",
 					"    Process CSV or Excel file and convert to Parquet format.\n",
 					"    \n",
@@ -1426,6 +1427,7 @@
 					"            df = df.withColumn(\"ingestion_date\", lit(current_timestamp()))\n",
 					"            df = df.withColumn(\"date_folder\",    lit(date_folder))\n",
 					"            df = df.withColumn(\"la_folder\",      lit(la_folder))\n",
+					"            df = df.withColumn(\"LA_Code\",        lit(la_code)) \n",
 					"\n",
 					"            # Write to Parquet\n",
 					"            print(f\"  Writing to Parquet: {dest_path}\")\n",
@@ -2514,13 +2516,14 @@
 					"    for file_path in all_files:\n",
 					"        try:\n",
 					"            file_name = os.path.basename(file_path)\n",
-					"            date_folder, la_folder, confidence = get_folder_parts(file_path)\n",
+					"            date_folder, la_folder, la_code, confidence = get_folder_parts(file_path)\n",
 					"            \n",
 					"            file_info = {\n",
 					"                \"path\": file_path,\n",
 					"                \"file_name\": file_name,\n",
 					"                \"date_folder\": date_folder,\n",
 					"                \"la_folder\": la_folder,\n",
+					"                \"la_code\":   la_code,        # ← added\n",
 					"                \"confidence\": confidence,\n",
 					"                \"file_type\": get_file_type(file_path),\n",
 					"                \"is_empty\": False,  # Don't check yet - check during processing\n",
@@ -2958,13 +2961,14 @@
 					"    for file_path in valid_files:\n",
 					"        try:\n",
 					"            file_name  = os.path.basename(file_path)\n",
-					"            date_folder, la_folder, confidence = get_folder_parts(file_path)\n",
+					"            date_folder, la_folder, la_code, confidence = get_folder_parts(file_path)\n",
 					"\n",
 					"            file_info = {\n",
 					"                \"path\":          file_path,\n",
 					"                \"file_name\":     file_name,\n",
 					"                \"date_folder\":   date_folder,\n",
 					"                \"la_folder\":     la_folder,\n",
+					"                \"la_code\":       la_code,        # ← added\n",
 					"                \"confidence\":    confidence,\n",
 					"                \"file_type\":     get_file_type(file_path),\n",
 					"                \"is_empty\":      False,\n",

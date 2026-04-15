@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1fe0889b-ae5c-48d4-9af2-322a80f4a8ec"
+				"spark.autotune.trackingId": "7d7b516f-e104-4ddf-b07c-46e4c87bc1da"
 			}
 		},
 		"metadata": {
@@ -185,9 +185,7 @@
 					"env = \"stg\"\n",
 					"storage_account = f\"baubaisadfsa{env}\"\n",
 					"    # CONFIGURATION\n",
-					"debug_mode = True  # Process only new files\n",
-					"# year_filter = \"2025\"  # Only process 2025 files\n",
-					"# source_container = \"juror-ingestion\"\n",
+					"#debug_mode = False  # # ← was True — False means respect the processed log\n",
 					"year_filter = \"2026\"  # Only process 2025 files\n",
 					"source_container = \"juror-raw\" #juror-raw\n",
 					"processing_container = \"juror-etl\"\n",
@@ -3009,9 +3007,8 @@
 					"        file_path = file_info[\"path\"]\n",
 					"        norm_path = normalize_file_path(file_path)\n",
 					"\n",
-					"        if debug_mode:\n",
-					"            new_files.append(file_info)\n",
-					"        elif file_path.lower() in processed_files_set or norm_path in processed_files_set:\n",
+					"        \n",
+					"        if file_path.lower() in processed_files_set or norm_path in processed_files_set:\n",
 					"            already_processed.append(file_path)\n",
 					"            print(f\"   ⏭️  Already processed: {file_info['file_name']}\")\n",
 					"        else:\n",

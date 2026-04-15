@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8c19b2d9-1c1c-4a95-ab90-e103d3d1deff"
+				"spark.autotune.trackingId": "7df28a28-adf2-4273-926e-fa939f19b6ce"
 			}
 		},
 		"metadata": {
@@ -156,8 +156,7 @@
 				},
 				"source": [
 					"processing_container = \"juror-etl\"#\"juror-etl\"\n",
-					"config_container = \"juror-etl\"\n",
-					"FORCE_CLEAN_RUN = True"
+					"config_container = \"juror-etl\""
 				],
 				"execution_count": null
 			},

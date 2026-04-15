@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "059fed97-52c1-4d79-8628-466e7560193e"
+				"spark.autotune.trackingId": "8c19b2d9-1c1c-4a95-ab90-e103d3d1deff"
 			}
 		},
 		"metadata": {
@@ -183,12 +183,30 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"# ============================================================\n",
+					"# Install required packages — runs every session\n",
+					"# Workaround for Synapse pool packages not persisting\n",
+					"# ============================================================\n",
+					"!pip install xlrd>=1.0.0 --quiet\n",
+					"!pip install openpyxl>=3.0.0 --quiet\n",
+					"!pip install pandas>=1.3.0 --quiet\n",
+					"\n",
+					"# Verify\n",
+					"import xlrd, openpyxl, pandas\n",
+					"print(f\"\\n📦 Versions:\")\n",
+					"print(f\"   xlrd:     {xlrd.__version__}\")\n",
+					"print(f\"   openpyxl: {openpyxl.__version__}\")\n",
+					"print(f\"   pandas:   {pandas.__version__}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
 					"def create_spark_session():\n",
-					"    \"\"\"Create and return a Spark session\n",
-					"    \n",
-					"    Note: spark-excel JAR (0.13.7) is installed at Synapse pool level.\n",
-					"    Excel files are read via pandas in read_excel_file() so no\n",
-					"    spark.jars.packages config is needed.\n",
+					"    \"\"\"Create and return a Spark session.\n",
+					"    Excel files are read via pandas (xlrd for .xls, openpyxl for .xlsx)\n",
+					"    installed via pip at session start. No spark.jars.packages needed.\n",
 					"    Memory settings kept for large dataset processing.\n",
 					"    \"\"\"\n",
 					"    return SparkSession.builder \\\n",

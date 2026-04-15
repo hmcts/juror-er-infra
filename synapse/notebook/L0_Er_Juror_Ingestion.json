@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7c55ff44-0271-400c-a908-0efe48ce2a42"
+				"spark.autotune.trackingId": "50603567-afde-44b6-a985-babc2950f170"
 			}
 		},
 		"metadata": {
@@ -1592,7 +1592,7 @@
 					"        confidence = \"very_low\"\n",
 					"\n",
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, la_code={la_code}, confidence={confidence}\")\n",
-					"    return date_folder, la_folder, confidence"
+					"    return date_folder, la_folder, la_code, confidence"
 				],
 				"execution_count": null
 			},
@@ -2970,7 +2970,7 @@
 					"                \"file_name\":     file_name,\n",
 					"                \"date_folder\":   date_folder,\n",
 					"                \"la_folder\":     la_folder,\n",
-					"                \"la_code\":       la_code,        # ← added\n",
+					"                \"la_code\":       la_code,        \n",
 					"                \"confidence\":    confidence,\n",
 					"                \"file_type\":     get_file_type(file_path),\n",
 					"                \"is_empty\":      False,\n",
@@ -3150,43 +3150,6 @@
 				"source": [
 					"if __name__ == \"__main__\":\n",
 					"    main()"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"editable": false,
-					"run_control": {
-						"frozen": true
-					}
-				},
-				"source": [
-					"import subprocess\n",
-					"import sys\n",
-					"import time\n",
-					"import os\n",
-					"\n",
-					"timestamp  = time.strftime(\"%Y%m%d_%H%M%S\")\n",
-					"local_path = f\"/tmp/L0_run_{timestamp}.txt\"\n",
-					"log_path   = f\"abfss://{processing_container}@{storage_account}.dfs.core.windows.net/L0_run_logs/L0_run_{timestamp}.txt\"\n",
-					"\n",
-					"# Redirect stdout/stderr directly to file at OS level\n",
-					"with open(local_path, \"w\", encoding=\"utf-8\") as log_file:\n",
-					"    sys.stdout = log_file\n",
-					"    sys.stderr = log_file\n",
-					"    try:\n",
-					"        main()\n",
-					"    finally:\n",
-					"        sys.stdout = sys.__stdout__   # restore using Python's original stdout\n",
-					"        sys.stderr = sys.__stderr__\n",
-					"\n",
-					"# Copy to ADLS\n",
-					"size_mb = os.path.getsize(local_path) / (1024 * 1024)\n",
-					"print(f\"📄 Log size: {size_mb:.2f} MB\")\n",
-					"mssparkutils.fs.cp(f\"file://{local_path}\", log_path)\n",
-					"os.remove(local_path)\n",
-					"print(f\"✅ Log saved: {log_path}\")"
 				],
 				"execution_count": null
 			}

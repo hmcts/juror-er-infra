@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7df28a28-adf2-4273-926e-fa939f19b6ce"
+				"spark.autotune.trackingId": "ac741622-77b0-4bf2-88fe-a87cd6ec03a5"
 			}
 		},
 		"metadata": {
@@ -940,7 +940,7 @@
 					"    file_name = parts[-1]\n",
 					"    if \"_\" in file_name:\n",
 					"        parts = file_name.split(\"_\", 1)\n",
-					"        if len(parts) == 2:\n",
+					"        if len(parts) == 3:\n",
 					"            date_part = parts[0]\n",
 					"            la_part = parts[1].split(\".\")[0]  # Remove extension\n",
 					"            return date_part, la_part\n",

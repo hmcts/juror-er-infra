@@ -693,7 +693,7 @@
 			},
 			"debug_mode": {
 				"type": "string",
-				"defaultValue": "true"
+				"defaultValue": "false"
 			},
 			"config_container": {
 				"type": "string",

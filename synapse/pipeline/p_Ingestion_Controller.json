@@ -144,6 +144,7 @@
 						"type": "ParquetSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
+							"maxConcurrentConnections": 10,
 							"recursive": true,
 							"modifiedDatetimeStart": {
 								"value": "@variables('lastModified')",
@@ -692,7 +693,7 @@
 			},
 			"debug_mode": {
 				"type": "string",
-				"defaultValue": "true"
+				"defaultValue": "false"
 			},
 			"config_container": {
 				"type": "string",

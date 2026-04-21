@@ -50,7 +50,7 @@ jobs:
         - bash: |
               echo "operation=${{ variables.operation }}"
               echo "PG server ${{ variables.postgresServer }}"
-              echo "Enviroment ${{ parameters.synapseName }}"
+              echo "Enviroment ${{ parameters.env }}"
           displayName: 'Print operation'
         - task: AzureCLI@2
           displayName: Get Subscription ID

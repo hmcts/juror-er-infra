@@ -52,6 +52,7 @@
                   "accountName": "=",
                   "username": "=",
                   "serviceEndpoint": "=",
+                  "server": "=",
                   "baseUrl": "=",
                   "url": "=",
                   "connectionString": "|:-connectionString:secureString",

@@ -33,7 +33,7 @@ jobs:
   variables:
     packageWheelName: 'none'
     ${{ if eq(parameters.env, 'stg') }}:
-      postgresServer: 'juror-api-demo.postgres.database.azure.com'
+      postgresServer: 'juror-api-demoa.postgres.database.azure.com'
     ${{ else }}:
       postgresServer: 'juror-api-${{ parameters.env }}.postgres.database.azure.com'
     ${{ if or(ne(parameters.validateOnly, true),and(eq(variables['isMain'], true), eq(variables['isAutoTriggered'], true)))}}:

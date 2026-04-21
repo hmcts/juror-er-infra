@@ -33,7 +33,7 @@ jobs:
   variables:
     packageWheelName: 'none'
     ${{ if eq(parameters.env, 'stg') }}:
-      postgresServer: 'juror-api-demoa.postgres.database.azure.com'
+      postgresServer: 'juror-api-demo.postgres.database.azure.com'
     ${{ else }}:
       postgresServer: 'juror-api-${{ parameters.env }}.postgres.database.azure.com'
     ${{ if or(ne(parameters.validateOnly, true),and(eq(variables['isMain'], true), eq(variables['isAutoTriggered'], true)))}}:
@@ -47,10 +47,7 @@ jobs:
         steps:
         - checkout: self
           clean: true
-        - bash: |
-              echo "operation=${{ variables.operation }}"
-              echo "PG server ${{ variables.postgresServer }}"
-              echo "Enviroment ${{ parameters.env }}"
+        - bash: echo "operation=${{ variables.operation }}"
           displayName: 'Print operation'
         - task: AzureCLI@2
           displayName: Get Subscription ID
@@ -61,8 +58,6 @@ jobs:
             inlineScript: |
               SUB_ID=$(az account show --query id -o tsv)
               echo "##vso[task.setvariable variable=SUBSCRIPTION_ID]$SUB_ID"
-
-
         - task: toggle-triggers-dev@2
           displayName: 'Disable triggers'
           condition: ne(${{ parameters.validateOnly }}, true)

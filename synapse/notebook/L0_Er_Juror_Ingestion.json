@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4d01965c-586b-4ed1-a320-dde495249831"
+				"spark.autotune.trackingId": "2aa5ce25-82bf-4b00-9598-a5e3cef0b9aa"
 			}
 		},
 		"metadata": {
@@ -182,14 +182,20 @@
 					]
 				},
 				"source": [
-					"env = \"stg\"\n",
-					"storage_account = f\"baubaisadfsa{env}\"\n",
 					"    # CONFIGURATION\n",
 					"#debug_mode = False  # # ← was True — False means respect the processed log\n",
 					"year_filter = \"2026\"  # Only process 2025 files\n",
 					"source_container = \"juror-raw\" #juror-raw\n",
 					"processing_container = \"juror-etl\"\n",
 					"ingestion_container = \"juror-ingestion\" #\"juror-ingestion\""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
+					"storage_account = f\"baubaisadfsa{env}\""
 				],
 				"execution_count": null
 			},

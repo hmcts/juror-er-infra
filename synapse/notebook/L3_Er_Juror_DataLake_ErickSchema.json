@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b8f6a221-caa2-4ff5-953c-8bfde9121f62"
+				"spark.autotune.trackingId": "253d7d22-5eb7-4d0b-b24a-cab39e50bda5"
 			}
 		},
 		"metadata": {
@@ -158,27 +158,6 @@
 			},
 			{
 				"cell_type": "code",
-				"metadata": {
-					"tags": [
-						"parameters"
-					]
-				},
-				"source": [
-					"# Define parameters\n",
-					"processing_container = \"juror-etl\"#\"juror-etl\"\n",
-					"config_container = \"juror-etl\"\n",
-					"eric_voters_tmp_container = \"dl-juror-eric-voters-temp\"\n",
-					"try:\n",
-					"    mssparkutils.fs.ls(path)\n",
-					"    print(f\"✅ Container exists: {eric_voters_tmp_container}\")\n",
-					"except Exception as e:\n",
-					"    print(f\"❌ Container missing: {eric_voters_tmp_container}\")\n",
-					"    print(f\"   Create it in Azure Portal first, then re-run\")"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
 				"source": [
 					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
 					"storage_account = f\"baubaisadfsa{env}\"\n",
@@ -199,6 +178,27 @@
 					"    .config(\"spark.sql.extensions\", \"io.delta.sql.DeltaSparkSessionExtension\") \\\n",
 					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
 					"    .getOrCreate()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"# Define parameters\n",
+					"processing_container = \"juror-etl\"#\"juror-etl\"\n",
+					"config_container = \"juror-etl\"\n",
+					"eric_voters_tmp_container = \"dl-juror-eric-voters-temp\"\n",
+					"try:\n",
+					"    mssparkutils.fs.ls(path)\n",
+					"    print(f\"✅ Container exists: {eric_voters_tmp_container}\")\n",
+					"except Exception as e:\n",
+					"    print(f\"❌ Container missing: {eric_voters_tmp_container}\")\n",
+					"    print(f\"   Create it in Azure Portal first, then re-run\")"
 				],
 				"execution_count": null
 			},
@@ -315,7 +315,7 @@
 					"    \"\"\"\n",
 					"    try:\n",
 					"        # Initialize storage paths\n",
-					"        storage_account  = \"baubaisadfsastg\"   # ← updated from prod to stg\n",
+					"        # storage_account auto-detected from workspace name (baubais-synapse-{env})\n",
 					"        source_path      = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"        delta_table_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
 					"\n",

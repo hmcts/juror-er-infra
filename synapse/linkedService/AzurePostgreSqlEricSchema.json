@@ -22,7 +22,10 @@
 					"referenceName": "LS_juror_eric_kv",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "juror-api-demo-password"
+				"secretName": {
+					"value": "@linkedService().passwordSecret",
+					"type": "Expression"
+				}
 			},
 			"authenticationType": "Basic"
 		},

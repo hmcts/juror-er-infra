@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fe77f789-07e1-4851-ab02-6deed5fcb5b2"
+				"spark.autotune.trackingId": "4308d136-af14-4474-b0d9-c635712279f9"
 			}
 		},
 		"metadata": {
@@ -183,7 +183,7 @@
 				},
 				"source": [
 					"    # CONFIGURATION\n",
-					"#debug_mode = False  # # ← was True — False means respect the processed log\n",
+					"debug_mode = False  # # ← was True — False means respect the processed log\n",
 					"year_filter = \"2026\"  # Only process 2025 files\n",
 					"source_container = \"juror-raw\" #juror-raw\n",
 					"processing_container = \"juror-etl\"\n",

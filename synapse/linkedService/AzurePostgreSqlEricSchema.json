@@ -16,7 +16,7 @@
 					"referenceName": "LS_juror_eric_kv",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "juror-api-demo-password"
+				"secretName": "juror-api-password"
 			},
 			"authenticationType": "Basic"
 		},

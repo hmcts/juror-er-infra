@@ -1,12 +1,6 @@
 {
 	"name": "AzurePostgreSqlEricSchema",
 	"properties": {
-		"parameters": {
-			"passwordSecret": {
-				"type": "string",
-				"defaultValue": "juror-api-password"
-			}
-		},
 		"annotations": [],
 		"type": "AzurePostgreSql",
 		"version": "2.0",
@@ -23,7 +17,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"secretName": {
-					"value": "@linkedService().passwordSecret",
+					"value": "juror-api-password",
 					"type": "Expression"
 				}
 			},

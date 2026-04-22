@@ -56,7 +56,10 @@
                   "baseUrl": "=",
                   "url": "=",
                   "connectionString": "|:-connectionString:secureString",
-                  "secretAccessKey": "|"
+                  "secretAccessKey": "|",
+                  "password": {
+                    "secretName": "="
+                  }
               }
           }
       },

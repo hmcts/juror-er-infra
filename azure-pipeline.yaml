@@ -99,5 +99,5 @@ stages:
               enableTriggers: True
               agentPool: ${{ variables.agentPool }}
               env: ${{ deployment.environment }}
-              validateOnly: ${{ ne(parameters.overrideAction, 'apply')}}
+              validateOnly: ${{ or(ne(parameters.overrideAction, 'apply'), ne(variables['Build.SourceBranchName'], 'main'), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI')) }}
               dependsOn: TerraformPlanApply

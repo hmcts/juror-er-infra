@@ -150,11 +150,11 @@
 		"parameters": {
 			"subscriptionId": {
 				"type": "string",
-				"defaultValue": "5ca62022-6aa2-4cee-aaa7-e7536c8d566c"
+				"defaultValue": "74dacd4f-a248-45bb-a2f0-af700dc4cf68"
 			},
 			"resourceGroup": {
 				"type": "string",
-				"defaultValue": "baubais-data-factory-rg-prod"
+				"defaultValue": "baubais-data-factory-rg-stg"
 			}
 		},
 		"variables": {

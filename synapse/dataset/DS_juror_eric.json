@@ -9,8 +9,8 @@
 		"type": "AzurePostgreSqlTable",
 		"schema": [
 			{
-				"name": "part_no",
-				"type": "character varying",
+				"name": "hash_id",
+				"type": "bigint",
 				"precision": 0,
 				"scale": 0
 			},
@@ -22,12 +22,6 @@
 			},
 			{
 				"name": "poll_number",
-				"type": "character varying",
-				"precision": 0,
-				"scale": 0
-			},
-			{
-				"name": "new_marker",
 				"type": "character varying",
 				"precision": 0,
 				"scale": 0
@@ -93,13 +87,7 @@
 				"scale": 0
 			},
 			{
-				"name": "address6",
-				"type": "character varying",
-				"precision": 0,
-				"scale": 0
-			},
-			{
-				"name": "zip",
+				"name": "postcode",
 				"type": "character varying",
 				"precision": 0,
 				"scale": 0
@@ -111,19 +99,7 @@
 				"scale": 0
 			},
 			{
-				"name": "date_selected2",
-				"type": "date",
-				"precision": 0,
-				"scale": 0
-			},
-			{
-				"name": "date_selected3",
-				"type": "date",
-				"precision": 0,
-				"scale": 0
-			},
-			{
-				"name": "rec_num",
+				"name": "la_id",
 				"type": "integer",
 				"precision": 0,
 				"scale": 0
@@ -143,12 +119,6 @@
 			{
 				"name": "postcode_start",
 				"type": "character varying",
-				"precision": 0,
-				"scale": 0
-			},
-			{
-				"name": "hash_id",
-				"type": "bigint",
 				"precision": 0,
 				"scale": 0
 			}

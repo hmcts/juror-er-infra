@@ -109,7 +109,7 @@
 												"Content-Type": "application/json"
 											},
 											"url": {
-												"value": "@{variables('SynapseFullIUrl')}/@{item().nodeName}?api-version=2021-06-01",
+												"value": "@{variables('SynapseFullIUrl')}/integrationRuntimes/IR-Juror/nodes/@{item().nodeName}?api-version=2021-06-01",
 												"type": "Expression"
 											},
 											"connectVia": {

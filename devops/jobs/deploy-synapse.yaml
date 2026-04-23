@@ -87,8 +87,8 @@ jobs:
               -LS_bais_bau_etf_properties_typeProperties_serviceEndpoint "https://baubais${{ parameters.env }}.file.core.windows.net/"
               -LS_Juror_Portal_properties_typeProperties_serviceEndpoint "https://jurorsa${{ parameters.env }}.blob.core.windows.net"
               -LS_juror_eric_kv_properties_typeProperties_baseUrl "https://baubais-${{ parameters.env }}-kv.vault.azure.net/"
-              -TR_node_cleanup_properties_0_parameters_subscriptionId "$(SUBSCRIPTION_ID)"
-              -TR_node_cleanup_properties_0_parameters_resourceGroup "baubais-data-factory-rg-${{ parameters.env }}"
+              -p_Maintanace_properties_parameters_subscriptionId_defaultValue "$(SUBSCRIPTION_ID)"
+              -p_Maintanace_properties_parameters_resourceGroup_defaultValue "baubais-data-factory-rg-${{ parameters.env }}"
               -TR_new_file_properties_typeProperties_scope "/subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/baubais-data-factory-rg-${{ parameters.env }}/providers/Microsoft.Storage/storageAccounts/baubaisadfsa${{ parameters.env }}"
               --verbose 
               

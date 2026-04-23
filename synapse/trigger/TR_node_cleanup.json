@@ -8,10 +8,6 @@
 				"pipelineReference": {
 					"referenceName": "p_Maintanace",
 					"type": "PipelineReference"
-				},
-				"parameters": {
-					"subscriptionId": "sb",
-					"resourceGroup": "rg"
 				}
 			}
 		],

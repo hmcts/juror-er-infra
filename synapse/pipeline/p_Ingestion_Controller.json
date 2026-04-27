@@ -170,18 +170,6 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "part_no",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "part_no",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
 									"name": "register_lett",
 									"type": "String",
 									"physicalType": "UTF8"
@@ -200,18 +188,6 @@
 								},
 								"sink": {
 									"name": "poll_number",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
-									"name": "new_marker",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "new_marker",
 									"type": "String",
 									"physicalType": "character varying"
 								}
@@ -338,25 +314,12 @@
 							},
 							{
 								"source": {
-									"name": "address6",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address6",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
 									"name": "zip",
 									"type": "String",
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "zip",
-									"type": "String",
+									"name": "postcode",
 									"physicalType": "character varying"
 								}
 							},
@@ -368,30 +331,6 @@
 								},
 								"sink": {
 									"name": "date_selected1",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "date_selected2",
-									"type": "DateTime",
-									"physicalType": "INT96"
-								},
-								"sink": {
-									"name": "date_selected2",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "date_selected3",
-									"type": "DateTime",
-									"physicalType": "INT96"
-								},
-								"sink": {
-									"name": "date_selected3",
 									"type": "DateTime",
 									"physicalType": "date"
 								}
@@ -403,8 +342,7 @@
 									"physicalType": "INT32"
 								},
 								"sink": {
-									"name": "rec_num",
-									"type": "Int32",
+									"name": "la_id",
 									"physicalType": "integer"
 								}
 							},

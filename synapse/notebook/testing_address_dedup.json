@@ -1,6 +1,9 @@
 {
 	"name": "testing_address_dedup",
 	"properties": {
+		"folder": {
+			"name": "Testing"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "11062d08-33e2-45ef-8bd7-455ead4fba97"
+				"spark.autotune.trackingId": "1eb206e4-39be-4d72-a2b3-cdd5a65b6b6d"
 			}
 		},
 		"metadata": {
@@ -51,7 +54,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"storage_account = \"baubaisadfsaprod\"\n",
+					"storage_account = \"baubaisadfsastg\"\n",
 					"\n",
 					"# voters_transformed is Delta\n",
 					"voters_transformed_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
@@ -152,7 +155,7 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"storage_account = \"baubaisadfsaprod\"\n",
+					"storage_account = \"baubaisadfsastg\"\n",
 					"voters_postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
 					"\n",
 					"df_pg = spark.read.parquet(voters_postgresql_path)\n",
@@ -204,6 +207,19 @@
 					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
 					"    ORDER BY date_key DESC\n",
 					"    LIMIT 20\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUM(CASE WHEN address2 IS NOT NULL AND address3 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address2)) = UPPER(TRIM(address3)) THEN 1 ELSE 0 END) AS dup_a2_a3,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$' THEN 1 ELSE 0 END) AS pc_in_a4\n",
+					"    FROM voters_postgresql\n",
 					"\"\"\").show()"
 				],
 				"execution_count": null

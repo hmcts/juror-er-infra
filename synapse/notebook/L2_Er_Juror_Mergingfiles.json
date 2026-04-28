@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "556c2da4-adc1-4fb7-8af4-d0488cd913bb"
+				"spark.autotune.trackingId": "c850232e-c7a5-499a-982f-2d40d8ca45f8"
 			}
 		},
 		"metadata": {
@@ -2378,6 +2378,10 @@
 					"        # Apply address field cleanup (trimming, empty-string to NULL)\n",
 					"        logger.info(\"Applying address field corrections...\")\n",
 					"        df = fix_address_fields(df)\n",
+					"        # NEW: Remove duplicate values and stray postcodes from address columns\n",
+					"        logger.info(\"Deduplicating address columns...\")\n",
+					"        df = deduplicate_address_fields(df)\n",
+					"\n",
 					"\n",
 					"        # Log count of NULL address4 (informational only - NULLs are allowed)\n",
 					"        if \"address4\" in df.columns:\n",

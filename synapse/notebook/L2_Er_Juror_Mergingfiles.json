@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "24396af6-bd60-4f54-9157-b1b4db24ee1c"
+				"spark.autotune.trackingId": "f83c1a56-c151-4df1-bd15-83a79433d0f7"
 			}
 		},
 		"metadata": {
@@ -2549,6 +2549,18 @@
 				"source": [
 					"## Main Pipeline Function"
 				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"import inspect\n",
+					"\n",
+					"# Should print the function source code, not raise NameError\n",
+					"print(inspect.getsource(deduplicate_address_fields))\n",
+					"print(\"=\" * 50)\n",
+					"print(inspect.getsource(prepare_postgresql_data))"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",

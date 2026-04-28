@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7481f177-bdcd-40a3-8c8a-bea067ceb506"
+				"spark.autotune.trackingId": "a6783e9c-b867-41ad-b394-27f70cf93465"
 			}
 		},
 		"metadata": {
@@ -497,6 +497,37 @@
 					"If this returns 0 rows, your hash is fully discriminating on the input fields and there are no records with identical-everything-but-different-hashes. That'd be a clean result.\n",
 					"If it returns rows, those are records where ALL hash inputs are identical but the hashes differ — which would point to a real bug (either NULL handling, encoding differences, or whitespace)."
 				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"# Check what dates are currently in voters_postgresql\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUBSTR(creation_date, 1, 8) AS date_key,\n",
+					"        COUNT(*) AS records\n",
+					"    FROM l3_delta_path\n",
+					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
+					"    ORDER BY date_key\n",
+					"\"\"\").show()\n",
+					"\n",
+					"# Then compare with what should be there (from voters_transformed)\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUBSTR(creation_date, 1, 8) AS date_key,\n",
+					"        COUNT(*) AS records\n",
+					"    FROM l3_delta_path\n",
+					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
+					"    ORDER BY date_key\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
 			}
 		]
 	}

@@ -1,0 +1,17 @@
+{
+	"name": "Adderess_deduplication_check",
+	"properties": {
+		"content": {
+			"query": "-- This is auto-generated code\nSELECT\n    SUM(CASE WHEN address  IS NULL THEN 1 ELSE 0 END) AS null_address,\n    SUM(CASE WHEN address2 IS NULL THEN 1 ELSE 0 END) AS null_address2,\n    SUM(CASE WHEN address3 IS NULL THEN 1 ELSE 0 END) AS null_address3,\n    SUM(CASE WHEN address4 IS NULL THEN 1 ELSE 0 END) AS null_address4,\n    SUM(CASE WHEN address5 IS NULL THEN 1 ELSE 0 END) AS null_address5,\n    COUNT(*) AS total\nFROM\n    OPENROWSET(\n        BULK 'https://baubaisadfsastg.dfs.core.windows.net/juror-etl/voters_postgresql/**',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\nSELECT\n    SUM(CASE WHEN address2 IS NOT NULL AND address3 IS NOT NULL\n             AND UPPER(LTRIM(RTRIM(address2))) = UPPER(LTRIM(RTRIM(address3)))\n             THEN 1 ELSE 0 END) AS dup_a2_a3,\n\n    SUM(CASE WHEN address2 IS NOT NULL AND address4 IS NOT NULL\n             AND UPPER(LTRIM(RTRIM(address2))) = UPPER(LTRIM(RTRIM(address4)))\n             THEN 1 ELSE 0 END) AS dup_a2_a4,\n\n    SUM(CASE WHEN address3 IS NOT NULL AND address4 IS NOT NULL\n             AND UPPER(LTRIM(RTRIM(address3))) = UPPER(LTRIM(RTRIM(address4)))\n             THEN 1 ELSE 0 END) AS dup_a3_a4,\n\n    SUM(CASE WHEN address4 IS NOT NULL AND address5 IS NOT NULL\n             AND UPPER(LTRIM(RTRIM(address4))) = UPPER(LTRIM(RTRIM(address5)))\n             THEN 1 ELSE 0 END) AS dup_a4_a5\nFROM OPENROWSET(\n    BULK 'https://baubaisadfsaprod.dfs.core.windows.net/juror-etl/voters_postgresql/**',\n    FORMAT = 'PARQUET'\n) AS rows;\n\nSELECT *\n    --COUNT_BIG(*) AS records_with_postcode_in_address4\nFROM OPENROWSET(\n    BULK 'https://baubaisadfsaprod.dfs.core.windows.net/juror-etl/voters_postgresql/**',\n    FORMAT = 'PARQUET'\n) AS rows\nWHERE\n    -- Strip spaces and check for postcode pattern length 5-7 chars\n    LEN(REPLACE(UPPER(address4), ' ', '')) BETWEEN 5 AND 7\n    AND REPLACE(UPPER(address4), ' ', '') LIKE '[A-Z][A-Z0-9]%[0-9][A-Z][A-Z]'\n    AND REPLACE(UPPER(address4), ' ', '') NOT LIKE '%[^A-Z0-9]%';\n\n    SELECT\n    COUNT_BIG(*)                                                AS total_records,\n    SUM(CASE WHEN address4 IS NOT NULL THEN 1 ELSE 0 END)       AS address4_populated,\n    SUM(CASE WHEN address4 = 'UNKNOWN' THEN 1 ELSE 0 END)       AS address4_unknown\nFROM OPENROWSET(\n    BULK 'https://baubaisadfsaprod.dfs.core.windows.net/juror-etl/voters_postgresql/**',\n    FORMAT = 'PARQUET'\n) AS rows;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

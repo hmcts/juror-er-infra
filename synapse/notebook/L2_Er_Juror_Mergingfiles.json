@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "60332a92-e2ab-4d6a-9805-aa41dcc90c02"
+				"spark.autotune.trackingId": "24396af6-bd60-4f54-9157-b1b4db24ee1c"
 			}
 		},
 		"metadata": {
@@ -2539,7 +2539,8 @@
 					"        logger.error(f\"Error preparing PostgreSQL data: {str(e)}\")\n",
 					"        import traceback\n",
 					"        logger.error(traceback.format_exc())\n",
-					"        return df"
+					"        raise\n",
+					"       # return df"
 				],
 				"execution_count": null
 			},

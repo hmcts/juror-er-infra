@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1eb206e4-39be-4d72-a2b3-cdd5a65b6b6d"
+				"spark.autotune.trackingId": "3b7bd57a-ec2d-40f3-8615-852d477ae4c4"
 			}
 		},
 		"metadata": {
@@ -56,7 +56,7 @@
 				"source": [
 					"storage_account = \"baubaisadfsastg\"\n",
 					"\n",
-					"# voters_transformed is Delta\n",
+					"# voters_transformed is Delta keep old strutcure of the addresses colums with duplicates values\n",
 					"voters_transformed_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
 					"df_transformed = spark.read.format(\"delta\").load(voters_transformed_path)\n",
 					"df_transformed.createOrReplaceTempView(\"voters_transformed\")\n",

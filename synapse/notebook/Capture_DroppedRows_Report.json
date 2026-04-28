@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a6783e9c-b867-41ad-b394-27f70cf93465"
+				"spark.autotune.trackingId": "f6103108-680b-4272-89ca-409ca504390f"
 			}
 		},
 		"metadata": {
@@ -512,7 +512,7 @@
 					"    SELECT\n",
 					"        SUBSTR(creation_date, 1, 8) AS date_key,\n",
 					"        COUNT(*) AS records\n",
-					"    FROM l3_delta_path\n",
+					"    FROM voters_postgresql\n",
 					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
 					"    ORDER BY date_key\n",
 					"\"\"\").show()\n",
@@ -522,7 +522,7 @@
 					"    SELECT\n",
 					"        SUBSTR(creation_date, 1, 8) AS date_key,\n",
 					"        COUNT(*) AS records\n",
-					"    FROM l3_delta_path\n",
+					"    FROM voters_transformed\n",
 					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
 					"    ORDER BY date_key\n",
 					"\"\"\").show()"

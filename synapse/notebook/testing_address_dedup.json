@@ -1,0 +1,229 @@
+{
+	"name": "testing_address_dedup",
+	"properties": {
+		"folder": {
+			"name": "Testing"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkbaubais",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "da405412-c1de-4e04-80ef-945ab3f999c9"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"storage_account = \"baubaisadfsastg\"\n",
+					"\n",
+					"# voters_transformed is Delta keep old strutcure of the addresses colums with duplicates values\n",
+					"voters_transformed_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
+					"df_transformed = spark.read.format(\"delta\").load(voters_transformed_path)\n",
+					"df_transformed.createOrReplaceTempView(\"voters_transformed\")\n",
+					"\n",
+					"# voters_postgresql is plain Parquet\n",
+					"voters_postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"df_postgresql = spark.read.parquet(voters_postgresql_path)\n",
+					"df_postgresql.createOrReplaceTempView(\"voters_postgresql\")\n",
+					"\n",
+					"print(f\"voters_transformed: {df_transformed.count()} records\")\n",
+					"print(f\"voters_postgresql:  {df_postgresql.count()} records\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# How many records have postcode-shaped values in each address column?\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUM(CASE WHEN address2 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$' THEN 1 ELSE 0 END) AS pc_in_address2,\n",
+					"        SUM(CASE WHEN address3 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$' THEN 1 ELSE 0 END) AS pc_in_address3,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$' THEN 1 ELSE 0 END) AS pc_in_address4,\n",
+					"        SUM(CASE WHEN address5 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$' THEN 1 ELSE 0 END) AS pc_in_address5\n",
+					"    FROM voters_transformed\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# How many records have duplicate values across address columns?\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUM(CASE WHEN address2 IS NOT NULL AND address3 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address2)) = UPPER(TRIM(address3)) THEN 1 ELSE 0 END) AS dup_a2_a3,\n",
+					"        SUM(CASE WHEN address2 IS NOT NULL AND address4 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address2)) = UPPER(TRIM(address4)) THEN 1 ELSE 0 END) AS dup_a2_a4,\n",
+					"        SUM(CASE WHEN address3 IS NOT NULL AND address4 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address3)) = UPPER(TRIM(address4)) THEN 1 ELSE 0 END) AS dup_a3_a4,\n",
+					"        SUM(CASE WHEN address4 IS NOT NULL AND address5 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address4)) = UPPER(TRIM(address5)) THEN 1 ELSE 0 END) AS dup_a4_a5\n",
+					"    FROM voters_transformed\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Show 20 sample records matching your example pattern\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT address, address2, address3, address4, address5, zip\n",
+					"    FROM voters_transformed\n",
+					"    WHERE address2 IS NOT NULL AND address3 IS NOT NULL\n",
+					"      AND UPPER(TRIM(address2)) = UPPER(TRIM(address3))\n",
+					"      AND address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$'\n",
+					"    LIMIT 20\n",
+					"\"\"\").show(truncate=False)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUM(CASE WHEN address2 IS NOT NULL AND address3 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address2)) = UPPER(TRIM(address3)) THEN 1 ELSE 0 END) AS dup_a2_a3,\n",
+					"        SUM(CASE WHEN address3 IS NOT NULL AND address4 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address3)) = UPPER(TRIM(address4)) THEN 1 ELSE 0 END) AS dup_a3_a4\n",
+					"    FROM voters_transformed\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        COUNT(*) AS total_records,\n",
+					"        SUM(CASE WHEN address4 IS NOT NULL THEN 1 ELSE 0 END) AS address4_populated,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$'\n",
+					"                 THEN 1 ELSE 0 END) AS address4_is_postcode,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2}$'\n",
+					"                 THEN 1 ELSE 0 END) AS address4_postcode_no_space,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][A-Z]{2}$'\n",
+					"                 THEN 1 ELSE 0 END) AS address4_postcode_with_space\n",
+					"    FROM voters_transformed\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"storage_account = \"baubaisadfsastg\"\n",
+					"voters_postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"\n",
+					"df_pg = spark.read.parquet(voters_postgresql_path)\n",
+					"df_pg.createOrReplaceTempView(\"voters_postgresql\")\n",
+					"\n",
+					"print(f\"voters_postgresql total records: {df_pg.count()}\")\n",
+					"\n",
+					"# Same diagnostic as before, but on voters_postgresql\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        COUNT(*) AS total_records,\n",
+					"        SUM(CASE WHEN address4 IS NOT NULL THEN 1 ELSE 0 END) AS address4_populated,\n",
+					"        SUM(CASE WHEN address4 = 'UNKNOWN' THEN 1 ELSE 0 END) AS address4_unknown,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$'\n",
+					"                 THEN 1 ELSE 0 END) AS address4_is_postcode,\n",
+					"        SUM(CASE WHEN address2 IS NOT NULL AND address3 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address2)) = UPPER(TRIM(address3))\n",
+					"                 THEN 1 ELSE 0 END) AS dup_a2_a3,\n",
+					"        SUM(CASE WHEN address3 IS NOT NULL AND address4 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address3)) = UPPER(TRIM(address4))\n",
+					"                 THEN 1 ELSE 0 END) AS dup_a3_a4\n",
+					"    FROM voters_postgresql\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Check the most recent run's date range in voters_postgresql\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        MIN(creation_date) AS earliest,\n",
+					"        MAX(creation_date) AS latest,\n",
+					"        COUNT(DISTINCT SUBSTR(creation_date, 1, 8)) AS distinct_dates,\n",
+					"        COUNT(*) AS total\n",
+					"    FROM voters_postgresql\n",
+					"\"\"\").show(truncate=False)\n",
+					"\n",
+					"# Check if recent records still have postcodes in address4\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUBSTR(creation_date, 1, 8) AS date_key,\n",
+					"        COUNT(*) AS total,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$'\n",
+					"                 THEN 1 ELSE 0 END) AS pc_in_address4\n",
+					"    FROM voters_postgresql\n",
+					"    WHERE creation_date IS NOT NULL\n",
+					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
+					"    ORDER BY date_key DESC\n",
+					"    LIMIT 20\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUM(CASE WHEN address2 IS NOT NULL AND address3 IS NOT NULL\n",
+					"                 AND UPPER(TRIM(address2)) = UPPER(TRIM(address3)) THEN 1 ELSE 0 END) AS dup_a2_a3,\n",
+					"        SUM(CASE WHEN address4 RLIKE '^[A-Z]{1,2}[0-9][A-Z0-9]?\\\\\\\\s?[0-9][A-Z]{2}$' THEN 1 ELSE 0 END) AS pc_in_a4\n",
+					"    FROM voters_postgresql\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

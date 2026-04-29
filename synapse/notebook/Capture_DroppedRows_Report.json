@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkbaubais",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "02ae4bfb-b869-46bd-9ed3-ab80f3e3b029"
+				"spark.autotune.trackingId": "f6103108-680b-4272-89ca-409ca504390f"
 			}
 		},
 		"metadata": {
@@ -28,6 +32,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -364,6 +383,149 @@
 					"    print(\"\\n  All missing rows fully accounted for.\")\n",
 					"\n",
 					"print(\"\\nDone.\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"storage_account = \"baubaisadfsastg\"\n",
+					"output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
+					"voters = spark.read.format(\"delta\").load(output_path)\n",
+					"\n",
+					"from pyspark.sql.functions import countDistinct, count, col\n",
+					"\n",
+					"# How many distinct combinations of forename + surname are there?\n",
+					"total = voters.count()\n",
+					"distinct_name_combos = voters.select(\"fname\", \"lname\").distinct().count()\n",
+					"\n",
+					"print(f\"Total records:                   {total:,}\")\n",
+					"print(f\"Distinct (fname, lname) pairs:   {distinct_name_combos:,}\")\n",
+					"print(f\"Ratio:                           {distinct_name_combos / total:.4f}\")\n",
+					"\n",
+					"# In real data this ratio is well below 1 (lots of name collisions).\n",
+					"# In synthetic test data with Surname1, Surname2, etc, it'll be ~1."
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"storage_account = \"baubaisadfsastg\"\n",
+					"output_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_transformed\"\n",
+					"\n",
+					"# Re-register the temp view\n",
+					"voters = spark.read.format(\"delta\").load(output_path)\n",
+					"voters.createOrReplaceTempView(\"voters_transformed\")\n",
+					"\n",
+					"print(f\"voters_transformed registered: {voters.count():,} records\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# For each name pair, how many distinct hash_ids do they have?\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        fname, lname,\n",
+					"        COUNT(*) AS record_count,\n",
+					"        COUNT(DISTINCT hash_id) AS distinct_hashes,\n",
+					"        COUNT(DISTINCT rec_num) AS distinct_rec_nums,\n",
+					"        COUNT(DISTINCT register_lett) AS distinct_register_letts,\n",
+					"        COUNT(DISTINCT poll_number) AS distinct_poll_numbers,\n",
+					"        COUNT(DISTINCT address) AS distinct_addresses,\n",
+					"        COUNT(DISTINCT zip) AS distinct_zips\n",
+					"    FROM voters_transformed\n",
+					"    GROUP BY fname, lname\n",
+					"    ORDER BY record_count DESC\n",
+					"    LIMIT 20\n",
+					"\"\"\").show(truncate=False)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#check whether you have any null register_lett values:\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUM(CASE WHEN LENGTH(lname) = 20 THEN 1 ELSE 0 END) AS lname_at_20,\n",
+					"        SUM(CASE WHEN LENGTH(lname) = 35 THEN 1 ELSE 0 END) AS lname_at_35,\n",
+					"        SUM(CASE WHEN LENGTH(fname) = 20 THEN 1 ELSE 0 END) AS fname_at_20,\n",
+					"        SUM(CASE WHEN LENGTH(fname) = 35 THEN 1 ELSE 0 END) AS fname_at_35,\n",
+					"        SUM(CASE WHEN LENGTH(address) = 35 THEN 1 ELSE 0 END) AS address_at_35,\n",
+					"        SUM(CASE WHEN LENGTH(zip) = 10 THEN 1 ELSE 0 END) AS zip_at_10,\n",
+					"        MAX(LENGTH(lname)) AS max_lname_len,\n",
+					"        MAX(LENGTH(fname)) AS max_fname_len,\n",
+					"        MAX(LENGTH(address)) AS max_address_len,\n",
+					"        MAX(LENGTH(register_lett)) AS max_register_lett_len\n",
+					"    FROM voters_transformed\n",
+					"\"\"\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        lname, fname,\n",
+					"        rec_num, register_lett, poll_number,\n",
+					"        address, zip,\n",
+					"        COUNT(*) AS occurrences,\n",
+					"        COUNT(DISTINCT hash_id) AS distinct_hashes\n",
+					"    FROM voters_transformed\n",
+					"    GROUP BY lname, fname, rec_num, register_lett, poll_number, address, zip\n",
+					"    HAVING COUNT(*) > 1\n",
+					"    ORDER BY occurrences DESC\n",
+					"    LIMIT 20\n",
+					"\"\"\").show(truncate=False)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"If this returns 0 rows, your hash is fully discriminating on the input fields and there are no records with identical-everything-but-different-hashes. That'd be a clean result.\n",
+					"If it returns rows, those are records where ALL hash inputs are identical but the hashes differ — which would point to a real bug (either NULL handling, encoding differences, or whitespace)."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"# Check what dates are currently in voters_postgresql\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUBSTR(creation_date, 1, 8) AS date_key,\n",
+					"        COUNT(*) AS records\n",
+					"    FROM voters_postgresql\n",
+					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
+					"    ORDER BY date_key\n",
+					"\"\"\").show()\n",
+					"\n",
+					"# Then compare with what should be there (from voters_transformed)\n",
+					"spark.sql(\"\"\"\n",
+					"    SELECT\n",
+					"        SUBSTR(creation_date, 1, 8) AS date_key,\n",
+					"        COUNT(*) AS records\n",
+					"    FROM voters_transformed\n",
+					"    GROUP BY SUBSTR(creation_date, 1, 8)\n",
+					"    ORDER BY date_key\n",
+					"\"\"\").show()"
 				],
 				"execution_count": null
 			}

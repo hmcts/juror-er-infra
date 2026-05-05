@@ -1,6 +1,9 @@
 {
 	"name": "audit_logger",
 	"properties": {
+		"folder": {
+			"name": "crime"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4941e6a0-747e-4ab5-9d98-1c49f1e75c15"
+				"spark.autotune.trackingId": "7562133b-3427-4340-819e-858734d1a17c"
 			}
 		},
 		"metadata": {

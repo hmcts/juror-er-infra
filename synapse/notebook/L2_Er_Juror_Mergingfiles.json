@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f83c1a56-c151-4df1-bd15-83a79433d0f7"
+				"spark.autotune.trackingId": "e4592efc-6db8-4d95-ad7c-03f5abda5025"
 			}
 		},
 		"metadata": {
@@ -1126,8 +1126,17 @@
 					"        # Generate hash_id if not exists\n",
 					"        transformed_df = generate_hash_id(transformed_df)\n",
 					"        \n",
+					"        # Drop within-batch duplicates on hash_id before writing\n",
+					"        before = transformed_df.count()\n",
+					"        transformed_df = transformed_df.dropDuplicates([\"hash_id\"])\n",
+					"        after = transformed_df.count()\n",
+					"        if before != after:\n",
+					"            logger.warning(\n",
+					"                f\"Dropped {before - after} duplicate hash_id(s) from {file_path}\"\n",
+					"            )\n",
 					"        # Write to Delta with tracking\n",
 					"        result = write_transformed_data_delta(transformed_df, output_path)\n",
+					"\n",
 					"        \n",
 					"        # Determine file contribution status\n",
 					"        if result[\"status\"] == \"success\":\n",

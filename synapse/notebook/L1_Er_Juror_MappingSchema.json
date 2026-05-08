@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b6b3d63d-e75c-4a3e-858c-4379a61b6a7d"
+				"spark.autotune.trackingId": "7003b3fa-50ed-45a8-b02f-29901edfd32e"
 			}
 		},
 		"metadata": {
@@ -135,7 +135,7 @@
 					"import logging\n",
 					"import os\n",
 					"import json\n",
-					"import re\n",
+					"import re, time\n",
 					"from datetime import datetime\n",
 					"from pyspark.sql import SparkSession\n",
 					"from pyspark.sql.functions import (\n",

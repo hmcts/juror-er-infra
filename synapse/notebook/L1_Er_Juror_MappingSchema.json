@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a99ededd-1570-451c-8ff8-0c1b95d1c04c"
+				"spark.autotune.trackingId": "10e66d95-3a4c-4baf-b347-108914b65a99"
 			}
 		},
 		"metadata": {
@@ -1242,7 +1242,7 @@
 					"\n",
 					"        # Standardize column names\n",
 					"        if reverse_mapping:\n",
-					"            df = standardize_column_names(df, reverse_mapping)\n",
+					"            df = standardize_column_names(df, reverse_mapping,regex_rules, column_mapping)\n",
 					"\n",
 					"        # Transform\n",
 					"        try:\n",

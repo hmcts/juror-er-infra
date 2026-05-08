@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "41de617c-0ca4-4535-ae59-27c4acb94048"
+				"spark.autotune.trackingId": "c6610e96-c460-4e61-a04e-e79f1a059c66"
 			}
 		},
 		"metadata": {
@@ -1187,7 +1187,7 @@
 				"cell_type": "code",
 				"source": [
 					"def process_file(spark, source_path, reverse_mapping, regex_rules,\n",
-					"                 transform_folder, error_folder, column_mapping=None, storage_account):\n",
+					"                 transform_folder, error_folder, column_mapping, storage_account):\n",
 					"    \n",
 					"    result = {\n",
 					"        \"file\": source_path,\n",

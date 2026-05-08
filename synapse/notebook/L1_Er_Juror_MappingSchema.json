@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b162b030-1187-4c45-9c84-2550aec10f13"
+				"spark.autotune.trackingId": "26246e60-96a3-4b4c-a4b6-e07d792d6245"
 			}
 		},
 		"metadata": {
@@ -1637,42 +1637,6 @@
 					"\n",
 					"    results = main()\n",
 					"    print(\"\\nProcess completed.\")"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"source": [
-					"import inspect\n",
-					"\n",
-					"# Check what's actually in reverse_mapping right now\n",
-					"column_mapping_test = {\n",
-					"    \"Address1\": {\n",
-					"        \"aliases\": [\n",
-					"            \"Add1\",\n",
-					"            {\"pattern\": r\"(?i)\\Aadd(?:r(?:ess)?)?[\\s_\\-]*1\\Z\", \"regex\": True}\n",
-					"        ]\n",
-					"    }\n",
-					"}\n",
-					"\n",
-					"result = get_reverse_mapping(column_mapping_test)\n",
-					"print(f\"Return type: {type(result).__name__}\")\n",
-					"print(f\"Length: {len(result) if hasattr(result, '__len__') else 'N/A'}\")\n",
-					"\n",
-					"if isinstance(result, tuple) and len(result) == 2:\n",
-					"    rmap, rules = result\n",
-					"    print(f\"\\nreverse_map keys: {list(rmap.keys())}\")\n",
-					"    print(f\"reverse_map values: {list(rmap.values())}\")\n",
-					"    print(f\"\\nValue types in reverse_map: {set(type(v).__name__ for v in rmap.values())}\")\n",
-					"    print(f\"\\nregex_rules count: {len(rules)}\")\n",
-					"else:\n",
-					"    # OLD version still loaded — this is the bug\n",
-					"    print(f\"\\n⚠️ get_reverse_mapping returned {type(result).__name__}, not tuple\")\n",
-					"    print(f\"Contents: {result}\")\n",
-					"    if isinstance(result, dict):\n",
-					"        print(f\"\\nValue types: {set(type(v).__name__ for v in result.values())}\")\n",
-					"        if any(isinstance(v, dict) for v in result.values()):\n",
-					"            print(\"⚠️ FOUND IT: reverse_map contains dict values — old function is still loaded\")"
 				],
 				"execution_count": null
 			}

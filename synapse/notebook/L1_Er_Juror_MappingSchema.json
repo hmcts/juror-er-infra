@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a4178842-00cf-4281-b05d-e6e6576f91ae"
+				"spark.autotune.trackingId": "04ae78d0-cf7c-4141-8107-ee2acd79b299"
 			}
 		},
 		"metadata": {
@@ -1186,7 +1186,8 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"def process_file(spark, source_path, reverse_mapping, transform_folder, error_folder, column_mapping=None, storage_account=\"baubaisadfsastg\"):\n",
+					"def process_file(spark, source_path, reverse_mapping, regex_rule,\n",
+					"                 transform_folder, error_folder, column_mapping=None, storage_account=\"baubaisadfsastg\"):\n",
 					"    \n",
 					"    result = {\n",
 					"        \"file\": source_path,\n",

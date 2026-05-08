@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "119b2e90-f52d-4c03-87fe-e564002d71c2"
+				"spark.autotune.trackingId": "f4d10d39-8ee4-4fc7-be19-75ff177648a3"
 			}
 		},
 		"metadata": {
@@ -1564,7 +1564,15 @@
 					"    results = []\n",
 					"    for i, file_path in enumerate(new_files):\n",
 					"        print(f\"Processing {i + 1}/{len(new_files)}: {os.path.basename(file_path)}\")\n",
-					"        result = process_file(spark, file_path, reverse_mapping, transform_folder, error_folder, column_mapping, storage_account)\n",
+					"        result = process_file(\n",
+					"            spark, \n",
+					"            file_path, \n",
+					"            reverse_mapping, \n",
+					"            regex_rules,\n",
+					"            transform_folder, \n",
+					"            error_folder, \n",
+					"            column_mapping, \n",
+					"            storage_account)\n",
 					"        results.append(result)\n",
 					"\n",
 					"    # Save summary\n",

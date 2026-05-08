@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c6610e96-c460-4e61-a04e-e79f1a059c66"
+				"spark.autotune.trackingId": "96427f94-4ed4-400f-8e27-199a404b42d4"
 			}
 		},
 		"metadata": {
@@ -1584,7 +1584,7 @@
 					"            StructField(\"status\", StringType(),True),\n",
 					"            StructField(\"row_processed\", IntegerType(),True),\n",
 					"            StructField(\"error\", StringType(),True),\n",
-					"            StructField(\"quarantined\", BolleanType(),True),\n",
+					"            StructField(\"quarantined\", BooleanType(),True),\n",
 					"            StructField(\"quarantine_reason\", StringType(),True),\n",
 					"        ])\n",
 					"        # Normalise each result to every key in schema present\n",

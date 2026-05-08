@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "41bd63b4-5dcc-493b-bb59-1005a72bf1cb"
+				"spark.autotune.trackingId": "a99ededd-1570-451c-8ff8-0c1b95d1c04c"
 			}
 		},
 		"metadata": {
@@ -1537,7 +1537,7 @@
 					"        reverse_mapping = {}\n",
 					"    else:\n",
 					"        column_mapping = read_column_mapping(spark, mapping_file)\n",
-					"        reverse_mapping = get_reverse_mapping(column_mapping)\n",
+					"        reverse_mapping, regex_rules = get_reverse_mapping(column_mapping)\n",
 					"\n",
 					"    # Read processed files log\n",
 					"    try:\n",

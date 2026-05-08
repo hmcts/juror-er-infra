@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "270ef817-85e6-4cb0-bb30-06a02b5d3865"
+				"spark.autotune.trackingId": "41de617c-0ca4-4535-ae59-27c4acb94048"
 			}
 		},
 		"metadata": {
@@ -1584,10 +1584,11 @@
 					"            StructField(\"status\", StringType(),True),\n",
 					"            StructField(\"row_processed\", IntegerType(),True),\n",
 					"            StructField(\"error\", StringType(),True),\n",
+					"            StructField(\"quarantined\", BolleanType(),True),\n",
 					"            StructField(\"quarantine_reason\", StringType(),True),\n",
 					"        ])\n",
 					"        # Normalise each result to every key in schema present\n",
-					"        normalize=({\n",
+					"        normalize=[{\n",
 					"            \"file\": r.get(\"file\"),\n",
 					"            \"status\": r.get(\"status\"),\n",
 					"            \"row_processed\": r.get(\"row_processed\"),\n",
@@ -1595,7 +1596,7 @@
 					"            \"quarantine_reason\": r.get(\"quarantine_reason\")\n",
 					"        }\n",
 					"        for r in results\n",
-					"        )\n",
+					"        ]\n",
 					"        summary_df = spark.createDataFrame( normalized, schema=summary_schema)\n",
 					"        summary_df.write.mode(\"overwrite\").json(f\"{summary_folder}/processing_summary.json\")\n",
 					"    except Exception as e:\n",

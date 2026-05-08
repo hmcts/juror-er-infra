@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "96427f94-4ed4-400f-8e27-199a404b42d4"
+				"spark.autotune.trackingId": "7f0c2291-8da6-42e9-bc0d-558b34598df9"
 			}
 		},
 		"metadata": {
@@ -1588,7 +1588,7 @@
 					"            StructField(\"quarantine_reason\", StringType(),True),\n",
 					"        ])\n",
 					"        # Normalise each result to every key in schema present\n",
-					"        normalize=[{\n",
+					"        normalized=[{\n",
 					"            \"file\": r.get(\"file\"),\n",
 					"            \"status\": r.get(\"status\"),\n",
 					"            \"row_processed\": r.get(\"row_processed\"),\n",

@@ -130,7 +130,7 @@
 			},
 			{
 				"name": "creation_date",
-				"type": "date",
+				"type": "character varying",
 				"precision": 0,
 				"scale": 0
 			}

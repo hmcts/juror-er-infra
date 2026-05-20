@@ -7,6 +7,8 @@
 				"name": "Copy from storage",
 				"description": "Copy data from storage",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "If file exist",
@@ -73,6 +75,8 @@
 			{
 				"name": "Execute ETL",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Copy from storage",
@@ -123,6 +127,8 @@
 				"name": "Copy to JurorDB",
 				"description": "Copy data to Juror DB",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Execute ETL",
@@ -413,6 +419,8 @@
 			{
 				"name": "Get metadata files",
 				"type": "GetMetadata",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -447,6 +455,8 @@
 			{
 				"name": "If file exist",
 				"type": "IfCondition",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Get metadata files",

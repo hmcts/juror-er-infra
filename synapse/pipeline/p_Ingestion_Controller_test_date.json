@@ -566,7 +566,7 @@
 							{
 								"name": "lastExecution",
 								"value": {
-									"value": "@utcNow()",
+									"value": "@pipeline().TriggerTime",
 									"type": "Expression"
 								}
 							}

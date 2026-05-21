@@ -4,17 +4,78 @@
 		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
 		"activities": [
 			{
+				"name": "Copy from storage",
+				"description": "Copy data from storage",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "If file exist",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0:30:00",
+					"retry": 1,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"modifiedDatetimeStart": {
+								"value": "@variables('lastModified')",
+								"type": "Expression"
+							},
+							"wildcardFolderPath": {
+								"value": "@pipeline().parameters.folder",
+								"type": "Expression"
+							},
+							"wildcardFileName": "*"
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_juror_binary",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_juror_eric_landing",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": {
+								"value": "@pipeline().parameters.source_container",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
 				"name": "Execute ETL",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Set Year Filter",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "If file exist",
+						"activity": "Copy from storage",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -32,11 +93,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"source_container": {
-							"value": "juror-la-landing",
+							"value": "@pipeline().parameters.source_container",
 							"type": "Expression"
 						},
 						"year_filter": {
-							"value": "@variables('yearFilter')",
+							"value": "@pipeline().parameters.year_filter",
 							"type": "Expression"
 						},
 						"processing_container": {
@@ -59,7 +120,7 @@
 				}
 			},
 			{
-				"name": "Copy to JurorDB",
+				"name": "Truncate staging_voters tabel in JurorDB",
 				"description": "Copy data to Juror DB",
 				"type": "Copy",
 				"dependsOn": [
@@ -71,7 +132,7 @@
 					}
 				],
 				"policy": {
-					"timeout": "0:30:00",
+					"timeout": "03:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -83,11 +144,8 @@
 						"type": "ParquetSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
+							"maxConcurrentConnections": 10,
 							"recursive": true,
-							"modifiedDatetimeStart": {
-								"value": "@variables('lastModified')",
-								"type": "Expression"
-							},
 							"wildcardFolderPath": "voters_postgresql/creation_date_partition=*/",
 							"wildcardFileName": "*",
 							"enablePartitionDiscovery": false
@@ -100,6 +158,7 @@
 						"type": "AzurePostgreSqlSink",
 						"writeBatchSize": 1000000,
 						"writeBatchTimeout": "00:30:00",
+						"preCopyScript": "TRUNCATE TABLE juror_eric.staging_voters;",
 						"writeMethod": "CopyCommand"
 					},
 					"enableStaging": false,
@@ -108,14 +167,14 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "part_no",
+									"name": "hash_id",
 									"type": "String",
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "part_no",
-									"type": "String",
-									"physicalType": "character varying"
+									"name": "hash_id",
+									"type": "Int64",
+									"physicalType": "bigint"
 								}
 							},
 							{
@@ -276,24 +335,12 @@
 							},
 							{
 								"source": {
-									"name": "address6",
-									"type": "String",
-									"physicalType": "UTF8"
-								},
-								"sink": {
-									"name": "address6",
-									"type": "String",
-									"physicalType": "character varying"
-								}
-							},
-							{
-								"source": {
 									"name": "zip",
 									"type": "String",
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "zip",
+									"name": "postcode",
 									"type": "String",
 									"physicalType": "character varying"
 								}
@@ -306,30 +353,6 @@
 								},
 								"sink": {
 									"name": "date_selected1",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "date_selected2",
-									"type": "DateTime",
-									"physicalType": "INT96"
-								},
-								"sink": {
-									"name": "date_selected2",
-									"type": "DateTime",
-									"physicalType": "date"
-								}
-							},
-							{
-								"source": {
-									"name": "date_selected3",
-									"type": "DateTime",
-									"physicalType": "INT96"
-								},
-								"sink": {
-									"name": "date_selected3",
 									"type": "DateTime",
 									"physicalType": "date"
 								}
@@ -341,7 +364,7 @@
 									"physicalType": "INT32"
 								},
 								"sink": {
-									"name": "rec_num",
+									"name": "la_id",
 									"type": "Int32",
 									"physicalType": "integer"
 								}
@@ -372,14 +395,26 @@
 							},
 							{
 								"source": {
-									"name": "hash_id",
+									"name": "postcode_start",
 									"type": "String",
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hash_id",
-									"type": "Int64",
-									"physicalType": "bigint"
+									"name": "postcode_start",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "creation_date",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "creation_date",
+									"type": "DateTime",
+									"physicalType": "date"
 								}
 							}
 						],
@@ -405,95 +440,10 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_juror_eric",
+						"referenceName": "DS_juror_eric_stg_voters",
 						"type": "DatasetReference"
 					}
 				]
-			},
-			{
-				"name": "update watermark",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Copy to JurorDB",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "JsonSource",
-						"additionalColumns": [
-							{
-								"name": "lastExecution",
-								"value": {
-									"value": "@utcNow()",
-									"type": "Expression"
-								}
-							}
-						],
-						"storeSettings": {
-							"type": "HttpReadSettings",
-							"requestMethod": "GET"
-						},
-						"formatSettings": {
-							"type": "JsonReadSettings"
-						}
-					},
-					"sink": {
-						"type": "JsonSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings",
-							"copyBehavior": "PreserveHierarchy"
-						},
-						"formatSettings": {
-							"type": "JsonWriteSettings"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_Dummy",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DS_metadata_json",
-						"type": "DatasetReference",
-						"parameters": {
-							"fileName": "landing.json",
-							"container": "metadata"
-						}
-					}
-				]
-			},
-			{
-				"name": "Set Year Filter",
-				"type": "SetVariable",
-				"dependsOn": [],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "yearFilter",
-					"value": {
-						"value": "@if(empty(pipeline().parameters.year_filter), if(\n   greater(int(formatDateTime(utcNow(), 'MM')), 9),\n   string(add(int(formatDateTime(utcNow(), 'yyyy')), 1)),\n   string(formatDateTime(utcNow(), 'yyyy'))\n), pipeline().parameters.year_filter)",
-						"type": "Expression"
-					}
-				}
 			},
 			{
 				"name": "Get metadata files",
@@ -543,7 +493,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@and(activity('Get metadata files').output.exists, empty(pipeline().parameters.last_modified))",
+						"value": "@activity('Get metadata files').output.exists",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -558,10 +508,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "lastModified",
-								"value": {
-									"value": "@if(empty(pipeline().parameters.last_modified),'1900-01-01T00:00:00+01:00', pipeline().parameters.last_modified)",
-									"type": "Expression"
-								}
+								"value": "1900-01-01T00:00:00+01:00"
 							}
 						}
 					],
@@ -627,13 +574,113 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "update watermark",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Copy to voters_temp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"additionalColumns": [
+							{
+								"name": "lastExecution",
+								"value": {
+									"value": "@utcNow()",
+									"type": "Expression"
+								}
+							}
+						],
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "PreserveHierarchy"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Dummy",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_metadata_json",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": "landing.json",
+							"container": "metadata"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy to voters_temp",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Truncate staging_voters tabel in JurorDB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "AzurePostgreSqlEricSchema",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "CALL juror_eric.merge_staging_into_voters_temp();"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
-		"concurrency": 1,
 		"parameters": {
 			"folder": {
 				"type": "string",
-				"defaultValue": "BAIS/Sites/External-In-Legacy/Juror_ER"
+				"defaultValue": "*/LA_Data"
 			},
 			"last_modified": {
 				"type": "string"
@@ -644,15 +691,15 @@
 			},
 			"year_filter": {
 				"type": "string",
-				"defaultValue": "2025"
+				"defaultValue": "2026"
 			},
 			"processing_container": {
 				"type": "string",
-				"defaultValue": "qz-test"
+				"defaultValue": "juror-etl"
 			},
 			"debug_mode": {
 				"type": "string",
-				"defaultValue": "true"
+				"defaultValue": "false"
 			},
 			"config_container": {
 				"type": "string",
@@ -665,9 +712,6 @@
 		},
 		"variables": {
 			"lastModified": {
-				"type": "String"
-			},
-			"yearFilter": {
 				"type": "String"
 			}
 		},

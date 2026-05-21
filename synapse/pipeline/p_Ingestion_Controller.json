@@ -1,5 +1,5 @@
 {
-	"name": "p_Ingestion_Controller",
+	"name": "p_Ingestion_Controller_la",
 	"properties": {
 		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
 		"activities": [
@@ -120,7 +120,7 @@
 				}
 			},
 			{
-				"name": "Copy to JurorDB",
+				"name": "Truncate staging_voters tabel in JurorDB",
 				"description": "Copy data to Juror DB",
 				"type": "Copy",
 				"dependsOn": [
@@ -146,10 +146,6 @@
 							"type": "AzureBlobFSReadSettings",
 							"maxConcurrentConnections": 10,
 							"recursive": true,
-							"modifiedDatetimeStart": {
-								"value": "@variables('lastModified')",
-								"type": "Expression"
-							},
 							"wildcardFolderPath": "voters_postgresql/creation_date_partition=*/",
 							"wildcardFileName": "*",
 							"enablePartitionDiscovery": false
@@ -162,12 +158,25 @@
 						"type": "AzurePostgreSqlSink",
 						"writeBatchSize": 1000000,
 						"writeBatchTimeout": "00:30:00",
+						"preCopyScript": "TRUNCATE TABLE juror_eric.staging_voters;",
 						"writeMethod": "CopyCommand"
 					},
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
+							{
+								"source": {
+									"name": "hash_id",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "hash_id",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
 							{
 								"source": {
 									"name": "register_lett",
@@ -188,6 +197,18 @@
 								},
 								"sink": {
 									"name": "poll_number",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "new_marker",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "new_marker",
 									"type": "String",
 									"physicalType": "character varying"
 								}
@@ -320,6 +341,7 @@
 								},
 								"sink": {
 									"name": "postcode",
+									"type": "String",
 									"physicalType": "character varying"
 								}
 							},
@@ -343,6 +365,7 @@
 								},
 								"sink": {
 									"name": "la_id",
+									"type": "Int32",
 									"physicalType": "integer"
 								}
 							},
@@ -372,14 +395,26 @@
 							},
 							{
 								"source": {
-									"name": "hash_id",
+									"name": "postcode_start",
 									"type": "String",
 									"physicalType": "UTF8"
 								},
 								"sink": {
-									"name": "hash_id",
-									"type": "Int64",
-									"physicalType": "bigint"
+									"name": "postcode_start",
+									"type": "String",
+									"physicalType": "character varying"
+								}
+							},
+							{
+								"source": {
+									"name": "creation_date",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "creation_date",
+									"type": "DateTime",
+									"physicalType": "date"
 								}
 							}
 						],
@@ -405,7 +440,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_juror_eric",
+						"referenceName": "DS_juror_eric_stg_voters",
 						"type": "DatasetReference"
 					}
 				]
@@ -545,7 +580,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Copy to JurorDB",
+						"activity": "Copy to voters_temp",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -607,6 +642,39 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Copy to voters_temp",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Truncate staging_voters tabel in JurorDB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "AzurePostgreSqlEricSchema",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "CALL juror_eric.merge_staging_into_voters_temp();"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
 		"parameters": {

@@ -1,5 +1,5 @@
 {
-	"name": "p_Ingestion_Controller_la",
+	"name": "p_Ingestion_Controller",
 	"properties": {
 		"description": "Hight level pipeline \n- Load the data from BAIS\n- Triggers data transformation",
 		"activities": [

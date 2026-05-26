@@ -6,7 +6,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "p_Ingestion_Controller_la",
+					"referenceName": "p_Ingestion_Controller",
 					"type": "PipelineReference"
 				}
 			}

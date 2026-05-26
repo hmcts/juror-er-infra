@@ -6,12 +6,6 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "p_Ingestion_Controller_la",
-					"type": "PipelineReference"
-				}
-			},
-			{
-				"pipelineReference": {
 					"referenceName": "p_Ingestion_Controller",
 					"type": "PipelineReference"
 				}

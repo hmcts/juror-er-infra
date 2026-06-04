@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2edb7f16-ca18-4fda-bfc8-97de240013eb"
+				"spark.autotune.trackingId": "d68681bb-56d1-41fb-baae-b4373cb76255"
 			}
 		},
 		"metadata": {
@@ -1424,6 +1424,8 @@
 					"                    \"N/A\": None, \"n/a\": None, \"NA\": None,\n",
 					"                })\n",
 					"\n",
+					"                excel_df = normalise_dob_pandas(excel_df)\n",
+					"\n",
 					"                df = spark.createDataFrame(excel_df)\n",
 					"\n",
 					"                try:\n",
@@ -1461,6 +1463,7 @@
 					"                        lit(None),\n",
 					"                    ).otherwise(col(c)),\n",
 					"                )\n",
+					"            df = normalise_dob_spark(df)\n",
 					"\n",
 					"            # Add metadata columns for tracking\n",
 					"            df = df.withColumn(\"source_file\",    lit(source_path))\n",

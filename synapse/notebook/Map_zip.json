@@ -1,6 +1,9 @@
 {
 	"name": "Map_zip",
 	"properties": {
+		"folder": {
+			"name": "Testing"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dd676ff8-b3c6-4c96-bae3-00dbbfa7df80"
+				"spark.autotune.trackingId": "f25545f3-4a14-4b52-b40f-4485f0d592b9"
 			}
 		},
 		"metadata": {

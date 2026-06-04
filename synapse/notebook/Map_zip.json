@@ -1,0 +1,158 @@
+{
+	"name": "Map_zip",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkbaubais",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "dd676ff8-b3c6-4c96-bae3-00dbbfa7df80"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import functions as F\n",
+					"from pyspark.sql.window import Window\n",
+					"from delta.tables import DeltaTable\n",
+					"\n",
+					"PROD_PATH = \"abfss://dl-juror-eric-voters-temp@baubaisadfsaprod.dfs.core.windows.net/voters_deduplicated_delta\"\n",
+					"STG_PATH  = \"abfss://dl-juror-eric-voters-temp@baubaisadfsastg.dfs.core.windows.net/voters_deduplicated_delta\"\n",
+					"\n",
+					"POSTCODE_START_PATTERN = r\"^([A-Z]{1,2}[0-9][A-Z0-9]?)\"\n",
+					"\n",
+					"# Load both tables\n",
+					"prod_df = spark.read.format(\"delta\").load(PROD_PATH)\n",
+					"stg_df  = spark.read.format(\"delta\").load(STG_PATH)\n",
+					"\n",
+					"# Derive the postcode prefix on both sides\n",
+					"prod_df = prod_df.withColumn(\n",
+					"    \"pc_start\",\n",
+					"    F.regexp_extract(F.upper(F.trim(F.col(\"zip\"))), POSTCODE_START_PATTERN, 1)\n",
+					")\n",
+					"stg_df = stg_df.withColumn(\n",
+					"    \"pc_start\",\n",
+					"    F.regexp_extract(F.upper(F.trim(F.col(\"zip\"))), POSTCODE_START_PATTERN, 1)\n",
+					")\n",
+					"\n",
+					"# Lookup 1: full postcode -> most common rec_num\n",
+					"zip_lookup = (\n",
+					"    prod_df\n",
+					"    .filter(F.col(\"zip\").isNotNull() & F.col(\"rec_num\").isNotNull())\n",
+					"    .groupBy(\"zip\", \"rec_num\").count()\n",
+					"    .withColumn(\"rn\", F.row_number().over(\n",
+					"        Window.partitionBy(\"zip\").orderBy(F.desc(\"count\"))))\n",
+					"    .filter(\"rn = 1\")\n",
+					"    .select(\"zip\", F.col(\"rec_num\").alias(\"prod_rec_num\"))\n",
+					")\n",
+					"\n",
+					"# Lookup 2: postcode prefix -> most common rec_num (fallback)\n",
+					"prefix_lookup = (\n",
+					"    prod_df\n",
+					"    .filter((F.col(\"pc_start\") != \"\") & F.col(\"rec_num\").isNotNull())\n",
+					"    .groupBy(\"pc_start\", \"rec_num\").count()\n",
+					"    .withColumn(\"rn\", F.row_number().over(\n",
+					"        Window.partitionBy(\"pc_start\").orderBy(F.desc(\"count\"))))\n",
+					"    .filter(\"rn = 1\")\n",
+					"    .select(\"pc_start\", F.col(\"rec_num\").alias(\"prefix_rec_num\"))\n",
+					")\n",
+					"\n",
+					"# Corrections set\n",
+					"corrections = (\n",
+					"    stg_df.select(\"hash_id\", \"zip\", \"pc_start\", \"rec_num\")\n",
+					"    .join(zip_lookup, \"zip\", \"left\")\n",
+					"    .join(prefix_lookup, \"pc_start\", \"left\")\n",
+					"    .withColumn(\"new_rec_num\", F.coalesce(\"prod_rec_num\", \"prefix_rec_num\"))\n",
+					"    .filter(\n",
+					"        F.col(\"new_rec_num\").isNotNull() &\n",
+					"        (\n",
+					"            (F.col(\"new_rec_num\") != F.col(\"rec_num\")) |\n",
+					"            F.col(\"rec_num\").isNull()\n",
+					"        )\n",
+					"    )\n",
+					"    .select(\"hash_id\", \"new_rec_num\", \"pc_start\")\n",
+					")\n",
+					"\n",
+					"print(f\"Rows to correct: {corrections.count():,}\")\n",
+					"corrections.show(20, truncate=False)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"stg_delta = DeltaTable.forPath(spark, STG_PATH)\n",
+					"\n",
+					"update_set = {\n",
+					"    \"rec_num\": \"s.new_rec_num\",\n",
+					"    \"postcode_start\": \"s.pc_start\"\n",
+					"}\n",
+					"\n",
+					"# Only sync the audit column if it actually exists\n",
+					"if \"last_updated\" in stg_df.columns:\n",
+					"    update_set[\"last_updated\"] = \"current_timestamp()\"\n",
+					"\n",
+					"(stg_delta.alias(\"t\")\n",
+					"    .merge(corrections.alias(\"s\"), \"t.hash_id = s.hash_id\")\n",
+					"    .whenMatchedUpdate(set=update_set)\n",
+					"    .execute())"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"stg_check = spark.read.format(\"delta\").load(STG_PATH)\n",
+					"stg_check.groupBy(\"rec_num\").count().orderBy(\"rec_num\").show(100)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"target_dates = [\"20260408\", \"20260401\",\"20260408\",\"20260413\",\"20260408\",\"20260413\"] "
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

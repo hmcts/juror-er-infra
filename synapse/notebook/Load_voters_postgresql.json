@@ -1,0 +1,162 @@
+{
+	"name": "Load_voters_postgresql",
+	"properties": {
+		"folder": {
+			"name": "Testing"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkbaubais",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "3386f49e-6980-4e1a-a96d-3b559fc81fb0"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"editable": false,
+					"run_control": {
+						"frozen": true
+					}
+				},
+				"source": [
+					"target_dates = [\"20260408\", \"20260401\",\"20260408\",\"20260413\",\"20260408\",\"20260413\"] "
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# ============================================================================\n",
+					"# CELL 1: Imports, logging, Spark session\n",
+					"# ============================================================================\n",
+					"\n",
+					"from pyspark.sql import SparkSession\n",
+					"from pyspark.sql.functions import col, lit, regexp_extract\n",
+					"from notebookutils import mssparkutils\n",
+					"import logging\n",
+					"\n",
+					"logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
+					"logger = logging.getLogger()\n",
+					"\n",
+					"spark = SparkSession.builder \\\n",
+					"    .appName(\"STG Voters - Rewrite voters_postgresql\") \\\n",
+					"    .config(\"spark.sql.extensions\", \"io.delta.sql.DeltaSparkSessionExtension\") \\\n",
+					"    .config(\"spark.sql.catalog.spark_catalog\", \"org.apache.spark.sql.delta.catalog.DeltaCatalog\") \\\n",
+					"    .getOrCreate()\n",
+					"\n",
+					"\n",
+					"# ============================================================================\n",
+					"# CELL 2: Rewrite voters_postgresql from the corrected L3 Delta table\n",
+					"# ============================================================================\n",
+					"\n",
+					"def rewrite_voters_postgresql_stg():\n",
+					"    storage_account = \"baubaisadfsastg\"\n",
+					"    source_path = f\"abfss://dl-juror-eric-voters-temp@{storage_account}.dfs.core.windows.net/voters_deduplicated_delta\"\n",
+					"    postgresql_path = f\"abfss://juror-etl@{storage_account}.dfs.core.windows.net/voters_postgresql\"\n",
+					"\n",
+					"    # PostgreSQL schema columns only\n",
+					"    postgresql_columns = [\n",
+					"        \"part_no\", \"register_lett\", \"poll_number\", \"new_marker\", \"title\",\n",
+					"        \"lname\", \"fname\", \"dob\", \"flags\", \"address\", \"address2\", \"address3\",\n",
+					"        \"address4\", \"address5\", \"address6\", \"zip\", \"date_selected1\",\n",
+					"        \"date_selected2\", \"date_selected3\", \"rec_num\", \"perm_disqual\",\n",
+					"        \"source_id\", \"postcode_start\", \"creation_date\", \"hash_id\"\n",
+					"    ]\n",
+					"\n",
+					"    # Read the corrected L3 Delta table\n",
+					"    logger.info(f\"Reading L3 Delta table from {source_path}\")\n",
+					"    source_df = spark.read.format(\"delta\").load(source_path)\n",
+					"    logger.info(f\"Source record count: {source_df.count():,}\")\n",
+					"\n",
+					"    # Check which postgresql columns exist in the source; add any missing as NULL\n",
+					"    missing = [c for c in postgresql_columns if c not in source_df.columns]\n",
+					"    if missing:\n",
+					"        logger.warning(f\"Columns missing in L3 table, adding as NULL: {missing}\")\n",
+					"        for c in missing:\n",
+					"            source_df = source_df.withColumn(c, lit(None))\n",
+					"\n",
+					"    # Select ONLY the postgresql columns (drops audit/CDC columns etc.)\n",
+					"    pg_df = source_df.select(*postgresql_columns)\n",
+					"\n",
+					"    # Sanity check the corrected rec_num\n",
+					"    logger.info(\"rec_num distribution (top 20):\")\n",
+					"    pg_df.groupBy(\"rec_num\").count().orderBy(col(\"count\").desc()).show(20)\n",
+					"\n",
+					"    # Partition column, same as the L2 pipeline write\n",
+					"    pg_df = pg_df.withColumn(\n",
+					"        \"creation_date_partition\",\n",
+					"        regexp_extract(col(\"creation_date\"), \"^(\\\\d{8})\", 1)\n",
+					"    )\n",
+					"\n",
+					"    # Rewrite voters_postgresql\n",
+					"    logger.info(f\"Rewriting {postgresql_path}\")\n",
+					"    pg_df.write \\\n",
+					"        .partitionBy(\"creation_date_partition\") \\\n",
+					"        .mode(\"overwrite\") \\\n",
+					"        .option(\"partitionOverwriteMode\", \"static\") \\\n",
+					"        .parquet(postgresql_path)\n",
+					"\n",
+					"    logger.info(\"voters_postgresql rewritten successfully\")\n",
+					"    return postgresql_path\n",
+					"\n",
+					"\n",
+					"# ============================================================================\n",
+					"# CELL 3: Execute and verify\n",
+					"# ============================================================================\n",
+					"\n",
+					"result_path = rewrite_voters_postgresql_stg()\n",
+					"\n",
+					"if result_path:\n",
+					"    check_df = spark.read.parquet(result_path)\n",
+					"    print(f\"Verified: {check_df.count():,} records in voters_postgresql\")\n",
+					"    check_df.groupBy(\"rec_num\").count().orderBy(\"rec_num\").show(50)\n",
+					"    check_df.select(\"zip\", \"rec_num\", \"postcode_start\").show(10, truncate=False)\n",
+					"else:\n",
+					"    print(\"Rewrite failed - check logs above\")"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

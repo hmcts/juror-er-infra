@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "38882d7a-a329-461e-b4eb-3df1d5d788fe"
+				"spark.autotune.trackingId": "5d370139-7694-458b-a95d-93b690feb500"
 			}
 		},
 		"metadata": {
@@ -3483,6 +3483,22 @@
 				"source": [
 					"if __name__ == \"__main__\":\n",
 					"    main()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df = spark.read.parquet(\"abfss://juror-etl@baubaisadfsastg.dfs.core.windows.net/files/20260605_Redbridge_JUR_LA_GA_01-12-2025_csv.parquet\")\n",
+					"df.select(\"Date Of Birth\").show(20, truncate=False)\n",
+					"df.filter(col(\"Date Of Birth\").isNull()).count()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
 				],
 				"execution_count": null
 			}

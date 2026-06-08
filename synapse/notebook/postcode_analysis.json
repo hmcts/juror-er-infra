@@ -93,7 +93,7 @@
 					"\n",
 					"spark.sparkContext.setCheckpointDir(CHECKPOINT)"
 				],
-				"execution_count": 18
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -121,7 +121,7 @@
 					"print(f\"2025 rows:    {df_2025.count():,}\")\n",
 					"print(f\"Current rows: {df_current.count():,}\")"
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -157,7 +157,7 @@
 					"print(f\"2025  distinct rec_num+zip: {df_2025_clean.count():,}\")\n",
 					"print(f\"Current distinct rec_num+zip: {df_current_clean.count():,}\")"
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -184,7 +184,7 @@
 					"    .withColumn(\"abs_difference\",   F.abs(F.col(\"count_difference\")))\n",
 					")"
 				],
-				"execution_count": 22
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -254,7 +254,7 @@
 					"print(\"\\nSignificance distribution:\")\n",
 					"df_flagged.groupBy(\"significance\").count().orderBy(\"count\").show()"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -292,7 +292,7 @@
 					"df_detail.groupBy(\"change_type\").count().orderBy(\"count\").show()\n",
 					"print(f\"Total changed rows: {df_detail.count():,}\")"
 				],
-				"execution_count": 24
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -325,7 +325,7 @@
 					"\n",
 					"print(\"\\n✅ Analysis complete\")"
 				],
-				"execution_count": 25
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -362,7 +362,7 @@
 					"    .show(10, truncate=False)\n",
 					")"
 				],
-				"execution_count": 26
+				"execution_count": null
 			}
 		]
 	}

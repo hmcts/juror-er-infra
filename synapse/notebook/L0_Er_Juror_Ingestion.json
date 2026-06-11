@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "50892168-d419-460c-8a2b-c42c86d2f71a"
+				"spark.autotune.trackingId": "423e9f2e-218e-42e7-ab0f-c891f22883ed"
 			}
 		},
 		"metadata": {
@@ -1456,6 +1456,10 @@
 					"        # Build a UNIQUE folder_key per file using original filename + index\n",
 					"        # ====================================================================\n",
 					"        file_stem      = os.path.splitext(file_name)[0]\n",
+					"        clean_stem, had_illegal = sanitize_name_component(file_stem)\n",
+					"        if had_illegal:\n",
+					"            print(f\"  🔤 Illegal characters in filename — sanitised: '{file_stem}' → '{clean_stem}'\")\n",
+					"            file_stem = clean_stem\n",
 					"        file_ext       = os.path.splitext(source_path)[1].lower()\n",
 					"        suffix         = f\"_{file_index}\" if file_index > 0 else \"\"\n",
 					"        file_ext_clean = file_ext.replace(\".\", \"\")\n",

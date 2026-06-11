@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1789f9e0-b8bd-48d1-8392-afbcee6366dd"
+				"spark.autotune.trackingId": "61c28be4-473a-4548-83f4-0ffeaa4af646"
 			}
 		},
 		"metadata": {
@@ -924,9 +924,9 @@
 					"                        clean_stem, had_illegal = sanitize_name_component(stem)\n",
 					"                        if had_illegal:\n",
 					"                            safe_name = f\"{clean_stem}{ext}\"\n",
-					"                             print(f\"{indent}  🔤 Illegal characters in extracted filename — \"\n",
+					"                            print(f\"{indent}  🔤 Illegal characters in extracted filename — \"\n",
 					"                                  f\"'{out_name}' → '{safe_name}'\")\n",
-					"                             remote_file_path = f\"{out_dir}/{safe_name}\"\n",
+					"                            remote_file_path = f\"{out_dir}/{safe_name}\"\n",
 					"                        \n",
 					"                        print(f\"{indent}  ✅ Uploading: {os.path.basename(remote_file_path)}\")\n",
 					"                        mssparkutils.fs.cp(f\"file://{local_file_path}\", remote_file_path)\n",

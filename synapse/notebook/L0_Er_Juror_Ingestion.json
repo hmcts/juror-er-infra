@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "423e9f2e-218e-42e7-ab0f-c891f22883ed"
+				"spark.autotune.trackingId": "cb4a86d9-48e7-43aa-8f86-977063d2adee"
 			}
 		},
 		"metadata": {
@@ -353,6 +353,36 @@
 					"                .otherwise(when(col(TMP) == \"\", lit(None)).otherwise(col(TMP))),\n",
 					"            ).drop(TMP)\n",
 					"    return df"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# ============================================================================\n",
+					"# Filename sanitisation for ADLS (abfss) paths & Parquet folder names\n",
+					"# Anything outside [A-Za-z0-9._-] is illegal/problematic in an abfss path\n",
+					"# (spaces, & # % / \\ : | < > * ? quotes, accents, control chars, ...).\n",
+					"# Only the FILE NAME is touched — date_folder / la_folder / la_code come\n",
+					"# from the folder path and are left untouched, so LA-code reading and the\n",
+					"# output structure stay the same as every other file.\n",
+					"# ============================================================================\n",
+					"ILLEGAL_PATH_CHARS_RE = re.compile(r'[^A-Za-z0-9._-]')\n",
+					"\n",
+					"def sanitize_name_component(name, replacement=\"_\"):\n",
+					"    \"\"\"\n",
+					"    Returns (clean_name, had_illegal).\n",
+					"    had_illegal is True only when a genuinely illegal char was present,\n",
+					"    so clean filenames are returned byte-for-byte unchanged.\n",
+					"    \"\"\"\n",
+					"    if name is None:\n",
+					"        return name, False\n",
+					"    had_illegal = bool(ILLEGAL_PATH_CHARS_RE.search(name))\n",
+					"    clean = ILLEGAL_PATH_CHARS_RE.sub(replacement, name)\n",
+					"    clean = re.sub(r'_+', '_', clean).strip('_')   # collapse + trim\n",
+					"    if not clean:                                   # name was all illegal chars\n",
+					"        clean = \"file\"\n",
+					"    return clean, had_illegal"
 				],
 				"execution_count": null
 			},

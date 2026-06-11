@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cb4a86d9-48e7-43aa-8f86-977063d2adee"
+				"spark.autotune.trackingId": "11d10fab-7544-4906-b977-bc60e2c49551"
 			}
 		},
 		"metadata": {
@@ -159,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": null
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -189,7 +189,7 @@
 					"processing_container = \"juror-etl\"\n",
 					"ingestion_container = \"juror-ingestion\" #\"juror-ingestion\""
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -197,7 +197,7 @@
 					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"print(f\"   openpyxl: {openpyxl.__version__}\")\n",
 					"print(f\"   pandas:   {pandas.__version__}\")"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -239,7 +239,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -354,11 +354,49 @@
 					"            ).drop(TMP)\n",
 					"    return df"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
 				"source": [
+					"# ============================================================================\n",
+					"# Spark reads a path as a Hadoop GLOB, so filenames containing [ ] { } * ?\n",
+					"# (e.g. 'Juror [1].csv') fail with PATH_NOT_FOUND even though the file exists,\n",
+					"# and get wrongly quarantined as 'file_unreadable'. mssparkutils.fs.cp is NOT\n",
+					"# glob-based, so we rename the file in place to a Spark-safe name within the\n",
+					"# SAME folder. Folder structure (and LA-code detection) is untouched.\n",
+					"# ============================================================================\n",
+					"GLOB_METACHARS_RE = re.compile(r'[\\[\\]\\{\\}\\*\\?]')\n",
+					"\n",
+					"def ensure_spark_safe_source(file_path):\n",
+					"    \"\"\"Rename a glob-unsafe source file in place; return the path Spark should read.\"\"\"\n",
+					"    file_name = os.path.basename(file_path)\n",
+					"    if not GLOB_METACHARS_RE.search(file_name):\n",
+					"        return file_path                       # already safe — do nothing\n",
+					"\n",
+					"    folder    = os.path.dirname(file_path)\n",
+					"    stem, ext = os.path.splitext(file_name)\n",
+					"    clean_stem, _ = sanitize_name_component(stem)\n",
+					"    safe_name = f\"{clean_stem}{ext}\"\n",
+					"    safe_path = f\"{folder}/{safe_name}\"\n",
+					"\n",
+					"    # Don't clobber an existing clean file with the same name\n",
+					"    if mssparkutils.fs.exists(safe_path):\n",
+					"        safe_name = f\"{clean_stem}_{abs(hash(file_path)) % 100000}{ext}\"\n",
+					"        safe_path = f\"{folder}/{safe_name}\"\n",
+					"\n",
+					"    print(f\"   🪄 Glob-unsafe filename — renaming source for Spark read:\")\n",
+					"    print(f\"      {file_name} → {safe_name}\")\n",
+					"    try:\n",
+					"        mssparkutils.fs.cp(file_path, safe_path, True)   # cp works (not glob-based)\n",
+					"        if mssparkutils.fs.exists(safe_path):\n",
+					"            mssparkutils.fs.rm(file_path, True)          # remove glob-named original\n",
+					"            return safe_path\n",
+					"        print(f\"   ⚠️  Rename not verified — reading original path\")\n",
+					"        return file_path\n",
+					"    except Exception as e:\n",
+					"        print(f\"   ⚠️  Could not rename source ({e}) — reading original path\")\n",
+					"        return file_path\n",
 					"# ============================================================================\n",
 					"# Filename sanitisation for ADLS (abfss) paths & Parquet folder names\n",
 					"# Anything outside [A-Za-z0-9._-] is illegal/problematic in an abfss path\n",
@@ -384,7 +422,7 @@
 					"        clean = \"file\"\n",
 					"    return clean, had_illegal"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -418,7 +456,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -440,7 +478,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -501,7 +539,7 @@
 					"\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -669,7 +707,7 @@
 					"        print(f\"   ⚠️  Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -895,7 +933,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -994,7 +1032,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "code",
@@ -1157,7 +1195,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -1179,7 +1217,7 @@
 					"    return (file_path_lower in quarantine_log_data['quarantine_files'] or \n",
 					"            norm_path in quarantine_log_data['quarantine_files'])"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -1341,7 +1379,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False, None, None"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -1376,7 +1414,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -1413,7 +1451,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -1454,7 +1492,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -1656,7 +1694,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -1705,7 +1743,7 @@
 					"\n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -1792,7 +1830,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, la_code={la_code}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, la_code, confidence"
 				],
-				"execution_count": null
+				"execution_count": 22
 			},
 			{
 				"cell_type": "markdown",
@@ -1917,7 +1955,7 @@
 					"\n",
 					"    return all_files"
 				],
-				"execution_count": null
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -2468,7 +2506,7 @@
 					"\n",
 					"\"\"\""
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -2553,7 +2591,7 @@
 					"    print(f\"Total quarantined: {len(quarantined)} files\")\n",
 					"    print(\"=\" * 70)"
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -2574,7 +2612,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -2597,7 +2635,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": null
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -2659,7 +2697,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -2731,7 +2769,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": null
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -2785,7 +2823,7 @@
 					"\n",
 					"    return file_index"
 				],
-				"execution_count": null
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -2865,7 +2903,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": null
+				"execution_count": 31
 			},
 			{
 				"cell_type": "markdown",
@@ -2917,7 +2955,7 @@
 					"    print(f\"   Files quarantined: {len(_moved_files['quarantine']) - len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
 					"    "
 				],
-				"execution_count": null
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -3145,7 +3183,7 @@
 					"    print(f\"{indent}   Files quarantined:         {len(moved_files.get('quarantine', []))}\")\n",
 					"    print(f\"{indent}   Failed operations:         {len(moved_files.get('failed', []))}\")"
 				],
-				"execution_count": null
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -3491,7 +3529,7 @@
 					"\n",
 					"    print_quarantine_summary(moved_files)"
 				],
-				"execution_count": null
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -3499,7 +3537,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": null
+				"execution_count": 35
 			}
 		]
 	}

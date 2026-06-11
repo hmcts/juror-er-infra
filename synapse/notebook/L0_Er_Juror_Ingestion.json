@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6d4ff964-4985-41e4-8e61-0d94b834c882"
+				"spark.autotune.trackingId": "156e8ee8-a4d3-4af7-9fa2-0c5da7b3ee65"
 			}
 		},
 		"metadata": {
@@ -159,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 75
+				"execution_count": 145
 			},
 			{
 				"cell_type": "markdown",
@@ -189,7 +189,7 @@
 					"processing_container = \"juror-etl\"\n",
 					"ingestion_container = \"juror-ingestion\" #\"juror-ingestion\""
 				],
-				"execution_count": 76
+				"execution_count": 146
 			},
 			{
 				"cell_type": "code",
@@ -197,7 +197,7 @@
 					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": 77
+				"execution_count": 147
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"print(f\"   openpyxl: {openpyxl.__version__}\")\n",
 					"print(f\"   pandas:   {pandas.__version__}\")"
 				],
-				"execution_count": 78
+				"execution_count": 148
 			},
 			{
 				"cell_type": "code",
@@ -239,7 +239,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 79
+				"execution_count": 149
 			},
 			{
 				"cell_type": "code",
@@ -354,7 +354,7 @@
 					"            ).drop(TMP)\n",
 					"    return df"
 				],
-				"execution_count": 80
+				"execution_count": 150
 			},
 			{
 				"cell_type": "code",
@@ -422,7 +422,7 @@
 					"        clean = \"file\"\n",
 					"    return clean, had_illegal"
 				],
-				"execution_count": 81
+				"execution_count": 151
 			},
 			{
 				"cell_type": "code",
@@ -456,7 +456,7 @@
 					"        \n",
 					"    return False"
 				],
-				"execution_count": 82
+				"execution_count": 152
 			},
 			{
 				"cell_type": "code",
@@ -478,7 +478,7 @@
 					"    \"\"\"Check if file is a zip file\"\"\"\n",
 					"    return file_path.lower().endswith('.zip')"
 				],
-				"execution_count": 83
+				"execution_count": 153
 			},
 			{
 				"cell_type": "code",
@@ -539,7 +539,7 @@
 					"\n",
 					""
 				],
-				"execution_count": 84
+				"execution_count": 154
 			},
 			{
 				"cell_type": "code",
@@ -707,7 +707,7 @@
 					"        print(f\"   ⚠️  Error in is_empty_file check: {str(e)}\")\n",
 					"        return True, \"file_corrupted\""
 				],
-				"execution_count": 85
+				"execution_count": 155
 			},
 			{
 				"cell_type": "markdown",
@@ -933,7 +933,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False, \"file_unreadable\""
 				],
-				"execution_count": 86
+				"execution_count": 156
 			},
 			{
 				"cell_type": "code",
@@ -1032,7 +1032,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 87
+				"execution_count": 157
 			},
 			{
 				"cell_type": "code",
@@ -1069,7 +1069,13 @@
 					"        # Read using Spark\n",
 					"        text_df = spark.read.text(log_file_path)\n",
 					"        log_content = \"\\n\".join([row.value for row in text_df.collect()])\n",
-					"        \n",
+					"        # Guard: empty file or UTF-8 BOM → treat as \"no prior history\".\n",
+					"        # json.loads(\"\") raises: Expecting value: line 1 column 1 (char 0)\n",
+					"\n",
+					"        log_content = log_content.lstrip(\"\\ufeff\").strip()\n",
+					"        if not log_content:\n",
+					"            print(\"  Quarantine log exists but is empty — treating as no prior history\")\n",
+					"            return {'quarantine_files': set(), 'quarantine_details': []}\n",
 					"        # Parse JSON\n",
 					"        log_data = json.loads(log_content)\n",
 					"        \n",
@@ -1195,7 +1201,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 88
+				"execution_count": 158
 			},
 			{
 				"cell_type": "code",
@@ -1217,7 +1223,7 @@
 					"    return (file_path_lower in quarantine_log_data['quarantine_files'] or \n",
 					"            norm_path in quarantine_log_data['quarantine_files'])"
 				],
-				"execution_count": 89
+				"execution_count": 159
 			},
 			{
 				"cell_type": "code",
@@ -1379,7 +1385,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False, None, None"
 				],
-				"execution_count": 90
+				"execution_count": 160
 			},
 			{
 				"cell_type": "code",
@@ -1414,7 +1420,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 91
+				"execution_count": 161
 			},
 			{
 				"cell_type": "code",
@@ -1451,7 +1457,7 @@
 					"        print(f\"Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 92
+				"execution_count": 162
 			},
 			{
 				"cell_type": "code",
@@ -1492,7 +1498,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False"
 				],
-				"execution_count": 93
+				"execution_count": 163
 			},
 			{
 				"cell_type": "code",
@@ -1694,7 +1700,7 @@
 					"        print(f\"  Traceback: {traceback.format_exc()}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 94
+				"execution_count": 164
 			},
 			{
 				"cell_type": "code",
@@ -1743,7 +1749,7 @@
 					"\n",
 					"    return date_folder, la_folder"
 				],
-				"execution_count": 95
+				"execution_count": 165
 			},
 			{
 				"cell_type": "code",
@@ -1830,7 +1836,7 @@
 					"    print(f\"Extracted: date_folder={date_folder}, la_folder={la_folder}, la_code={la_code}, confidence={confidence}\")\n",
 					"    return date_folder, la_folder, la_code, confidence"
 				],
-				"execution_count": 96
+				"execution_count": 166
 			},
 			{
 				"cell_type": "markdown",
@@ -1956,7 +1962,7 @@
 					"\n",
 					"    return all_files"
 				],
-				"execution_count": 97
+				"execution_count": 167
 			},
 			{
 				"cell_type": "code",
@@ -2507,7 +2513,7 @@
 					"\n",
 					"\"\"\""
 				],
-				"execution_count": 98
+				"execution_count": 168
 			},
 			{
 				"cell_type": "code",
@@ -2592,7 +2598,7 @@
 					"    print(f\"Total quarantined: {len(quarantined)} files\")\n",
 					"    print(\"=\" * 70)"
 				],
-				"execution_count": 99
+				"execution_count": 169
 			},
 			{
 				"cell_type": "code",
@@ -2613,7 +2619,7 @@
 					"    \n",
 					"    return normalized"
 				],
-				"execution_count": 100
+				"execution_count": 170
 			},
 			{
 				"cell_type": "code",
@@ -2636,7 +2642,7 @@
 					"    \n",
 					"    return False  # Use False"
 				],
-				"execution_count": 101
+				"execution_count": 171
 			},
 			{
 				"cell_type": "code",
@@ -2698,7 +2704,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return set()"
 				],
-				"execution_count": 102
+				"execution_count": 172
 			},
 			{
 				"cell_type": "code",
@@ -2770,7 +2776,7 @@
 					"        print(f\"Error in file group processing: {str(e)}\")\n",
 					"        return False, None"
 				],
-				"execution_count": 103
+				"execution_count": 173
 			},
 			{
 				"cell_type": "code",
@@ -2824,7 +2830,7 @@
 					"\n",
 					"    return file_index"
 				],
-				"execution_count": 104
+				"execution_count": 174
 			},
 			{
 				"cell_type": "code",
@@ -2904,7 +2910,7 @@
 					"        print(traceback.format_exc())\n",
 					"        return False"
 				],
-				"execution_count": 105
+				"execution_count": 175
 			},
 			{
 				"cell_type": "markdown",
@@ -2956,7 +2962,7 @@
 					"    print(f\"   Files quarantined: {len(_moved_files['quarantine']) - len([f for f in _moved_files['quarantine'] if f.lower().endswith('.zip')])}\")\n",
 					"    "
 				],
-				"execution_count": 106
+				"execution_count": 176
 			},
 			{
 				"cell_type": "code",
@@ -3184,7 +3190,7 @@
 					"    print(f\"{indent}   Files quarantined:         {len(moved_files.get('quarantine', []))}\")\n",
 					"    print(f\"{indent}   Failed operations:         {len(moved_files.get('failed', []))}\")"
 				],
-				"execution_count": 107
+				"execution_count": 177
 			},
 			{
 				"cell_type": "code",
@@ -3530,7 +3536,7 @@
 					"\n",
 					"    print_quarantine_summary(moved_files)"
 				],
-				"execution_count": 108
+				"execution_count": 178
 			},
 			{
 				"cell_type": "code",
@@ -3538,7 +3544,7 @@
 					"if __name__ == \"__main__\":\n",
 					"    main()"
 				],
-				"execution_count": 109
+				"execution_count": 179
 			}
 		]
 	}

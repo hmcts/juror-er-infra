@@ -21,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "11d10fab-7544-4906-b977-bc60e2c49551"
+				"spark.autotune.trackingId": "6e5fde62-afe7-4fea-8659-51661023bb7c"
 			}
 		},
 		"metadata": {
@@ -159,7 +159,7 @@
 					"import logging\n",
 					"import traceback"
 				],
-				"execution_count": 1
+				"execution_count": 36
 			},
 			{
 				"cell_type": "markdown",
@@ -189,7 +189,7 @@
 					"processing_container = \"juror-etl\"\n",
 					"ingestion_container = \"juror-ingestion\" #\"juror-ingestion\""
 				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -197,7 +197,7 @@
 					"env = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
 					"storage_account = f\"baubaisadfsa{env}\""
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -217,7 +217,7 @@
 					"print(f\"   openpyxl: {openpyxl.__version__}\")\n",
 					"print(f\"   pandas:   {pandas.__version__}\")"
 				],
-				"execution_count": 4
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -239,7 +239,7 @@
 					"file_counters = defaultdict(int)\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -354,7 +354,7 @@
 					"            ).drop(TMP)\n",
 					"    return df"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -422,7 +422,7 @@
 					"        clean = \"file\"\n",
 					"    return clean, had_illegal"
 				],
-				"execution_count": 7
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -1945,8 +1945,9 @@
 					"\n",
 					"                # Add non-ZIP files to processing list\n",
 					"                elif 'File Structure Definitions.xlsx' not in file_info.path:\n",
-					"                    print(f\"{indent}Found file: {file_info.path}\")\n",
-					"                    all_files.append(file_info.path)\n",
+					"                    safe_path = ensure_spark_safe_source(file_info.path)\n",
+					"                    print(f\"{indent}Found file: {safe_path}\")\n",
+					"                    all_files.append(safe_path)\n",
 					"\n",
 					"    except Exception as e:\n",
 					"        print(f\"{indent}Error accessing path {path}: {str(e)}\")\n",

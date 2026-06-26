@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ef5a8fbe-c358-43f9-aba8-0c02a082e881"
+				"spark.autotune.trackingId": "1555fed6-7d67-474e-a684-281016cd67ba"
 			}
 		},
 		"metadata": {
@@ -92,7 +92,7 @@
 					"PATH_CURRENT    = f\"abfss://{CONTAINER_NOW}@{STORAGE}/voters_deduplicated_delta/\"\n",
 					"spark.sparkContext.setCheckpointDir(CHECKPOINT)"
 				],
-				"execution_count": 18
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -120,7 +120,7 @@
 					"print(f\"2025 rows:    {df_2025.count():,}\")\n",
 					"print(f\"Current rows: {df_current.count():,}\")"
 				],
-				"execution_count": 19
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -156,7 +156,7 @@
 					"print(f\"2025  distinct rec_num+zip: {df_2025_clean.count():,}\")\n",
 					"print(f\"Current distinct rec_num+zip: {df_current_clean.count():,}\")"
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -183,7 +183,7 @@
 					"    .withColumn(\"abs_difference\",   F.abs(F.col(\"count_difference\")))\n",
 					")"
 				],
-				"execution_count": 22
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -253,7 +253,7 @@
 					"print(\"\\nSignificance distribution:\")\n",
 					"df_flagged.groupBy(\"significance\").count().orderBy(\"count\").show()"
 				],
-				"execution_count": 23
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -291,7 +291,7 @@
 					"df_detail.groupBy(\"change_type\").count().orderBy(\"count\").show()\n",
 					"print(f\"Total changed rows: {df_detail.count():,}\")"
 				],
-				"execution_count": 24
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -324,7 +324,7 @@
 					"\n",
 					"print(\"\\n✅ Analysis complete\")"
 				],
-				"execution_count": 25
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",
@@ -361,7 +361,7 @@
 					"    .show(10, truncate=False)\n",
 					")"
 				],
-				"execution_count": 26
+				"execution_count": null
 			}
 		]
 	}

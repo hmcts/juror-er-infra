@@ -1,0 +1,368 @@
+{
+	"name": "postcode_analysis",
+	"properties": {
+		"folder": {
+			"name": "crime"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparkbaubais",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "1555fed6-7d67-474e-a684-281016cd67ba"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/74dacd4f-a248-45bb-a2f0-af700dc4cf68/resourceGroups/baubais-data-factory-rg-stg/providers/Microsoft.Synapse/workspaces/baubais-synapse-stg/bigDataPools/sparkbaubais",
+				"name": "sparkbaubais",
+				"type": "Spark",
+				"endpoint": "https://baubais-synapse-stg.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkbaubais",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"source": [
+					"# ER Juror — Postcode Change Analysis (2025 vs Current Year)\n",
+					"\n",
+					"Compares `rec_num + zip` between 2025 baseline CSV and current Delta table.\n",
+					"\n",
+					"| Output | Description |\n",
+					"|---|---|\n",
+					"| `la_summary` | LA-level statistics with IQR significance flags |\n",
+					"| `postcode_detail_significant` | Changed postcodes: New / Removed / Count Changed |\n",
+					""
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Config\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql import functions as F, SparkSession\n",
+					"from notebookutils import mssparkutils\n",
+					"\n",
+					"spark = SparkSession.builder.getOrCreate()\n",
+					"\n",
+					"# ── Config ────────────────────────────────────────────────────────────────────\n",
+					"env             = mssparkutils.env.getWorkspaceName().split(\"-\")[-1]\n",
+					"storage_account = f\"baubaisadfsa{env}\"\n",
+					"STORAGE         = f\"{storage_account}.dfs.core.windows.net\"\n",
+					"CONTAINER_25    = \"dl-juror-eric-voters-temp-2025\"\n",
+					"CONTAINER_NOW   = \"dl-juror-eric-voters-temp\"\n",
+					"OUTPUT_BASE     = f\"abfss://{CONTAINER_NOW}@{STORAGE}/postcode_analysis\"\n",
+					"CHECKPOINT      = f\"abfss://{CONTAINER_NOW}@{STORAGE}/checkpoints\"\n",
+					"PATH_2025       = f\"abfss://{CONTAINER_25}@{STORAGE}/rec_num_vs_zip_25.csv\"\n",
+					"PATH_CURRENT    = f\"abfss://{CONTAINER_NOW}@{STORAGE}/voters_deduplicated_delta/\"\n",
+					"spark.sparkContext.setCheckpointDir(CHECKPOINT)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Step 1 — Read source data\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_2025 = (\n",
+					"    spark.read\n",
+					"    .option(\"header\", \"true\")\n",
+					"    .option(\"inferSchema\", \"true\")\n",
+					"    .csv(PATH_2025)\n",
+					")\n",
+					"\n",
+					"df_current = (\n",
+					"    spark.read\n",
+					"    .format(\"delta\")\n",
+					"    .load(PATH_CURRENT)\n",
+					")\n",
+					"\n",
+					"print(f\"2025 rows:    {df_2025.count():,}\")\n",
+					"print(f\"Current rows: {df_current.count():,}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Step 2 — Clean and standardise\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_2025_clean = (\n",
+					"    df_2025\n",
+					"    .select(\n",
+					"        F.col(\"rec_num\").cast(\"integer\").alias(\"rec_num\"),\n",
+					"        F.upper(F.trim(F.col(\"zip\"))).alias(\"zip\"),\n",
+					"        F.col(\"count\").alias(\"count_2025\")\n",
+					"    )\n",
+					"    .filter(F.col(\"zip\").isNotNull() & F.col(\"rec_num\").isNotNull())\n",
+					"    .dropDuplicates([\"rec_num\", \"zip\"])\n",
+					")\n",
+					"df_current_clean = (\n",
+					"    df_current\n",
+					"    # removed: .filter(F.col(\"AdtclmnRecordActiveInd\") == 1)\n",
+					"    .select(\n",
+					"        F.col(\"rec_num\").cast(\"integer\").alias(\"rec_num\"),\n",
+					"        F.upper(F.trim(F.col(\"zip\"))).alias(\"zip\"),\n",
+					"    )\n",
+					"    .filter(F.col(\"zip\").isNotNull() & F.col(\"rec_num\").isNotNull())\n",
+					"    .groupBy(\"rec_num\", \"zip\")\n",
+					"    .agg(F.count(\"*\").alias(\"count_current\"))\n",
+					")\n",
+					"print(f\"2025  distinct rec_num+zip: {df_2025_clean.count():,}\")\n",
+					"print(f\"Current distinct rec_num+zip: {df_current_clean.count():,}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Step 3 — Full outer join + classify changes\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_joined = (\n",
+					"    df_2025_clean\n",
+					"    .join(df_current_clean, on=[\"rec_num\", \"zip\"], how=\"full_outer\")\n",
+					"    .fillna(0, subset=[\"count_2025\", \"count_current\"])\n",
+					"    .withColumn(\n",
+					"        \"change_type\",\n",
+					"        F.when(F.col(\"count_2025\")    == 0,                      \"New\")\n",
+					"         .when(F.col(\"count_current\") == 0,                      \"Removed\")\n",
+					"         .when(F.col(\"count_2025\")    != F.col(\"count_current\"), \"Count Changed\")\n",
+					"         .otherwise(\"Unchanged\")\n",
+					"    )\n",
+					"    .withColumn(\"count_difference\", F.col(\"count_current\") - F.col(\"count_2025\"))\n",
+					"    .withColumn(\"abs_difference\",   F.abs(F.col(\"count_difference\")))\n",
+					")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Step 4 — LA-level summary with IQR significance\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_la_summary = (\n",
+					"    df_joined\n",
+					"    .groupBy(\"rec_num\")\n",
+					"    .agg(\n",
+					"        F.sum(\"count_2025\")                                        .alias(\"total_2025\"),\n",
+					"        F.sum(\"count_current\")                                     .alias(\"total_current\"),\n",
+					"        F.count(F.when(F.col(\"change_type\") == \"New\",           1)).alias(\"new_postcodes\"),\n",
+					"        F.count(F.when(F.col(\"change_type\") == \"Removed\",       1)).alias(\"removed_postcodes\"),\n",
+					"        F.count(F.when(F.col(\"change_type\") == \"Count Changed\", 1)).alias(\"count_changed_postcodes\"),\n",
+					"        F.count(F.when(F.col(\"change_type\") == \"Unchanged\",     1)).alias(\"unchanged_postcodes\"),\n",
+					"    )\n",
+					"    .withColumn(\"net_change\", F.col(\"total_current\") - F.col(\"total_2025\"))\n",
+					"    .withColumn(\n",
+					"        \"pct_net_change\",\n",
+					"        F.round(\n",
+					"            F.when(F.col(\"total_2025\") > 0,\n",
+					"                F.col(\"net_change\") / F.col(\"total_2025\") * 100\n",
+					"            ).otherwise(0), 2\n",
+					"        )\n",
+					"    )\n",
+					"    .withColumn(\"abs_pct_change\", F.abs(F.col(\"pct_net_change\")))\n",
+					"    .withColumn(\n",
+					"        \"change_direction\",\n",
+					"        F.when(F.col(\"net_change\") > 0, \"Growth\")\n",
+					"         .when(F.col(\"net_change\") < 0, \"Loss\")\n",
+					"         .otherwise(\"No Change\")\n",
+					"    )\n",
+					")\n",
+					"\n",
+					"# IQR outlier detection\n",
+					"q1, q3      = df_la_summary.approxQuantile(\"pct_net_change\", [0.25, 0.75], 0.01)\n",
+					"iqr         = q3 - q1\n",
+					"lower_fence = q1 - (1.5 * iqr)\n",
+					"upper_fence = q3 + (1.5 * iqr)\n",
+					"\n",
+					"print(f\"Q1: {q1:.2f}%  Q3: {q3:.2f}%  IQR: {iqr:.2f}%\")\n",
+					"print(f\"Lower fence: {lower_fence:.2f}%  Upper fence: {upper_fence:.2f}%\")\n",
+					"\n",
+					"df_flagged = (\n",
+					"    df_la_summary\n",
+					"    .withColumn(\n",
+					"        \"is_outlier\",\n",
+					"        (F.col(\"pct_net_change\") < lower_fence) |\n",
+					"        (F.col(\"pct_net_change\") > upper_fence)\n",
+					"    )\n",
+					"    .withColumn(\n",
+					"        \"significance\",\n",
+					"        F.when(F.col(\"abs_pct_change\") >= 20, \"🔴 Critical\")\n",
+					"         .when(F.col(\"abs_pct_change\") >= 10, \"🟠 Significant\")\n",
+					"         .when(F.col(\"abs_pct_change\") >= 5,  \"🟡 Moderate\")\n",
+					"         .when(F.col(\"is_outlier\"),            \"🔵 Outlier\")\n",
+					"         .otherwise(\"🟢 Normal\")\n",
+					"    )\n",
+					")\n",
+					"\n",
+					"print(\"\\nSignificance distribution:\")\n",
+					"df_flagged.groupBy(\"significance\").count().orderBy(\"count\").show()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Step 5 — Build postcode detail (all changes except Unchanged)\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"df_detail = (\n",
+					"    df_joined\n",
+					"    .filter(F.col(\"change_type\") != \"Unchanged\")\n",
+					"    .join(\n",
+					"        df_flagged.select(\"rec_num\", \"significance\", \"change_direction\"),\n",
+					"        on=\"rec_num\",\n",
+					"        how=\"left\"\n",
+					"    )\n",
+					"    .select(\n",
+					"        \"rec_num\",\n",
+					"        \"zip\",\n",
+					"        \"change_type\",\n",
+					"        \"count_2025\",\n",
+					"        \"count_current\",\n",
+					"        \"count_difference\",\n",
+					"        \"abs_difference\",\n",
+					"        \"significance\",\n",
+					"        \"change_direction\"\n",
+					"    )\n",
+					"    .orderBy(\"rec_num\", F.col(\"abs_difference\").desc())\n",
+					")\n",
+					"\n",
+					"print(\"Postcode detail breakdown:\")\n",
+					"df_detail.groupBy(\"change_type\").count().orderBy(\"count\").show()\n",
+					"print(f\"Total changed rows: {df_detail.count():,}\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Step 6 — Write to Delta Lake\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def write_delta(df, path, name, partitions=None):\n",
+					"    \"\"\"Write DataFrame to Delta with row count verification.\"\"\"\n",
+					"    print(f\"Writing {name}...\")\n",
+					"    df.checkpoint()\n",
+					"    writer = df.repartition(partitions) if partitions else df\n",
+					"    (\n",
+					"        writer.write\n",
+					"        .format(\"delta\")\n",
+					"        .mode(\"overwrite\")\n",
+					"        .option(\"overwriteSchema\", \"true\")\n",
+					"        .save(path)\n",
+					"    )\n",
+					"    count = spark.read.format(\"delta\").load(path).count()\n",
+					"    print(f\"  ✅ {name} — {count:,} rows → {path}\")\n",
+					"    return count\n",
+					"\n",
+					"write_delta(df_flagged, f\"{OUTPUT_BASE}/la_summary\",                 \"LA summary\")\n",
+					"write_delta(df_detail,  f\"{OUTPUT_BASE}/postcode_detail_significant\", \"Postcode detail\", partitions=20)\n",
+					"\n",
+					"print(\"\\n✅ Analysis complete\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"source": [
+					"## Step 7 — Verify outputs\n",
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"print(\"Files in postcode_analysis:\")\n",
+					"for f in mssparkutils.fs.ls(f\"{OUTPUT_BASE}/\"):\n",
+					"    print(f\"  {f.name:45s} {f.size:>12,} bytes\")\n",
+					"\n",
+					"print(\"\\nLA summary — top 10 by absolute change:\")\n",
+					"(\n",
+					"    spark.read.format(\"delta\")\n",
+					"    .load(f\"{OUTPUT_BASE}/la_summary\")\n",
+					"    .orderBy(F.col(\"abs_pct_change\").desc())\n",
+					"    .select(\n",
+					"        \"rec_num\", \"total_2025\", \"total_current\",\n",
+					"        \"new_postcodes\", \"removed_postcodes\", \"count_changed_postcodes\",\n",
+					"        \"pct_net_change\", \"significance\", \"change_direction\"\n",
+					"    )\n",
+					"    .show(10, truncate=False)\n",
+					")\n",
+					"\n",
+					"print(\"\\nPostcode detail — top 10 by largest count difference:\")\n",
+					"(\n",
+					"    spark.read.format(\"delta\")\n",
+					"    .load(f\"{OUTPUT_BASE}/postcode_detail_significant\")\n",
+					"    .orderBy(F.col(\"abs_difference\").desc())\n",
+					"    .show(10, truncate=False)\n",
+					")"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

@@ -235,6 +235,39 @@
 					"driverSize": "Small",
 					"numExecutors": null
 				}
+			},
+			{
+				"name": "Postcode Analysis",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L3_DataLake_ErickSchema",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "postcode_analysis",
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"driverSize": "Small"
+				}
 			}
 		],
 		"parameters": {

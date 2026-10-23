@@ -106,7 +106,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "L2_Er_Juror_Mergingfiles",
+						"activity": "L2_1_Er_Juror_Town",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -132,6 +132,39 @@
 						"spark.dynamicAllocation.maxExecutors": null
 					},
 					"numExecutors": null
+				}
+			},
+			{
+				"name": "L2_1_Er_Juror_Town",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L2_Er_Juror_Mergingfiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L2_1_Er_Juror_TownEnrichment",
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkbaubais",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"driverSize": "Small"
 				}
 			}
 		],

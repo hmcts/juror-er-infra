@@ -1,5 +1,5 @@
 {
-	"name": "L2_1_Er_Juror_TownEnrichmen",
+	"name": "L2_1_Er_Juror_TownEnrichment",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "090da156-31ed-4112-8056-f557276c3adb"
+				"spark.autotune.trackingId": "fe30fd92-a820-4af6-855a-2cc26da3708f"
 			}
 		},
 		"metadata": {

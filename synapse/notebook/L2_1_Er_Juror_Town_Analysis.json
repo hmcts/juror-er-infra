@@ -1,5 +1,5 @@
 {
-	"name": "L2_1_Er_Juror_Town_ETL",
+	"name": "L2_1_Er_Juror_Town_Analysis",
 	"properties": {
 		"folder": {
 			"name": "crime"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "14472426-d5e4-4e31-baf8-64aa5d3b3e1d"
+				"spark.autotune.trackingId": "db9b4b1b-5a27-43db-a8e3-bccf7fe76846"
 			}
 		},
 		"metadata": {

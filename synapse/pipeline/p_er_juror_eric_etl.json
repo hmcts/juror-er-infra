@@ -179,7 +179,7 @@
 				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "L2_MergingFiles",
+						"activity": "L2_Town ETL",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -266,7 +266,40 @@
 						"type": "BigDataPoolReference"
 					},
 					"executorSize": "Small",
-					"driverSize": "Small"
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
+				}
+			},
+			{
+				"name": "L2_Town ETL",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "L2_MergingFiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": "L2_1_Er_Juror_TownEnrichment",
+						"type": "NotebookReference"
+					},
+					"snapshot": true
 				}
 			}
 		],

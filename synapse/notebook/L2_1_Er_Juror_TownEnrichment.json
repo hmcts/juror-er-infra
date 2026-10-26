@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "eb2c8e63-d5cd-421d-87b7-ee13fb9dcca0"
+				"spark.autotune.trackingId": "17a8bf27-76f3-4e7b-adc2-5c049e0d15c9"
 			}
 		},
 		"metadata": {
@@ -129,7 +129,7 @@
 					"NONLOCALITY_REGEX = (r\"(^| )(UNIVERSITY|COLLEGE|SCHOOL|HOSPITAL|BARRACKS|RESIDENCE|PRISON|ACADEMY|CAMPUS)( |$)|\"\n",
 					"                     r\"^(FLAT|APARTMENT|APT|UNIT|BLOCK|ROOM|FLOOR|SUITE|PLOT) |[0-9]\")\n",
 					"REBUILD_LOOKUP = False\n",
-					"DRY_RUN = True            # True = report only, nothing is written. Set False to write.\n",
+					"DRY_RUN = False            # True = report only, nothing is written. Set False to write.\n",
 					"# -----------------------------------------------------------------------\n",
 					"\n",
 					"AFFIX_REGEX = (r\"^(CITY OF|LONDON BOROUGH OF|ROYAL BOROUGH OF|COUNTY OF|GREATER|THE)\\s+\"\n",

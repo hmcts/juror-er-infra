@@ -1,6 +1,9 @@
 {
 	"name": "L2_1_Er_Juror_TownEnrichment",
 	"properties": {
+		"folder": {
+			"name": "crime"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fe30fd92-a820-4af6-855a-2cc26da3708f"
+				"spark.autotune.trackingId": "eb2c8e63-d5cd-421d-87b7-ee13fb9dcca0"
 			}
 		},
 		"metadata": {

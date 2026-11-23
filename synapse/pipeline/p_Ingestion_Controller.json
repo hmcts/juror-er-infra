@@ -691,7 +691,7 @@
 			},
 			"year_filter": {
 				"type": "string",
-				"defaultValue": "2026"
+				"defaultValue": "@string(sub(int(formatDateTime(utcNow(),'yyyy')),1))"
 			},
 			"processing_container": {
 				"type": "string",

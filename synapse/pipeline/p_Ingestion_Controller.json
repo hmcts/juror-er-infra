@@ -97,7 +97,7 @@
 							"type": "Expression"
 						},
 						"year_filter": {
-							"value": "@pipeline().parameters.year_filter",
+							"value": "@formatDateTime(utcNow(),'yyyy')",
 							"type": "Expression"
 						},
 						"processing_container": {
@@ -691,7 +691,7 @@
 			},
 			"year_filter": {
 				"type": "string",
-				"defaultValue": "@string(sub(int(formatDateTime(utcNow(),'yyyy')),1))"
+				"defaultValue": "2026"
 			},
 			"processing_container": {
 				"type": "string",
